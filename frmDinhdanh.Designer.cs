@@ -49,6 +49,8 @@
             this.txtDiengiai = new DevExpress.XtraEditors.TextEdit();
             this.txtTukhoa = new DevExpress.XtraEditors.TextEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.behaviorManager1 = new DevExpress.Utils.Behaviors.BehaviorManager(this.components);
@@ -61,6 +63,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtTukhoa.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -173,9 +176,10 @@
             // 
             // txtTKThue
             // 
+            this.txtTKThue.EditValue = "1331";
             this.txtTKThue.Location = new System.Drawing.Point(685, 107);
             this.txtTKThue.Name = "txtTKThue";
-            this.txtTKThue.Size = new System.Drawing.Size(511, 27);
+            this.txtTKThue.Size = new System.Drawing.Size(347, 27);
             this.txtTKThue.TabIndex = 19;
             // 
             // labelControl11
@@ -188,6 +192,7 @@
             // 
             // txtTKCo
             // 
+            this.txtTKCo.EditValue = "1111";
             this.txtTKCo.Location = new System.Drawing.Point(281, 107);
             this.txtTKCo.Name = "txtTKCo";
             this.txtTKCo.Size = new System.Drawing.Size(372, 27);
@@ -203,6 +208,7 @@
             // 
             // txtTKNo
             // 
+            this.txtTKNo.EditValue = "152";
             this.txtTKNo.Location = new System.Drawing.Point(18, 107);
             this.txtTKNo.Name = "txtTKNo";
             this.txtTKNo.Size = new System.Drawing.Size(231, 27);
@@ -237,6 +243,8 @@
             // 
             this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelControl1.Controls.Add(this.comboBoxEdit1);
+            this.panelControl1.Controls.Add(this.labelControl1);
             this.panelControl1.Controls.Add(this.labelControl8);
             this.panelControl1.Controls.Add(this.labelControl7);
             this.panelControl1.Controls.Add(this.txtDiengiai);
@@ -252,6 +260,23 @@
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(1343, 144);
             this.panelControl1.TabIndex = 21;
+            // 
+            // comboBoxEdit1
+            // 
+            this.comboBoxEdit1.Location = new System.Drawing.Point(1059, 107);
+            this.comboBoxEdit1.Name = "comboBoxEdit1";
+            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit1.Size = new System.Drawing.Size(150, 27);
+            this.comboBoxEdit1.TabIndex = 24;
+            // 
+            // labelControl1
+            // 
+            this.labelControl1.Location = new System.Drawing.Point(1059, 80);
+            this.labelControl1.Name = "labelControl1";
+            this.labelControl1.Size = new System.Drawing.Size(60, 19);
+            this.labelControl1.TabIndex = 23;
+            this.labelControl1.Text = "TK Thuế";
             // 
             // labelControl8
             // 
@@ -293,6 +318,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             this.panelControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).EndInit();
             this.ResumeLayout(false);
 
@@ -322,5 +348,7 @@
         private DevExpress.XtraGrid.Columns.GridColumn colType;
         private DevExpress.Utils.Behaviors.BehaviorManager behaviorManager1;
         private DevExpress.XtraGrid.Columns.GridColumn colDelete;
+        private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
+        private DevExpress.XtraEditors.LabelControl labelControl1;
     }
 }

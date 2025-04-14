@@ -55,6 +55,16 @@ namespace SaovietTax
         private void frmDinhdanh_Load(object sender, EventArgs e)
         {
             dbPath = ConfigurationManager.AppSettings["dbpath"];
+            comboBoxEdit1.Properties.Buttons[0].Kind = DevExpress.XtraEditors.Controls.ButtonPredefines.Combo;
+
+            comboBoxEdit1.Properties.Items.AddRange(new string[]
+         {
+            "Thấp",
+            "Cao" 
+         });
+            comboBoxEdit1.SelectedIndex = 0;
+            comboBoxEdit1.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+
             InitDB();
             LoadDataDinhDanh();
         }
@@ -72,8 +82,34 @@ namespace SaovietTax
             
             gridView.CustomUnboundColumnData += gridView_CustomUnboundColumnData;
             gridView.RowCellClick += gridView_RowCellClick;
-
+            gridView.CellValueChanged += GridView_CellValueChanged;
         }
+        private void GridView_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            GridView gridView = gcDinhdanh.MainView as GridView;
+            // Lấy thông tin về hàng và cột của ô đã thay đổi
+            int rowHandle = e.RowHandle;
+            string columnName = e.Column.FieldName; // Tên cột
+            //Lấy current data row
+            int ID = int.Parse(gridView.GetRowCellValue(rowHandle, gridView.Columns["ID"]).ToString());
+            string Type = gridView.GetRowCellValue(rowHandle, gridView.Columns["Type"]).ToString();
+            string KeyValue = gridView.GetRowCellValue(rowHandle, gridView.Columns["KeyValue"]).ToString();
+            string TKNo = gridView.GetRowCellValue(rowHandle, gridView.Columns["TKNo"]).ToString();
+            string TKCo = gridView.GetRowCellValue(rowHandle, gridView.Columns["TKCo"]).ToString();
+            string TKThue = gridView.GetRowCellValue(rowHandle, gridView.Columns["TKThue"]).ToString();
+            string sql = "UPDATE tbDinhdanhtaikhoan SET Type = ?, KeyValue = ?, TKNo = ?, TKCo = ?, TKThue = ? WHERE ID = ?";
+            OleDbParameter[] parameters = new OleDbParameter[]
+{
+        new OleDbParameter("?",Type),
+           new OleDbParameter("?",KeyValue),
+                 new OleDbParameter("?",TKNo),
+             new OleDbParameter("?",TKCo),
+              new OleDbParameter("?",TKThue),
+                new OleDbParameter("?",ID)
+};
+            int resl = ExecuteQueryResult(sql, parameters);
+        }
+
         private void gridView_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
         {
             if (e.Column.FieldName == "colDelete" )

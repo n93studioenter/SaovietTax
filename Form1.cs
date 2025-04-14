@@ -31,8 +31,10 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using DevExpress.Internal.WinApi.Windows.UI.Notifications;
-namespace SaovietTax {
-    public partial class frmMain : DevExpress.XtraEditors.XtraForm {
+namespace SaovietTax
+{
+    public partial class frmMain : DevExpress.XtraEditors.XtraForm
+    {
         #region  Khai báo
         string savedPath = "";
         string dbPath = "";
@@ -114,9 +116,9 @@ namespace SaovietTax {
         {
             InitializeComponent();
         }
-      
+
         private void LoadDataGridview()
-        { 
+        {
             bindingSource.DataSource = people;
             gridControl1.DataSource = bindingSource;
             GridView gridView = gridControl1.MainView as GridView;
@@ -148,7 +150,7 @@ namespace SaovietTax {
                 return;
             object newValue = e.Value; // Giá trị mới
 
-            string query = "SELECT * FROM HeThongTK WHERE SoHieu = ?"; 
+            string query = "SELECT * FROM HeThongTK WHERE SoHieu = ?";
 
             if (!string.IsNullOrEmpty(newValue.ToString()))
             {
@@ -161,7 +163,7 @@ namespace SaovietTax {
                 if (kq.Rows.Count == 0)
                 {
                     GridView gridView = gridControl1.MainView as GridView;
-                    gridView.SetRowCellValue(rowHandle, e.Column, ""); 
+                    gridView.SetRowCellValue(rowHandle, e.Column, "");
                     XtraMessageBox.Show("Số tài khoản không tồn tại trong hệ thống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -196,7 +198,8 @@ namespace SaovietTax {
             KeyValue TEXT,
             TKNo TEXT,  
             TKCo TEXT,
-            TKThue TEXT 
+            TKThue TEXT,
+            Uutien TEXT
         );";
 
             using (OleDbCommand command = new OleDbCommand(createTableQuery, connection))
@@ -315,7 +318,7 @@ namespace SaovietTax {
         }
         private void ControlsSetup()
         {
-           
+
             //Thiết lập cho cbb Từ ngày, đến ngày
 
             comboBoxEdit1.Properties.Buttons[0].Kind = DevExpress.XtraEditors.Controls.ButtonPredefines.Combo;
@@ -420,6 +423,7 @@ namespace SaovietTax {
         }
         private void LoadXmlFiles(string path)
         {
+            people = new BindingList<FileImport>();
             path = path + "\\HDDauVao";
             int fromMonth = int.Parse(comboBoxEdit1.SelectedItem.ToString()); // Thay đổi theo tháng bắt đầu (ví dụ: 3 cho tháng 3)
             int toMonth = int.Parse(comboBoxEdit2.SelectedItem.ToString());   // Thay đổi theo tháng kết thúc (ví dụ: 7 cho tháng 7)
@@ -429,7 +433,7 @@ namespace SaovietTax {
             int countXml = files.Count();
             Dictionary<string, string> lstHodpn = new Dictionary<string, string>();
             //Lấy danh sách hóa đơn để kiểm tra cho excel
-            
+
             // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
             var excelFiles = Directory.EnumerateFiles(path, "*.xlsx", SearchOption.AllDirectories)
                 .Where(file => IsFileInMonthRange(file, path, fromMonth, toMonth)).ToList(); // Kiểm tra xem file có nằm trong khoảng tháng
@@ -443,25 +447,25 @@ namespace SaovietTax {
                     // Lấy worksheet đầu tiên
                     var worksheet = workbook.Worksheet(1); // Hoặc bạn có thể dùng tên worksheet như worksheet = workbook.Worksheet("Sheet1");
                                                            // Lấy giá trị của ô A6
-                   
+
                     var currentCell = worksheet.Cell("A6"); // Bắt đầu từ ô A6
 
                     // Kiểm tra các ô bắt đầu từ A6 cho đến khi gặp ô trống
                     while (!currentCell.IsEmpty())
-                    { 
+                    {
                         rowCount++; // Tăng số dòng
                         currentCell = currentCell.Worksheet.Row(currentCell.Address.RowNumber + 1).Cell("A"); // Chuyển xuống ô bên dưới
-                    } 
+                    }
 
                 }
             }
 
             int countExcel = 0;
-            if (rowCount>0)
+            if (rowCount > 0)
                 countExcel = rowCount - 1;
-        
-             totalCount = countXml + countExcel;
-            lblSofiles.Text = totalCount.ToString() ;
+
+            totalCount = countXml + countExcel;
+            lblSofiles.Text = totalCount.ToString();
             //foreach (string file in files)
             //{
             //    progressPercentage = (filesLoaded * 100) / totalCount;
@@ -527,7 +531,6 @@ namespace SaovietTax {
                 }
                 //Kiểm tra trong database có hoa do nay chưa
                 string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-
 
                 // Tạo mảng tham số với giá trị cho câu lệnh SQL
                 OleDbParameter[] parameters = new OleDbParameter[]
@@ -638,14 +641,12 @@ WHERE kh.SoHieu = ?";
                     InitCustomer(2, Sohieu, ten, diachi, mst);
                 }
 
-
-
                 query = @" SELECT TOP 1 *  FROM KhachHang AS kh  
 INNER JOIN HoaDon AS hd ON kh.Maso = hd.MaKhachHang    
 WHERE kh.MST = ?  
 ORDER BY hd.MaSo DESC"; // Sử dụng ? thay cho @mst trong OleDb
                 result = ExecuteQuery(query, new OleDbParameter("?", mst));
-                if (result.Rows.Count > 0)
+                if (result.Rows.Count > 10)
                 {
                     SoHD = result.Rows[0]["SoHD"].ToString();
 
@@ -706,20 +707,15 @@ ORDER BY  MaSo DESC";
                 }
                 else
                 {
-                    //TkNo = 0;
-                    //TkCo = 1111;
-                    //TkThue = 1331;
+
                 }
                 if (TkThue == 0)
                 {
-                    //if (TkCo != 5111)
-                    //    TkThue = 1331;
-                    //else
-                    //    TkThue = 33311;
+
                 }
                 //Add detail
                 var hhdVuList = xmlDoc.SelectNodes("//HHDVu");
-
+                //Mật định tài khoản 
                 //Kiểm tra Đã tồn tại số hóa đơn và số hiệu
                 if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
                 {
@@ -746,13 +742,13 @@ ORDER BY  MaSo DESC";
 WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                             //int rs = (int)ExecuteQuery(query, new OleDbParameter("?", "SAdsd")).Rows[0][0];
-                            var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh.ToLower())));
+                            var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh).ToLower()));
                             //Kiểm tra thêm trong list
                             var checkold = people.LastOrDefault().fileImportDetails.Where(m => m.Ten == newName && m.DVT == Helpers.ConvertUnicodeToVni(DVTinh)).FirstOrDefault();
                             string sohieu = "";
                             if (getdata.Rows.Count == 0)
                             {
-                                if(checkold==null)
+                                if (checkold == null)
                                     sohieu = GenerateResultString(NormalizeVietnameseString(THHDVu.Trim()));
                                 else
                                     sohieu = checkold.SoHieu;
@@ -812,40 +808,88 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         people.LastOrDefault().TKNo = "6422";
                     }
                 }
-                //Kiểm tra lại lại mã với Định danh
-                foreach (var item in people)
+               
+            }
+            //Kiểm tra lại lại mã với Định danh
+            foreach (var item in people)
+            {
+                //Lấy danh sách định danh
+                string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+
+                result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
+                if (item.TKNo == "0")
                 {
-                    //Lấy danh sách định danh
-                    string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-
-                    result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
-                    if (item.TKNo == "0")
+                    //Nếu có con
+                    if (item.fileImportDetails.Count > 0)
                     {
-                        //Nếu có con
-                        if (item.fileImportDetails.Count > 0)
+                        foreach (DataRow row in result.Rows)
                         {
-                            foreach (DataRow row in result.Rows)
+                            string[] conditions = row["KeyValue"].ToString().Split('&');
+                            string name = Helpers.ConvertUnicodeToVni((string)row["KeyValue"]);
+                            int hasdata = 0;
+                            foreach (string condition in conditions)
                             {
-                                string name =Helpers.ConvertUnicodeToVni((string)row["KeyValue"]);
-
-                                if (item.fileImportDetails.Any(m => m.Ten.Contains(name)))
+                                string[] parts = Regex.Split(condition, @"([><=%]+)"); // Vẫn giữ % để linh hoạt nếu cần
+                                if (parts.Length == 3)
                                 {
-                                    item.Noidung = row["Type"].ToString();
-                                    item.TKNo = row["TKNo"].ToString();
-                                    item.TKCo = row["TKCo"].ToString();
-                                    item.TkThue = int.Parse(row["TKThue"].ToString());
+                                    string key = parts[0];
+                                    string operatorStr = parts[1];
+                                    string valueStr = parts[2];
+                                    if (key == "Ten")
+                                    {
+                                        var newname = Helpers.ConvertUnicodeToVni(valueStr);
+                                        string chuoiBinhThuong = newname.Replace("\\\"", "\"").Trim('"');
+                                        var check = item.fileImportDetails.Where(m => m.Ten.Contains(chuoiBinhThuong)).FirstOrDefault();
+                                        if (check != null)
+                                        {
+                                            hasdata += 1;
+                                        }
+                                    }
+                                    if (key == "TongTien")
+                                    {
+                                        var check = item.TongTien > double.Parse(valueStr);
+                                        if (check)
+                                            hasdata += 1;
+                                    }
+                                    if (key == "MST")
+                                    {
+                                        if (item.Mst == valueStr)
+                                            hasdata += 1;
+                                    }
                                 }
+
                             }
+                            if (hasdata == conditions.Count() && item.TKNo=="0")
+                            {
+                                item.TKNo = row["TKNo"].ToString();
+                                item.TKCo = row["TKCo"].ToString();
+                                item.TkThue = int.Parse(row["TkThue"].ToString());
+                              //  item.Noidung = row["Type"].ToString();
+                            }
+                            //if (item.fileImportDetails.Any(m => m.Ten.Contains(name)))
+                            //{
+                            //    item.Noidung = row["Type"].ToString();
+                            //    item.TKNo = row["TKNo"].ToString();
+                            //    item.TKCo = row["TKCo"].ToString();
+                            //    item.TkThue = int.Parse(row["TKThue"].ToString());
+                            //}
                         }
-                        else
-                        {
-                            item.TKCo = "1111";
-                            item.TkThue = 1331;
-                        }
+                    }
+                    else
+                    {
+                        item.TKCo = "1111";
+                        item.TkThue = 1331;
                     }
                 }
             }
-            progressBarControl1.EditValue = 100;
+
+            //Điền lại diễn giải
+            foreach (var item in people)
+            {
+                if (string.IsNullOrEmpty(item.Noidung))
+                    item.Noidung = Helpers.ConvertVniToUnicode(item.fileImportDetails.FirstOrDefault().Ten);
+            }
+                progressBarControl1.EditValue = 100;
         }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
@@ -1890,26 +1934,26 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             }
 
             return randomNumbers;
-        } 
+        }
 
         private void gridControl1_DoubleClick(object sender, EventArgs e)
         {
-          
+
         }
 
         private void gridControl1_MouseClick(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void gridControl1_Click(object sender, EventArgs e)
         {
             GridView gridView = gridControl1.MainView as GridView;
             var hitInfo = gridView.CalcHitInfo(gridView.GridControl.PointToClient(MousePosition));
-            
+
 
             // Kiểm tra nếu nhấp vào một ô
-            if (hitInfo.InRowCell  )
+            if (hitInfo.InRowCell)
             {
                 int columnIndex = hitInfo.Column.VisibleIndex; // Chỉ số cột
                 if (columnIndex != 0)
@@ -1966,7 +2010,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                         currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.Columns["Noidung"]).ToString();
                         gridView.SetRowCellValue(nextRowHandle, gridView.Columns["Noidung"], currentValue);
                     }
-                   
+
                     // Di chuyển tiêu điểm đến ô trong hàng tiếp theo
                     gridView.FocusedRowHandle = nextRowHandle;
                     gridView.FocusedColumn = gridView.FocusedColumn; // Giữ nguyên cột
@@ -2167,16 +2211,16 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             string searchTerm = "%" + km + "%";
 
             string querydinhdanh = @" SELECT *  FROM PhanLoaiVattu where TenPhanLoai like ?"; // Sử dụng ? thay cho @mst trong OleDb
-            result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm));
+           var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm));
             //Nếu chưa có thì thêm mới
 
             if (result.Rows.Count == 0)
             {
                 query = @"
-INSERT INTO PhanLoaiVattu (SoHieu,TenPhanLoai,Cap,MaTK)
-VALUES (?,?,?,?)";
+                INSERT INTO PhanLoaiVattu (SoHieu,TenPhanLoai,Cap,MaTK)
+                VALUES (?,?,?,?)";
                 var parameterss = new OleDbParameter[]
-{
+            {
 new OleDbParameter("?","HKM"),
   new OleDbParameter("?","Haøng khuyeán maõi"),
    new OleDbParameter("?",1),
@@ -2188,26 +2232,57 @@ new OleDbParameter("?","HKM"),
 WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             //int rs = (int)ExecuteQuery(query, new OleDbParameter("?", "SAdsd")).Rows[0][0];
-            var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh.ToLower())));
+            var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", DVTinh.ToLower()));
             if (getdata.Rows.Count == 0)
             {
                 query = @"
 INSERT INTO Vattu (MaPhanLoai,SoHieu,TenVattu,DonVi)
 VALUES (?,?,?,?)";
-                int maphanloai = 0;
-                querydinhdanh = @" SELECT *  FROM PhanLoaiVattu where TenPhanLoai like ?"; // Sử dụng ? thay cho @mst trong OleDb
-                result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm));
-                if (result.Rows.Count > 0)
-                    maphanloai = int.Parse(result.Rows[0]["MaSo"].ToString());
+                int maphanloai = 0; 
+                if (newName.Contains(km))
+                    maphanloai = int.Parse(resultkm.Rows[0]["MaSo"].ToString());
                 else
-                    maphanloai = 1;
+                {
+                    //Nếu chưa có nhóm tạm thì tạo
+                    string nt = Helpers.ConvertUnicodeToVni("Nhóm tạm").ToLower();
+                    string searchTemp = "%" + nt + "%";
+
+                    string quryNhomtam = @" SELECT *  FROM PhanLoaiVattu where TenPhanLoai like ?"; // Sử dụng ? thay cho @mst trong OleDb
+                    var resultnt = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTemp));
+                    if (resultnt.Rows.Count == 0)
+                    {
+                        //Tạo nhóm tạm
+                        query = @"
+INSERT INTO PhanLoaiVattu (SoHieu,TenPhanLoai,Cap,MaTK)
+VALUES (?,?,?,?)";
+                        var parameterss = new OleDbParameter[]
+        {
+new OleDbParameter("?","NT"),
+  new OleDbParameter("?",nt),
+   new OleDbParameter("?",1),
+    new OleDbParameter("?",39)
+        };
+                        int rr = ExecuteQueryResult(query, parameterss);
+                         quryNhomtam = @" SELECT *  FROM PhanLoaiVattu where TenPhanLoai like ?"; // Sử dụng ? thay cho @mst trong OleDb
+                         resultnt = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTemp));
+                        if (resultnt.Rows.Count > 0)
+                        {
+                            maphanloai = int.Parse(resultnt.Rows[0]["MaSo"].ToString());
+                        }
+                    }
+                    else
+                    {
+                        maphanloai= int.Parse(resultnt.Rows[0]["MaSo"].ToString());
+                    }
+
+                }
                 var parameters = new OleDbParameter[]
        {
 
 new OleDbParameter("?",maphanloai),
   new OleDbParameter("?",sohieu.ToUpper()),
    new OleDbParameter("?",newName),
-    new OleDbParameter("?",Helpers.ConvertUnicodeToVni(DVTinh))
+    new OleDbParameter("?",DVTinh)
        };
 
                 // Thực thi truy vấn và lấy kết quả
@@ -2262,7 +2337,10 @@ new OleDbParameter("?",maphanloai),
             frmDinhdanh frmDinhdanh = new frmDinhdanh();
             frmDinhdanh.ShowDialog();
         }
+        private void Matdinhtaikhoan(string MST, string Tensp, ref string TKNo, ref string TKCo, ref string TKThue)
+        {
 
+        }
         public static string NormalizeVietnameseString(string input)
         {
 
