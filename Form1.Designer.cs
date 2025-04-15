@@ -36,10 +36,10 @@
             this.btnMdtk = new DevExpress.XtraEditors.SimpleButton();
             this.btnimport = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtpass = new System.Windows.Forms.TextBox();
             this.labelControl12 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl13 = new DevExpress.XtraEditors.LabelControl();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.txtuser = new System.Windows.Forms.TextBox();
             this.btnTaicoquanthue = new DevExpress.XtraEditors.SimpleButton();
             this.lblSofiles = new System.Windows.Forms.Label();
             this.progressBarControl1 = new DevExpress.XtraEditors.ProgressBarControl();
@@ -182,22 +182,22 @@
             // 
             // panelControl3
             // 
-            this.panelControl3.Controls.Add(this.textBox1);
+            this.panelControl3.Controls.Add(this.txtpass);
             this.panelControl3.Controls.Add(this.labelControl12);
             this.panelControl3.Controls.Add(this.labelControl13);
-            this.panelControl3.Controls.Add(this.textBox2);
+            this.panelControl3.Controls.Add(this.txtuser);
             this.panelControl3.Controls.Add(this.btnTaicoquanthue);
             this.panelControl3.Location = new System.Drawing.Point(11, 13);
             this.panelControl3.Name = "panelControl3";
             this.panelControl3.Size = new System.Drawing.Size(424, 155);
             this.panelControl3.TabIndex = 6;
             // 
-            // textBox1
+            // txtpass
             // 
-            this.textBox1.Location = new System.Drawing.Point(142, 67);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(277, 27);
-            this.textBox1.TabIndex = 19;
+            this.txtpass.Location = new System.Drawing.Point(142, 67);
+            this.txtpass.Name = "txtpass";
+            this.txtpass.Size = new System.Drawing.Size(277, 27);
+            this.txtpass.TabIndex = 19;
             // 
             // labelControl12
             // 
@@ -215,12 +215,12 @@
             this.labelControl13.TabIndex = 17;
             this.labelControl13.Text = "Tên tài khoản";
             // 
-            // textBox2
+            // txtuser
             // 
-            this.textBox2.Location = new System.Drawing.Point(142, 16);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(277, 27);
-            this.textBox2.TabIndex = 16;
+            this.txtuser.Location = new System.Drawing.Point(142, 16);
+            this.txtuser.Name = "txtuser";
+            this.txtuser.Size = new System.Drawing.Size(277, 27);
+            this.txtuser.TabIndex = 16;
             // 
             // btnTaicoquanthue
             // 
@@ -865,12 +865,11 @@
         private DevExpress.XtraEditors.LabelControl labelControl7;
         private DevExpress.XtraEditors.SimpleButton btnLuudinhdanh;
         private DevExpress.XtraEditors.PanelControl panelControl3;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtpass;
         private DevExpress.XtraEditors.LabelControl labelControl12;
         private DevExpress.XtraEditors.LabelControl labelControl13;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox txtuser;
         private DevExpress.XtraEditors.SimpleButton btnMdtk;
         private DevExpress.XtraEditors.PanelControl panelControl4;
     }
 }
-

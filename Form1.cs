@@ -104,7 +104,7 @@ namespace SaovietTax
                 Id += 1;
                 fileImportDetails = new List<FileImportDetail>();
                 Type = type;
-                Checked = noidung.Contains("âm") ? false : true;
+                Checked = noidung.Contains("(*)") ? false : true;
                 Path = path;
                 SoHieuTP = tenTP;
             }
@@ -256,7 +256,7 @@ namespace SaovietTax
             // Đường dẫn đến cơ sở dữ liệu Access và mật khẩu
             //dbPath = @"C:\S.T.E 25\S.T.E 25\DATA\KT2025.mdb"; // Thay đổi đường dẫn này
             dbPath = ConfigurationManager.AppSettings["dbpath"];
-
+            //dbPath = "sadsa";
 
 
             string filePath = ConfigurationManager.AppSettings["dbpath"];
@@ -268,51 +268,54 @@ namespace SaovietTax
             //connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
             // connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database";
             //connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\S.T.E 25\S.T.E 25\DATA\importData.accdb;Persist Security Info=False";
-            try
+            MessageBox.Show(connectionString);
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
-                using (OleDbConnection connection = new OleDbConnection(connectionString))
+                try
                 {
                     connection.Open();
-                    string tableName = "tbimport";
-                    string tableNamedetail = "tbimportdetail";
-                    string tableDinhdanh = "tbDinhdanhtaikhoan";
-                    // Kiểm tra xem bảng đã tồn tại hay không
-                    if (!TableExists(connection, tableDinhdanh))
-                    {
-                        // Tạo bảng nếu chưa tồn tại
-                        CreateTableDinhDanh(connection, tableDinhdanh);
-                        Console.WriteLine($"Bảng '{tableDinhdanh}' đã được tạo thành công.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Bảng '{tableName}' đã tồn tại.");
-                    }
-                    if (!TableExists(connection, tableName))
-                    {
-                        // Tạo bảng nếu chưa tồn tại
-                        CreateTable(connection, tableName);
-                        Console.WriteLine($"Bảng '{tableName}' đã được tạo thành công.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Bảng '{tableName}' đã tồn tại.");
-                    }
-                    // Kiểm tra xem bảng đã tồn tại hay không
-                    if (!TableExists(connection, tableNamedetail))
-                    {
-                        // Tạo bảng nếu chưa tồn tại
-                        CreateTableDetail(connection, tableNamedetail);
-                        Console.WriteLine($"Bảng '{tableNamedetail}' đã được tạo thành công.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Bảng '{tableNamedetail}' đã tồn tại.");
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Có lỗi xảy ra: {ex.Message}");
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
+             
+                MessageBox.Show("Kết nối database thành công");
+                string tableName = "tbimport";
+                string tableNamedetail = "tbimportdetail";
+                string tableDinhdanh = "tbDinhdanhtaikhoan";
+                // Kiểm tra xem bảng đã tồn tại hay không
+                if (!TableExists(connection, tableDinhdanh))
+                {
+                    // Tạo bảng nếu chưa tồn tại
+                    CreateTableDinhDanh(connection, tableDinhdanh);
+                    Console.WriteLine($"Bảng '{tableDinhdanh}' đã được tạo thành công.");
+                }
+                else
+                {
+                    Console.WriteLine($"Bảng '{tableName}' đã tồn tại.");
+                }
+                if (!TableExists(connection, tableName))
+                {
+                    // Tạo bảng nếu chưa tồn tại
+                    CreateTable(connection, tableName);
+                    Console.WriteLine($"Bảng '{tableName}' đã được tạo thành công.");
+                }
+                else
+                {
+                    Console.WriteLine($"Bảng '{tableName}' đã tồn tại.");
+                }
+                // Kiểm tra xem bảng đã tồn tại hay không
+                if (!TableExists(connection, tableNamedetail))
+                {
+                    // Tạo bảng nếu chưa tồn tại
+                    CreateTableDetail(connection, tableNamedetail);
+                    Console.WriteLine($"Bảng '{tableNamedetail}' đã được tạo thành công.");
+                }
+                else
+                {
+                    Console.WriteLine($"Bảng '{tableNamedetail}' đã tồn tại.");
+                }
             }
 
         }
@@ -391,15 +394,77 @@ namespace SaovietTax
                 isetupDbpath = false;
                 return;
             }
-            txtUsername.Text = ConfigurationManager.AppSettings["username"];
-            txtPassword.Text = ConfigurationManager.AppSettings["password"];
+            //txtUsername.Text = ConfigurationManager.AppSettings["username"];
+            //txtPassword.Text = ConfigurationManager.AppSettings["password"];
+            txtuser.Text = ConfigurationManager.AppSettings["username"];
+            txtpass.Text= ConfigurationManager.AppSettings["password"];
         }
         private BackgroundWorker worker;
+        private static int GetColumnLength(OleDbConnection connection, string tableName, string columnName)
+        {
+            int length = 0;
 
+            string sql = $"SELECT TOP 1 [{columnName}] FROM [{tableName}]";
+            using (OleDbCommand command = new OleDbCommand(sql, connection))
+            {
+                using (OleDbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly))
+                {
+                    DataTable schemaTable = reader.GetSchemaTable();
+                    if (schemaTable != null)
+                    {
+                        foreach (DataRow row in schemaTable.Rows)
+                        {
+                            if (row["ColumnName"].ToString() == columnName)
+                            {
+                                length = Convert.ToInt32(row["ColumnSize"]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return length;
+        }
+        private void CheckDB()
+        {
+            OleDbConnection connection = new OleDbConnection(connectionString);
+            connection.Open();
+            int checkLenghtTen = GetColumnLength(connection, "KhachHang", "Ten");
+            if (checkLenghtTen < 255)
+            {
+                // Lệnh SQL để thay đổi kích thước cột Ten từ 100 sang 255
+                string sql = "ALTER TABLE KhachHang ALTER COLUMN Ten TEXT(255)";
+
+                using (OleDbCommand command = new OleDbCommand(sql, connection))
+                {
+                    // Thực thi lệnh SQL
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Kích thước cột Ten đã được thay đổi thành 255.");
+
+                }
+            }
+            int checkLenghtDiachi = GetColumnLength(connection, "KhachHang", "DiaChi");
+            if (checkLenghtDiachi < 255)
+            {
+                // Lệnh SQL để thay đổi kích thước cột Ten từ 100 sang 255
+                string sql = "ALTER TABLE KhachHang ALTER COLUMN DiaChi TEXT(255)";
+
+                using (OleDbCommand command = new OleDbCommand(sql, connection))
+                {
+                    // Thực thi lệnh SQL
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Kích thước cột Ten đã được thay đổi thành 255.");
+
+                }
+            }
+        }
         private void frmMain_Load(object sender, EventArgs e)
         {
+           
             InitData();
             InitDB();
+            CheckDB();
             ControlsSetup();
             LoadDataDinhDanh();
         }
@@ -756,6 +821,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             else
                                 sohieu = getdata.Rows[0]["SoHieu"].ToString();
 
+                            //Gán giá trị cho các giá trị ""
+                            DGia = !string.IsNullOrEmpty(DGia) ? DGia :"0";
+                            SLuong = !string.IsNullOrEmpty(DGia) ? DGia : "0";
                             FileImportDetail fileImportDetail = new FileImportDetail(newName, people.LastOrDefault().ID, sohieu, double.Parse(SLuong), double.Parse(DGia), Helpers.ConvertUnicodeToVni(DVTinh));
                             people.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                         }
@@ -770,7 +838,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 if (hhdVuList.Count == 1)
                                 {
                                     FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, people.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception");
-                                    people.LastOrDefault().TKNo = "331";
+                                    people.LastOrDefault().TKNo = "3311";
                                     people.LastOrDefault().TKCo = "711";
                                     people.LastOrDefault().TkThue = 1331;
                                     people.LastOrDefault().Noidung = "Chiếc khấu thương mại";
@@ -810,8 +878,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
                
             }
-            //Kiểm tra lại lại mã với Định danh
+            //Trường hợp không đủ info
+            //Th1 có 1 sản phẩm và ko có đơn vị tính
             foreach (var item in people)
+            {
+                if (item.fileImportDetails.Count == 1 && string.IsNullOrEmpty(item.fileImportDetails[0].DVT))
+                {
+                    item.TKNo = "6422";
+                    item.TKCo = "1111";
+                    item.TkThue = 1331;
+                }
+            }
+                //Kiểm tra lại lại mã với Định danh
+                foreach (var item in people)
             {
                 //Lấy danh sách định danh
                 string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
@@ -837,7 +916,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     string valueStr = parts[2];
                                     if (key == "Ten")
                                     {
-                                        var newname = Helpers.ConvertUnicodeToVni(valueStr);
+                                        //var newname = Helpers.ConvertUnicodeToVni(valueStr);
+                                        var newname = valueStr;
                                         string chuoiBinhThuong = newname.Replace("\\\"", "\"").Trim('"');
                                         var check = item.fileImportDetails.Where(m => m.Ten.Contains(chuoiBinhThuong)).FirstOrDefault();
                                         if (check != null)
@@ -882,11 +962,36 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                 }
             }
-
-            //Điền lại diễn giải
+            //Nếu vẫn chưa có thì dùng ưu tiên
             foreach (var item in people)
             {
-                if (string.IsNullOrEmpty(item.Noidung))
+                string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan where KeyValue like '%Ưu tiên%'"; // Sử dụng ? thay cho @mst trong OleDb
+
+                result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
+                if(result.Rows.Count>0)
+                {
+                    foreach (DataRow row in result.Rows)
+                    {
+                        if(string.IsNullOrEmpty(item.TKNo) || item.TKNo=="0")
+                        item.TKNo = row["TKNo"].ToString();
+                        if (string.IsNullOrEmpty(item.TKCo) || item.TKCo=="0")
+                            item.TKCo = row["TKCo"].ToString();
+                        if(item.TkThue==0)
+                        item.TkThue = int.Parse(row["TkThue"].ToString());
+                        //Cho truong hop 331 711
+                        if(item.TKNo== "3311")
+                        {
+                            item.TKNo = "711";
+                            item.TKCo = "3311";
+                        }
+                    }
+                }
+                   
+            }
+                //Điền lại diễn giải
+                foreach (var item in people)
+            {
+                if (item.fileImportDetails.Count>0)
                     item.Noidung = Helpers.ConvertVniToUnicode(item.fileImportDetails.FirstOrDefault().Ten);
             }
                 progressBarControl1.EditValue = 100;
@@ -967,7 +1072,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
                         string trangthaihoadon = worksheet.Cell(i, 16).Value.ToString();
                         if (trangthaihoadon.Contains("điều chỉnh"))
-                            diengiai = "(*) Hóa đơn điều chỉnh";
+                        {
+                            diengiai = "(*) Hóa đơn điều chỉnh"; 
+                        }
                         // Tạo mảng tham số với giá trị cho câu lệnh SQL
                         OleDbParameter[] parameters = new OleDbParameter[]
                         {
@@ -1053,7 +1160,7 @@ where SoHieu = ?
 ORDER BY  MaSo DESC";
                             result = ExecuteQuery(query, new OleDbParameter("?", SoHD));
                             var index = 0;
-                            if (result.Rows.Count > 0)
+                            if (result.Rows.Count > 10)
                             {
                                 foreach (DataRow row in result.Rows)
                                 {
@@ -1771,8 +1878,8 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 return;
             }
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["username"].Value = txtUsername.Text;
-            config.AppSettings.Settings["password"].Value = txtPassword.Text;
+            config.AppSettings.Settings["username"].Value = txtuser.Text;
+            config.AppSettings.Settings["password"].Value = txtpass.Text;
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
             XtraMessageBox.Show("Cập nhật tài khoản thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1806,22 +1913,30 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
-                connection.Open();
-                Console.WriteLine("Kết nối đến cơ sở dữ liệu thành công!");
-
-                using (OleDbCommand command = new OleDbCommand(query, connection))
+                try
                 {
-                    // Thêm các tham số vào command
-                    if (parameters != null)
-                    {
-                        command.Parameters.AddRange(parameters);
-                    }
+                    connection.Open();
+                    Console.WriteLine("Kết nối đến cơ sở dữ liệu thành công!");
 
-                    using (OleDbDataAdapter dataAdapter = new OleDbDataAdapter(command))
+                    using (OleDbCommand command = new OleDbCommand(query, connection))
                     {
-                        dataAdapter.Fill(dataTable);
+                        // Thêm các tham số vào command
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        using (OleDbDataAdapter dataAdapter = new OleDbDataAdapter(command))
+                        {
+                            dataAdapter.Fill(dataTable);
+                        }
                     }
                 }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            
             }
 
             return dataTable; // Trả về DataTable chứa dữ liệu
@@ -2036,6 +2151,11 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 return;
             }
             bool isNull = false;
+            if (people.Any(m =>string.IsNullOrEmpty(m.TKCo) && m.Checked) || people.Any(m => string.IsNullOrEmpty(m.TKCo) && m.Checked) || people.Any(m => string.IsNullOrEmpty(m.Noidung) && m.Checked))
+            {
+                XtraMessageBox.Show("Thông tin không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             foreach (var item in people)
             {
                 if (!item.Checked)
@@ -2186,8 +2306,9 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
             //}
             if (isNull == false)
-            {
-                MessageBox.Show("Lấy dữ liệu thành công");
+            { 
+                XtraMessageBox.Show("Lấy dữ liệu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 isClick = true;
                 this.Close();
             }
@@ -2341,6 +2462,32 @@ new OleDbParameter("?",maphanloai),
         {
 
         }
+
+        private void txtuser_TextChanged(object sender, EventArgs e)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            config.AppSettings.Settings["username"].Value = txtuser.Text;
+            config.AppSettings.Settings["password"].Value = txtpass.Text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void panelControl3_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void txtpass_TextChanged(object sender, EventArgs e)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            config.AppSettings.Settings["username"].Value = txtuser.Text;
+            config.AppSettings.Settings["password"].Value = txtpass.Text;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
         public static string NormalizeVietnameseString(string input)
         {
 
