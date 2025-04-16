@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -146,6 +147,12 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmCongtrinh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCongtrinh.Designer.cs">
+      <DependentUpon>frmCongtrinh.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmDinhdanh.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -166,6 +173,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCongtrinh.resx">
+      <DependentUpon>frmCongtrinh.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDinhdanh.resx">
       <DependentUpon>frmDinhdanh.cs</DependentUpon>
@@ -204,8 +214,12 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Selenium.WebDriver.ChromeDriver.135.0.7049.8400\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.ChromeDriver.135.0.7049.8400\build\Selenium.WebDriver.ChromeDriver.targets'))" />
     <Error Condition="!Exists('..\packages\Selenium.WebDriver.4.31.0\build\Selenium.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.4.31.0\build\Selenium.WebDriver.targets'))" />
+    <Error Condition="!Exists('..\packages\Selenium.WebDriver.GeckoDriver.Win64.0.36.0\build\Selenium.WebDriver.GeckoDriver.Win64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.GeckoDriver.Win64.0.36.0\build\Selenium.WebDriver.GeckoDriver.Win64.targets'))" />
+    <Error Condition="!Exists('..\packages\Selenium.WebDriver.GeckoDriver.0.36.0\build\Selenium.WebDriver.GeckoDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.GeckoDriver.0.36.0\build\Selenium.WebDriver.GeckoDriver.targets'))" />
   </Target>
   <Import Project="..\packages\Selenium.WebDriver.4.31.0\build\Selenium.WebDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.4.31.0\build\Selenium.WebDriver.targets')" />
+  <Import Project="..\packages\Selenium.WebDriver.GeckoDriver.Win64.0.36.0\build\Selenium.WebDriver.GeckoDriver.Win64.targets" Condition="Exists('..\packages\Selenium.WebDriver.GeckoDriver.Win64.0.36.0\build\Selenium.WebDriver.GeckoDriver.Win64.targets')" />
+  <Import Project="..\packages\Selenium.WebDriver.GeckoDriver.0.36.0\build\Selenium.WebDriver.GeckoDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.GeckoDriver.0.36.0\build\Selenium.WebDriver.GeckoDriver.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

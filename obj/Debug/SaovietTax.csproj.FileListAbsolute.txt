@@ -131,3 +131,4 @@ C:\TCP\Saoviet\SaovietTax\SaovietTax\bin\Debug\SaovietTax.exe
 C:\TCP\Saoviet\SaovietTax\SaovietTax\bin\Debug\SaovietTax.pdb
 C:\TCP\Saoviet\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.Up2Date
 C:\TCP\Saoviet\SaovietTax\SaovietTax\obj\Debug\SaovietTax.Form2.resources
+C:\TCP\Saoviet\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmCongtrinh.resources

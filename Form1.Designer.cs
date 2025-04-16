@@ -198,6 +198,7 @@
             this.txtpass.Name = "txtpass";
             this.txtpass.Size = new System.Drawing.Size(277, 27);
             this.txtpass.TabIndex = 19;
+            this.txtpass.TextChanged += new System.EventHandler(this.txtpass_TextChanged_1);
             // 
             // labelControl12
             // 
@@ -221,6 +222,7 @@
             this.txtuser.Name = "txtuser";
             this.txtuser.Size = new System.Drawing.Size(277, 27);
             this.txtuser.TabIndex = 16;
+            this.txtuser.TextChanged += new System.EventHandler(this.txtuser_TextChanged_1);
             // 
             // btnTaicoquanthue
             // 
