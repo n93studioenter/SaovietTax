@@ -1382,6 +1382,7 @@ WHERE kh.SoHieu = ?";
                 }
             }
         }
+        int globaltype = 0;
         private void Xulysaudangnhap2()
         {
             if (DoTask > Endtask)
@@ -1402,7 +1403,7 @@ WHERE kh.SoHieu = ?";
             Thread.Sleep(1000);
             // Tìm input với class 'ant-calendar-input' và placeholder 'Chọn thời điểm'
             var allInputs = Driver.FindElements(By.CssSelector("input.ant-calendar-picker-input"));
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
             allInputs[0].Click();
             IWebElement monthSelect = Driver.FindElement(
 By.CssSelector("a.ant-calendar-month-select[title='Chọn tháng']"));
@@ -1422,6 +1423,13 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 .Perform();
             var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[1]")));
             button.Click();
+
+            //Chờ table xuất hiện
+            wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
+            IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
+            int rowCount = rows.Count;
+            //Chọn 50 rows
+            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
 
             //Chọn 50 rows
             wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
@@ -1463,8 +1471,8 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 }
                 if (hasrow)
                 {
-                    IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
-                    int rowCount = rows.Count;
+                     rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
+                     rowCount = rows.Count;
 
                     Console.WriteLine($"Số dòng trong bảng: {rowCount}");
 
@@ -1513,7 +1521,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                             try
                             {
-                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
                                 wait.Until(d => File.Exists(fp));
                                 lstHas.Add(fp);
                             }
@@ -1564,7 +1572,21 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 Xulysaudangnhap2();
             }
-        } 
+        }
+        private void waitLoading(WebDriverWait wait)
+        {
+            var spinWrapper = wait.Until(d =>
+            {
+                var elements = d.FindElements(By.CssSelector(".enNzTo"));
+                return elements.Count > 0 ? elements[0] : null; // Trả về phần tử nếu tìm thấy
+            });
+            // Lấy giá trị của thuộc tính 'style'
+            wait.Until(d =>
+            {
+                string displayValue = (string)((IJavaScriptExecutor)Driver).ExecuteScript("return window.getComputedStyle(arguments[0]).display;", spinWrapper);
+                return displayValue == "none";
+            });
+        }
         private void Xulysaudangnhap()
         {
             if (DoTask > Endtask)
@@ -1582,13 +1604,13 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             try
             {
                 var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-
+                var notificationButton = wait.Until(d => d.FindElement(By.XPath("//i[@aria-label='icon: bell']/parent::button")));
 
                 string targetUrl = "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don";
-
+                Thread.Sleep(5000);
                 // Cách 1: Chuyển trang đơn giản
                 Driver.Navigate().GoToUrl(targetUrl);
-                Thread.Sleep(2000);
+                Thread.Sleep(5000);
                 var tab = wait.Until(d => d.FindElement(
                     By.XPath("//div[@role='tab' and .//span[contains(text(),'Tra cứu hóa đơn điện tử mua vào')]]")
                 ));
@@ -1624,10 +1646,38 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[2]")));
                 button.Click();
 
+                //Chờ loading ẩn
+                waitLoading(wait);
+
+                //wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
+                //IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
+                //int rowCount = rows.Count;
                 //Chọn 50 rows
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-                var divElement = wait.Until(d => d.FindElements(By.XPath("//div[@class='ant-select-selection-selected-value' and @title='15']")));
+                
 
+                var divElement = wait.Until(d => d.FindElements(By.XPath("//div[@class='ant-select-selection-selected-value' and @title='15']")));
+                // Nếu tìm thấy ít nhất một phần tử
+                if (divElement[1] != null)
+                {
+                    // Thực hiện cuộn đến phần tử với thời gian
+                    var jsExecutor = (IJavaScriptExecutor)Driver;
+                    int scrollDuration = 2000; // Thời gian cuộn (ms)
+                    int scrollStep = 50; // Bước cuộn (px)
+
+                    for (int i = 0; i < scrollDuration; i += scrollStep)
+                    {
+                        jsExecutor.ExecuteScript("window.scrollBy(0, arguments[0]);", scrollStep);
+                        Thread.Sleep(scrollStep); // Thời gian nghỉ giữa các lần cuộn
+                    }
+
+                    // Cuộn đến phần tử cuối cùng
+                    jsExecutor.ExecuteScript("arguments[0].scrollIntoView(true);", divElement[1]);
+                }
+                else
+                {
+                    Console.WriteLine("Không tìm thấy phần tử");
+                }
                 // Kiểm tra nếu phần tử được tìm thấy và nhấp vào nó
                 if (divElement != null && divElement[1].Displayed)
                 {
@@ -1644,129 +1694,129 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 {
                     option50[0].Click();
                 }
-                //Click download XML   
-                Thread.Sleep(1000);
-
+                //Click download XML
+                //chờ loading tiếp
+                waitLoading(wait);
 
                 // Cách 1: Target vào thẻ <i> có aria-label
                 //   d.FindElement(By.CssSelector("button.ant-btn-icon-only i[aria-label='icon: user']")
-
+                Thread.Sleep(1000);
                 bool isPhantrang = false;
-                while (isPhantrang == false)
+                try
                 {
-                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-
-                    // Đợi cho đến khi có ít nhất 1 dòng xuất hiện
-                    wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
-                    IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
-                    int rowCount = rows.Count;
-
-                    Console.WriteLine($"Số dòng trong bảng: {rowCount}");
-
-
-                    int currentRow = 1;
-                    bool hasMoreRows = true;
-                    List<string> lstHas = new List<string>();
-                    int hasdata = 0;
-                    while ((currentRow) <= rowCount)
+                    while (isPhantrang == false)
                     {
-                        try
+                        wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+
+                        // Đợi cho đến khi có ít nhất 1 dòng xuất hiện
+                        wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
+                        IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
+                        var rowCount = rows.Count;
+
+                        Console.WriteLine($"Số dòng trong bảng: {rowCount}");
+
+
+                        int currentRow = 1;
+                        bool hasMoreRows = true;
+                        List<string> lstHas = new List<string>();
+                        int hasdata = 0;
+                        while ((currentRow) <= rowCount)
                         {
-                            // Tìm dòng hiện tại
-                            var row = wait.Until(d =>
-                                d.FindElement(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{currentRow}]")));
-                            var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
-                            var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
-
-                            string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-
-
-                            // Tạo mảng tham số với giá trị cho câu lệnh SQL
-                            OleDbParameter[] parameters = new OleDbParameter[]
-                            {
-            new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
-            new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
-                            };
-                            //var kq = ExecuteQuery(query, parameters);
-                            //var a = people;
-                            //var check = a.Any(m => m.KHHDon == cellC25TYY && m.SHDon.Contains(cell22252));
-                            //if (check || kq.Rows.Count != 0)
-                            //{
-                            //    currentRow++;
-                            //    hasdata++;
-                            //    continue;
-                            //}
-
-                            // Click vào dòng
-                            row.Click();
-                            button = wait.Until(d =>
-                             d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
-                            button.Click();
-                            // Xử lý sau khi click (đợi tải, đóng popup,...)
-                            Thread.Sleep(50); // Đợi 1 giây giữa các lần click
-                            string fp = "";
-                            if (currentRow == 15)
-                            {
-                                int aas = 10;
-                            }
-                            if (currentRow == 1)
-                                fp = savedPath + "\\HDDauVao\\" + "invoice.zip";
-                            else
-                                fp = savedPath + "\\HDDauVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
-
                             try
                             {
-                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-                                wait.Until(d => File.Exists(fp));
-                                lstHas.Add(fp);
+                                // Tìm dòng hiện tại
+                                var row = wait.Until(d =>
+                                    d.FindElement(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{currentRow}]")));
+                                var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
+                                var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
+
+                                string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
+
+
+                                // Tạo mảng tham số với giá trị cho câu lệnh SQL
+                                OleDbParameter[] parameters = new OleDbParameter[]
+                                {
+            new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
+            new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
+                                };
+                                //var kq = ExecuteQuery(query, parameters);
+                                //var a = people;
+                                //var check = a.Any(m => m.KHHDon == cellC25TYY && m.SHDon.Contains(cell22252));
+                                //if (check || kq.Rows.Count != 0)
+                                //{
+                                //    currentRow++;
+                                //    hasdata++;
+                                //    continue;
+                                //}
+
+                                // Click vào dòng
+                                row.Click();
+                                button = wait.Until(d =>
+                                 d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
+                                button.Click();
+                                // Xử lý sau khi click (đợi tải, đóng popup,...)
+                                waitLoading(wait);
+                                string fp = "";
+                                if (currentRow == 1)
+                                    fp = savedPath + "\\HDDauVao\\" + "invoice.zip";
+                                else
+                                    fp = savedPath + "\\HDDauVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
+
+                                try
+                                {
+                                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                                    wait.Until(d => File.Exists(fp));
+                                    lstHas.Add(fp);
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                                currentRow++; // Chuyển sang dòng tiếp theo
                             }
-                            catch(Exception ex)
+                            catch (NoSuchElementException)
                             {
-                               
+                                hasMoreRows = false; // Không còn dòng nào nữa
+
+
+                                Console.WriteLine($"Đã xử lý hết {currentRow - 1} dòng");
                             }
-                            currentRow++; // Chuyển sang dòng tiếp theo
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
+                                currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+                            }
                         }
-                        catch (NoSuchElementException)
+                        if (lstHas.Count > 0)
                         {
-                            hasMoreRows = false; // Không còn dòng nào nữa
-
-
-                            Console.WriteLine($"Đã xử lý hết {currentRow - 1} dòng");
+                            //var getlastlist = lstHas.LastOrDefault();
+                            //wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                            //wait.Until(d => File.Exists(getlastlist));
+                            GiaiNenhoadon(1);
                         }
-                        catch (Exception ex)
+                        //Xử lý phần trang 
+                        var buttonElement = Driver.FindElements(By.ClassName("ant-btn-primary"));
+
+                        // Kiểm tra xem button có bị vô hiệu hóa không
+                        bool isDisabled = !buttonElement[7].Enabled;
+                        if (isDisabled == false)
                         {
-                            Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
-                            currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+                            buttonElement[7].Click();
+                            Thread.Sleep(1000);
+                        }
+                        else
+                        {
+                            isPhantrang = true;
                         }
                     }
-                    if (lstHas.Count > 0)
-                    {
-                        //var getlastlist = lstHas.LastOrDefault();
-                        //wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-                        //wait.Until(d => File.Exists(getlastlist));
-                        GiaiNenhoadon(1);
-                    }
-                    //Xử lý phần trang 
-                    var buttonElement = Driver.FindElements(By.ClassName("ant-btn-primary"));
-
-                    // Kiểm tra xem button có bị vô hiệu hóa không
-                    bool isDisabled = !buttonElement[7].Enabled;
-                    if (isDisabled == false)
-                    {
-                        buttonElement[7].Click();
-                        Thread.Sleep(1000);
-                    }
-                    else
-                    {
-                        isPhantrang = true;
-                    }
+                  
                 }
-
-                Cucthuekhngnhanma(wait);
-                Xulymaytinhtien(wait);
-                DoTask += 1;
-
-                Xulysaudangnhap();
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
+                Thread.Sleep(1000);
+                Cucthuekhngnhanma(wait); 
             }
             catch (Exception ex)
             {
@@ -2008,6 +2058,21 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             //Xử lý hóa đơn từ máy tính tiền
             //By.Id("ttxly")
             var divElement = wait.Until(d => d.FindElements(By.Id("ttxly")));
+            if (divElement[1] != null)
+            {
+                var jsExecutor = (IJavaScriptExecutor)Driver;
+                int scrollDuration = 2000; // Thời gian cuộn (ms)
+                int scrollStep = 50; // Bước cuộn (px)
+
+                for (int i = 0; i < scrollDuration; i += scrollStep)
+                {
+                    jsExecutor.ExecuteScript("window.scrollBy(0, arguments[0]);", scrollStep);
+                    Thread.Sleep(scrollStep); // Thời gian nghỉ giữa các lần cuộn
+                }
+
+                // Cuộn đến phần tử cuối cùng
+                jsExecutor.ExecuteScript("arguments[0].scrollIntoView(true);", divElement[1]);
+            }
             Thread.Sleep(500); // Hoặc sử dụng WebDriverWait để chờ điều kiện phù hợp
             divElement[1].Click();
             wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
@@ -2056,7 +2121,9 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             }
             var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[2]")));
             button.Click();
-            //
+            //chờ loading
+
+            waitLoading(wait);
             wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
             Thread.Sleep(1000);
             IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
@@ -2122,7 +2189,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                      d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
                     button.Click();
                     // Xử lý sau khi click (đợi tải, đóng popup,...)
-                    Thread.Sleep(50); // Đợi 1 giây giữa các lần click
+                    waitLoading(wait);
                     string fp = "";
                     if (currentRow == 15)
                     {
@@ -2182,12 +2249,30 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             //  LoadXmlFiles(savedPath);
 
             //End Xử lý hóa đơn từ máy tính tiền
+            DoTask += 1;
+            Xulysaudangnhap();
         }
         private void Cucthuekhngnhanma(WebDriverWait wait)
         {
-            var divElement = wait.Until(d => d.FindElements(By.Id("ttxly"))); 
+            var divElement = wait.Until(d => d.FindElements(By.Id("ttxly")));
+            if (divElement[1] != null)
+            {
+                var jsExecutor = (IJavaScriptExecutor)Driver;
+                int scrollDuration = 2000; // Thời gian cuộn (ms)
+                int scrollStep = 50; // Bước cuộn (px)
+
+                for (int i = 0; i < scrollDuration; i += scrollStep)
+                {
+                    jsExecutor.ExecuteScript("window.scrollBy(0, arguments[0]);", scrollStep);
+                    Thread.Sleep(scrollStep); // Thời gian nghỉ giữa các lần cuộn
+                }
+
+                // Cuộn đến phần tử cuối cùng
+                jsExecutor.ExecuteScript("arguments[0].scrollIntoView(true);", divElement[1]);
+            }
             Thread.Sleep(500); // Hoặc sử dụng WebDriverWait để chờ điều kiện phù hợp
             // Nhấp vào phần tử đó
+
             divElement[1].Click();
             wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
             var listItem = wait.Until(d => d.FindElements(By.XPath("//li[@role='option' and @class='ant-select-dropdown-menu-item']"))
@@ -2212,9 +2297,8 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             }
             var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[2]")));
             button.Click();
-            //
-            Thread.Sleep(2000);
-
+            // 
+            waitLoading(wait);
             button = wait.Until(d =>
                 d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[18]")));
 
@@ -2229,6 +2313,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 .Perform();
 
             //Tải file excel
+            Xulymaytinhtien(wait);
         }
         private void simpleButton6_Click(object sender, EventArgs e)
         {
