@@ -165,7 +165,8 @@ namespace SaovietTax
             object newValue = e.Value; // Giá trị mới
 
             string query = "SELECT * FROM HeThongTK WHERE SoHieu = ?";
-
+            if (newValue == null)
+                return;
             if (!string.IsNullOrEmpty(newValue.ToString()))
             {
                 // Tạo mảng tham số với giá trị cho câu lệnh SQL
@@ -268,17 +269,30 @@ namespace SaovietTax
                 command.ExecuteNonQuery();
             }
         }
+        string mstcongty = "";
         private void InitDB()
         {
-            // Đường dẫn đến cơ sở dữ liệu Access và mật khẩu
-            //dbPath = @"C:\S.T.E 25\S.T.E 25\DATA\KT2025.mdb"; // Thay đổi đường dẫn này
-            dbPath = ConfigurationManager.AppSettings["dbpath"];
-            //dbPath = "sadsa";
+            string appPath = Assembly.GetExecutingAssembly().Location;
 
+            // Lấy thư mục chứa ứng dụng
+            string directoryPath = Path.GetDirectoryName(appPath);
 
-            string filePath = ConfigurationManager.AppSettings["dbpath"];
-            if (string.IsNullOrEmpty(filePath))
-                return;
+            // Xóa phần \bin\Debug để lấy đường dẫn gốc
+            string rootDirectory = Path.GetFullPath(Path.Combine(directoryPath, @"..\.."));
+
+            // Tạo đường dẫn đến file dpPath.txt trong thư mục hoadon
+            string filePaths = Path.Combine(rootDirectory, "hoadon", "dpPath.txt");
+            try
+            {
+                string content = File.ReadAllText(filePaths);
+                dbPath = content;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi khi đọc file: " + ex.Message);
+            }
+
+            
             // Đọc toàn bộ nội dung tệp
             string password = "1@35^7*9)1";
             connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
@@ -290,12 +304,26 @@ namespace SaovietTax
                 try
                 {
                     connection.Open();
-                    lblDpPath.Text = dbPath;
+                    string query = "SELECT * FROM License";
+
+                    // Tạo mảng tham số với giá trị cho câu lệnh SQL
+
+                    var kq = ExecuteQuery(query, null);
+                    if (kq.Rows.Count > 0)
+                    {
+                        string tencongty = kq.Rows[0]["TenCty"].ToString();
+                        string fileName = Path.GetFileName(dbPath.Trim());
+                        mstcongty = kq.Rows[0]["MaSoThue"].ToString();
+                        lblDpPath.Text = Helpers.ConvertVniToUnicode(tencongty) +"|"+ mstcongty + "|"+ fileName;
+                    }
+                   
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
+
+
                 string tableName = "tbimport";
                 string tableNamedetail = "tbimportdetail";
                 string tableDinhdanh = "tbDinhdanhtaikhoan";
@@ -384,35 +412,18 @@ namespace SaovietTax
         private void InitData()
         {
             savedPath = ConfigurationManager.AppSettings["LastFilePath"];
-            if (!string.IsNullOrEmpty(savedPath))
+            string query = "SELECT * FROM tbRegister";
+
+            // Tạo mảng tham số với giá trị cho câu lệnh SQL
+
+            var kq = ExecuteQuery(query, null);
+            if (kq.Rows.Count > 0)
             {
-                txtPath.Text = savedPath;
-                txtPath.Enabled = false;
-                isSetuppath = true;
+                savedPath = kq.Rows[0]["Hoadonpath"].ToString();
+                txtuser.Text = kq.Rows[0]["Username"].ToString();
+                txtpass.Text = kq.Rows[0]["Password"].ToString();
             }
-            else
-            {
-                XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                isSetuppath = false;
-                return;
-            }
-            dbPath = ConfigurationManager.AppSettings["dbpath"];
-            if (!string.IsNullOrEmpty(dbPath))
-            {
-                txtdbPath.Text = dbPath;
-                txtdbPath.Enabled = false;
-                isetupDbpath = true;
-            }
-            else
-            {
-                XtraMessageBox.Show("Vui lòng thiết lập đường dẫn cơ sở dữ liệu!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                isetupDbpath = false;
-                return;
-            }
-            //txtUsername.Text = ConfigurationManager.AppSettings["username"];
-            //txtPassword.Text = ConfigurationManager.AppSettings["password"];
-            txtuser.Text = ConfigurationManager.AppSettings["username"];
-            txtpass.Text = ConfigurationManager.AppSettings["password"];
+          
         }
         private BackgroundWorker worker;
         private static int GetColumnLength(OleDbConnection connection, string tableName, string columnName)
@@ -479,8 +490,9 @@ namespace SaovietTax
         private void frmMain_Load(object sender, EventArgs e)
         {
            
-            InitData();
             InitDB();
+
+            InitData();
             CheckDB();
             ControlsSetup();
             LoadDataDinhDanh();
@@ -662,6 +674,11 @@ namespace SaovietTax
                 {
                     ten = nBanNode.SelectSingleNode("Ten")?.InnerText;
                     mst = nBanNode.SelectSingleNode("MST")?.InnerText;
+                    if(mst!= mstcongty)
+                    {
+                        //MessageBox.Show("Mã số thuế không hợp lệ");
+                        //this.Close();
+                    }
                     if (mst == MasterMST)
                     {
                         XmlNode nMuaNode = ndhDonNode.SelectSingleNode("NMua");
@@ -1049,15 +1066,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(savedPath))
-            {
-                XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            //if (string.IsNullOrEmpty(savedPath))
+            //{
+            //    XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
 
-           // LoadXmlFiles(savedPath,1);
-           // LoadExcel(savedPath,1);
-            //LoadDataGridview(1);
+            LoadXmlFiles(savedPath,1);
+           LoadExcel(savedPath,1);
+           LoadDataGridview(1);
 
             LoadXmlFiles(savedPath, 2);
             LoadDataGridview(2);
@@ -1385,8 +1402,8 @@ WHERE kh.SoHieu = ?";
                     var passwordField = Driver.FindElement(By.Id("password"));
                     //usernameField.SendKeys("3502501171"); // Thay your_username bằng tên đăng nhập thực tế
                     //passwordField.SendKeys("PDVT12345678aA@");
-                    string username = ConfigurationManager.AppSettings["username"];
-                    string password = ConfigurationManager.AppSettings["password"];
+                    string username = txtuser.Text;
+                    string password = txtpass.Text;
                     usernameField.SendKeys(username); // Thay your_username bằng tên đăng nhập thực tế
                     passwordField.SendKeys(password);
                     new Actions(Driver)
@@ -1498,7 +1515,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 // Đợi cho đến khi có ít nhất 1 dòng xuất hiện
                 try
                 {
-                    wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
+                    //wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
                     hasrow = true;
                 }
                 catch(Exception ex)
@@ -1618,11 +1635,11 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                     }
                 }
 
-                Xulymaytinhtien2(wait);
-                DoTask += 1;
-
-                Xulysaudangnhap2();
+               
             }
+            Xulymaytinhtien2(wait);
+            DoTask += 1;
+            Xulysaudangnhap2();
         }
         private void waitLoading(WebDriverWait wait)
         {
@@ -2006,114 +2023,133 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             //var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[2]")));
             //button.Click();
             //
-            wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
-            Thread.Sleep(1000);
-            IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
-            var clickableRows = rows.Where(row =>
+            bool isPhantrang = false;
+
+            while (isPhantrang == false)
             {
-                try
+               // wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
+              
+                IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
+                var clickableRows = rows.Where(row =>
                 {
-                    // Kiểm tra xem dòng có thể click được bằng cách thử tìm một phần tử có thể click bên trong
-                    return row.Displayed && row.Enabled && row.FindElements(By.CssSelector("td")).Any(td => td.Displayed);
-                }
-                catch
-                {
-                    return false; // Nếu gặp lỗi, coi như không phải dòng có thể click
-                }
-            }).ToList();
-            int rowCount = clickableRows.Count;
-
-            Console.WriteLine($"Số dòng trong bảng: {rowCount}");
-
-
-
-            int currentRow = 1;
-            bool hasMoreRows = true;
-            List<string> lstHas = new List<string>();
-            int hasdata = 0;
-            while ((currentRow) <= rowCount)
-            {
-                try
-                {
-                    // Tìm dòng hiện tại
-                    var row = wait.Until(d =>
-                        d.FindElement(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{currentRow}]")));
-                    var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
-                    var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
-
-                    string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-
-
-                    // Tạo mảng tham số với giá trị cho câu lệnh SQL
-                    OleDbParameter[] parameters = new OleDbParameter[]
+                    try
                     {
+                        // Kiểm tra xem dòng có thể click được bằng cách thử tìm một phần tử có thể click bên trong
+                        return row.Displayed && row.Enabled && row.FindElements(By.CssSelector("td")).Any(td => td.Displayed);
+                    }
+                    catch
+                    {
+                        return false; // Nếu gặp lỗi, coi như không phải dòng có thể click
+                    }
+                }).ToList();
+                int rowCount = clickableRows.Count;
+
+                Console.WriteLine($"Số dòng trong bảng: {rowCount}");
+
+
+
+                int currentRow = 1;
+                bool hasMoreRows = true;
+                List<string> lstHas = new List<string>();
+                int hasdata = 0;
+                while ((currentRow) <= rowCount)
+                {
+                    try
+                    {
+                        // Tìm dòng hiện tại
+                        var row = wait.Until(d =>
+                            d.FindElement(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{currentRow}]")));
+                        var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
+                        var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
+
+                        string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
+
+
+                        // Tạo mảng tham số với giá trị cho câu lệnh SQL
+                        OleDbParameter[] parameters = new OleDbParameter[]
+                        {
             new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
             new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
-                    };
-                  
-                    // Click vào dòng
-                    row.Click();
-                   var button = wait.Until(d =>
-                     d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
-                    button.Click();
-                    // Xử lý sau khi click (đợi tải, đóng popup,...)
-                    waitLoading(wait);
-                    string fp = "";
-                    if (currentRow == 15)
-                    {
-                        int aas = 10;
+                        };
+
+                        // Click vào dòng
+                        row.Click();
+                        var button = wait.Until(d =>
+                          d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[13]")));
+                        button.Click();
+                        // Xử lý sau khi click (đợi tải, đóng popup,...)
+                        waitLoading(wait);
+                        string fp = "";
+                        if (currentRow == 15)
+                        {
+                            int aas = 10;
+                        }
+                        if (currentRow == 1)
+                            fp = savedPath + "\\HDDauRa\\" + "invoice.zip";
+                        else
+                            fp = savedPath + "\\HDDauRa\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
+
+                        wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                        wait.Until(d => File.Exists(fp));
+                        lstHas.Add(fp);
+                        currentRow++; // Chuyển sang dòng tiếp theo
                     }
-                    if (currentRow == 1)
-                        fp = savedPath + "\\HDDauVao\\" + "invoice.zip";
-                    else
-                        fp = savedPath + "\\HDDauVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
+                    catch (NoSuchElementException)
+                    {
+                        hasMoreRows = false; // Không còn dòng nào nữa
 
-                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-                    wait.Until(d => File.Exists(fp));
-                    lstHas.Add(fp);
-                    currentRow++; // Chuyển sang dòng tiếp theo
+
+                        Console.WriteLine($"Đã xử lý hết {currentRow - 1} dòng");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
+                        currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+                    }
                 }
-                catch (NoSuchElementException)
+                if (lstHas.Count == 0)
+                    return;
+                var getlastlist = lstHas.LastOrDefault();
+                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                wait.Until(d => File.Exists(getlastlist));
+
+                var pp = savedPath + "\\HDDauRa";
+                var pp2 = savedPath + "\\HDDauRa\\" + DoTask;
+                // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
+                string[] excelFiles = Directory.GetFiles(pp, "*.xlsx");
+                if (excelFiles.Length > 0)
                 {
-                    hasMoreRows = false; // Không còn dòng nào nữa
-
-
-                    Console.WriteLine($"Đã xử lý hết {currentRow - 1} dòng");
+                    string fileName = System.IO.Path.GetFileName(excelFiles[0]); // Lấy tên file
+                    string destFilePath = System.IO.Path.Combine(pp2, fileName); // Tạo đường dẫn đích
+                    try
+                    {
+                        File.Move(excelFiles[0], destFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        File.Delete(excelFiles[0]);
+                    }
                 }
-                catch (Exception ex)
+
+                // Di chuyển file
+
+
+                GiaiNenhoadon(2);
+                var buttonElement = Driver.FindElements(By.ClassName("ant-btn-primary"));
+
+                // Kiểm tra xem button có bị vô hiệu hóa không
+                bool isDisabled = !buttonElement[3].Enabled;
+                if (isDisabled == false)
                 {
-                    Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
-                    currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+                    buttonElement[3].Click();
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    isPhantrang = true;
                 }
             }
-            if (lstHas.Count == 0)
-                return;
-            var getlastlist = lstHas.LastOrDefault();
-            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-            wait.Until(d => File.Exists(getlastlist));
-
-            var pp = savedPath + "\\HDDauVao";
-            var pp2 = savedPath + "\\HDDauVao\\" + DoTask;
-            // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
-            string[] excelFiles = Directory.GetFiles(pp, "*.xlsx");
-            if (excelFiles.Length > 0)
-            {
-                string fileName = System.IO.Path.GetFileName(excelFiles[0]); // Lấy tên file
-                string destFilePath = System.IO.Path.Combine(pp2, fileName); // Tạo đường dẫn đích
-                try
-                {
-                    File.Move(excelFiles[0], destFilePath);
-                }
-                catch (Exception ex)
-                {
-                    File.Delete(excelFiles[0]);
-                }
-            }
-
-            // Di chuyển file
-
-
-            GiaiNenhoadon(2);
+              
             //  LoadXmlFiles(savedPath);
 
             //End Xử lý hóa đơn từ máy tính tiền
@@ -2602,9 +2638,8 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         }
 
         public string hiddenValue { get; set; }
-        private void gridControl1_KeyUp(object sender, KeyEventArgs e)
+        private void GridcontrolKeyup(KeyEventArgs e, GridView gridView)
         {
-            GridView gridView = gridControl1.MainView as GridView;
             if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
                 if (gridView.IsEditing)
@@ -2660,6 +2695,12 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 e.Handled = true; // Ngăn chặn âm thanh "click" khi nhấn Enter
             }
+        }
+        private void gridControl1_KeyUp(object sender, KeyEventArgs e)
+        {
+
+            GridView gridView = gridControl1.MainView as GridView;
+            GridcontrolKeyup(e, gridView);
         }
         public string Kiemtracongtrinh(int id)
         {
@@ -2859,9 +2900,189 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 this.Close();
             }
         }
+        private void ImportHDDaura()
+        {
+            if (string.IsNullOrEmpty(savedPath))
+            {
+                XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            bool isNull = false;
+            if (people2.Any(m => string.IsNullOrEmpty(m.TKCo) && m.Checked) ||
+                people2.Any(m => string.IsNullOrEmpty(m.TKNo) && m.Checked) ||
+                people2.Any(m => string.IsNullOrEmpty(m.Noidung) && m.Checked))
+            {
+                XtraMessageBox.Show("Thông tin không được để trống!", "Cảnh báo",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            foreach (var item in people2)
+            {
+                if (!item.Checked)
+                {
+                    continue;
+                }
+
+                if (item.TKCo == "711")
+                {
+                    item.TKNo = "711";
+                    item.TKCo = "331";
+                }
+
+                if (string.IsNullOrEmpty(item.TKCo) ||
+                    string.IsNullOrEmpty(item.TKNo) ||
+                    string.IsNullOrEmpty(item.Noidung))
+                {
+                    isNull = true;
+                    MessageBox.Show("Thông tin không được để trống");
+                    break;
+                }
+
+                // Xử lý 154 cho notk
+                if (item.TKNo.Contains('|'))
+                {
+                    var getsplits = item.TKNo.Split('|');
+                    item.TKNo = getsplits[0].Trim();
+                    item.SoHieuTP = getsplits[1].Trim();
+                }
+
+                if (item.Type == 3)
+                    continue;
+
+                if (item.TkThue == 0)
+                {
+                    if (item.TKNo == "6422" || item.TKNo == "6421")
+                        item.TkThue = 1331;
+                    if (item.TKNo == "152")
+                        item.TkThue = 1331;
+                    if (item.TKNo == "5111" || item.TKNo == "5112" || item.TKNo == "5113")
+                        item.TkThue = 33311;
+                }
+
+                string query = @"
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                string newTen = Helpers.ConvertUnicodeToVni(item.Ten);
+                string newNoidung = Helpers.ConvertUnicodeToVni(item.Noidung);
+
+                OleDbParameter[] parameters = new OleDbParameter[]
+                {
+            new OleDbParameter("?", item.SHDon),
+            new OleDbParameter("?", item.KHHDon),
+            new OleDbParameter("?", item.NLap),
+            new OleDbParameter("?", newTen),
+            new OleDbParameter("?", newNoidung),
+            new OleDbParameter("?", item.TKCo),
+            new OleDbParameter("?", item.TKNo),
+            new OleDbParameter("?", item.TkThue),
+            new OleDbParameter("?", item.Mst),
+            new OleDbParameter("?", "0"),
+            new OleDbParameter("?", DateTime.Now.ToShortDateString()),
+            new OleDbParameter("?", item.TongTien.ToString()),
+            new OleDbParameter("?", item.Vat.ToString()),
+            new OleDbParameter("?", item.SoHieuTP.ToString())
+                };
+
+                int a = ExecuteQueryResult(query, parameters);
+
+                if (a > 0)
+                {
+                    if (item.TKNo != "6422" && item.TKNo != "64221" && !item.TKNo.Contains("154|") && item.TKNo!="5113")
+                    {
+                        string tableName = "tbImport";
+                        query = $"SELECT MAX(ID) FROM {tableName}";
+
+                        int parentID = (int)ExecuteQuery(query, new OleDbParameter("?", null)).Rows[0][0];
+                        int idconttrinh = 1;
+
+                        foreach (var it in item.fileImportDetails)
+                        {
+                            if (item.TKNo == "154")
+                            {
+                                string sc = Helpers.ConvertUnicodeToVni("Sửa");
+                                if (it.Ten.Contains(sc))
+                                {
+                                    it.TKNo = "154";
+                                    it.MaCT = Kiemtracongtrinh(idconttrinh);
+                                    idconttrinh += 1;
+                                }
+                                else
+                                {
+                                    it.TKNo = "152";
+                                }
+                            }
+
+                            query = @"
+                        INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten,MaCT,TKNo)
+                        VALUES (?, ?, ?, ?, ?, ?,?,?)";
+
+                            parameters = new OleDbParameter[]
+                            {
+                        new OleDbParameter("?", parentID),
+                        new OleDbParameter("?", it.SoHieu),
+                        new OleDbParameter("?", it.Soluong),
+                        new OleDbParameter("?", it.Dongia),
+                        new OleDbParameter("?", it.DVT),
+                        new OleDbParameter("?", it.Ten),
+                        new OleDbParameter("?", it.MaCT),
+                        new OleDbParameter("?", it.TKNo)
+                            };
+
+                            int resl = ExecuteQueryResult(query, parameters);
+                            InsertHangHoa(it.DVT, it.SoHieu, it.Ten);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Thêm dữ liệu thất bại.");
+                }
+
+                try
+                {
+                    var htmlPath = Path.Combine(savedPath, "HDDauRa");
+                    var month = "\\" + item.NLap.Month;
+                    htmlPath += month;
+
+                    var htmlFiles = Directory.EnumerateFiles(htmlPath, "*.html", SearchOption.AllDirectories);
+                    foreach (var it in htmlFiles)
+                    {
+                        File.Move(it, it.Replace("HDDauRa", "HDDauraChonLoc"));
+                    }
+
+                    try
+                    {
+                        File.Move(item.Path, item.Path.Replace("HDDauRa", "HDDauraChonLoc"));
+                    }
+                    catch
+                    {
+                        File.Delete(item.Path);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            if (!isNull)
+            {
+                XtraMessageBox.Show("Lấy dữ liệu thành công!", "Thông báo",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                isClick = true;
+                this.Close();
+            }
+        }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            ImportHDDauvao();
+            if (chkDauvao.Checked)
+                ImportHDDauvao();
+            if (chkDaura.Checked)
+                ImportHDDaura();
         }
         bool isClick = false;
         public void InsertHangHoa(string DVTinh, string sohieu, string newName)
@@ -3053,25 +3274,76 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
         private void txtuser_TextChanged_1(object sender, EventArgs e)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            
+            string query = "UPDATE tbRegister SET username = ?"; 
+            // Khai báo mảng tham số với đủ 10 tham số
+            OleDbParameter[] parameters = new OleDbParameter[]
+            {
+        new OleDbParameter("?", txtuser.Text) 
+            };
 
-            config.AppSettings.Settings["username"].Value = txtuser.Text;
-            // config.AppSettings.Settings["password"].Value = txtpass.Text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            // Thực thi truy vấn và lấy kết quả
+            int a = ExecuteQueryResult(query, parameters);
         }
 
         private void txtpass_TextChanged_1(object sender, EventArgs e)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            
 
-            //config.AppSettings.Settings["username"].Value = txtuser.Text;
-            config.AppSettings.Settings["password"].Value = txtpass.Text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            string query = "UPDATE tbRegister SET [Password] = ?";
+            // Khai báo mảng tham số với đủ 10 tham số
+            OleDbParameter[] parameters = new OleDbParameter[]
+            {
+        new OleDbParameter("?", txtpass.Text)
+            };
+
+            // Thực thi truy vấn và lấy kết quả
+            int a = ExecuteQueryResult(query, parameters);
         }
 
         private void xtraTabControl2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gridControl2_Click(object sender, EventArgs e)
+        {
+            GridView gridView = gridControl2.MainView as GridView;
+            var hitInfo = gridView.CalcHitInfo(gridView.GridControl.PointToClient(MousePosition));
+
+
+            // Kiểm tra nếu nhấp vào một ô
+            if (hitInfo.InRowCell)
+            {
+                int columnIndex = hitInfo.Column.VisibleIndex; // Chỉ số cột
+                if (columnIndex != 0)
+                    return;
+                WebBrowser webBrowser1 = new WebBrowser
+                {
+                    Dock = DockStyle.Fill // Đổ đầy không gian của form
+                };
+                // Lấy giá trị trong ô đã nhấp
+                var hiddenValue = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["Path"]);
+                frmWebbrowser frmCongTrinh = new frmWebbrowser();
+                frmCongTrinh.Text = hiddenValue.ToString().Replace(".xml", "");
+                frmCongTrinh.Show();
+                frmCongTrinh.BringToFront();
+                frmCongTrinh.Activate();
+                // Thêm điều khiển WebBrowser vào Form
+                frmCongTrinh.Controls.Add(webBrowser1);
+                string filePath = hiddenValue.ToString().Replace(".xml", ".html");
+
+                webBrowser1.Navigate("file:///" + filePath.Replace("\\", "/"));
+            }
+        }
+
+        private void gridControl2_KeyUp(object sender, KeyEventArgs e)
+        {
+            GridView gridView = gridControl2.MainView as GridView;
+            GridcontrolKeyup(e, gridView);
+        }
+
+        private void xtraTabPage1_Paint(object sender, PaintEventArgs e)
         {
 
         }

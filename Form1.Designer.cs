@@ -156,7 +156,7 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1358, 651);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1340, 608);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1,
@@ -170,8 +170,9 @@
             this.xtraTabPage1.Controls.Add(this.progressBarControl1);
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1351, 616);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1328, 565);
             this.xtraTabPage1.Text = "Xử lý data";
+            this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
             // xtraTabControl2
             // 
@@ -181,7 +182,7 @@
             this.xtraTabControl2.Location = new System.Drawing.Point(11, 207);
             this.xtraTabControl2.Name = "xtraTabControl2";
             this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1332, 381);
+            this.xtraTabControl2.Size = new System.Drawing.Size(1314, 319);
             this.xtraTabControl2.TabIndex = 8;
             this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage3,
@@ -194,7 +195,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1325, 346);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1302, 276);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -224,7 +225,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1325, 346);
+            this.gridControl1.Size = new System.Drawing.Size(1302, 276);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -366,7 +367,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1325, 346);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1302, 276);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -396,10 +397,12 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1325, 346);
+            this.gridControl2.Size = new System.Drawing.Size(1302, 276);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
+            this.gridControl2.Click += new System.EventHandler(this.gridControl2_Click);
+            this.gridControl2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridControl2_KeyUp);
             // 
             // gridView3
             // 
@@ -528,10 +531,10 @@
             // 
             this.lblDpPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblDpPath.Appearance.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Blue;
+            this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Purple;
             this.lblDpPath.Appearance.Options.UseFont = true;
             this.lblDpPath.Appearance.Options.UseForeColor = true;
-            this.lblDpPath.Location = new System.Drawing.Point(12, 594);
+            this.lblDpPath.Location = new System.Drawing.Point(11, 540);
             this.lblDpPath.Name = "lblDpPath";
             this.lblDpPath.Size = new System.Drawing.Size(170, 19);
             this.lblDpPath.TabIndex = 7;
@@ -556,7 +559,6 @@
             // 
             // chkDaura
             // 
-            this.chkDaura.EditValue = true;
             this.chkDaura.Location = new System.Drawing.Point(373, 127);
             this.chkDaura.Name = "chkDaura";
             this.chkDaura.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
@@ -660,7 +662,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarControl1.Location = new System.Drawing.Point(11, 174);
             this.progressBarControl1.Name = "progressBarControl1";
-            this.progressBarControl1.Size = new System.Drawing.Size(1332, 27);
+            this.progressBarControl1.Size = new System.Drawing.Size(1314, 27);
             this.progressBarControl1.TabIndex = 3;
             // 
             // panelControl1
@@ -718,7 +720,7 @@
             // 
             this.xtraTabPage2.Controls.Add(this.navigationPane1);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1351, 616);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1328, 565);
             this.xtraTabPage2.Text = "Thiết lập";
             // 
             // navigationPane1
@@ -734,11 +736,12 @@
             this.navigationPage1,
             this.navigationPage2,
             this.navigationPage3});
-            this.navigationPane1.RegularSize = new System.Drawing.Size(1351, 616);
+            this.navigationPane1.RegularSize = new System.Drawing.Size(1333, 573);
             this.navigationPane1.SelectedPage = this.navigationPage1;
-            this.navigationPane1.Size = new System.Drawing.Size(1351, 616);
+            this.navigationPane1.Size = new System.Drawing.Size(1328, 565);
             this.navigationPane1.TabIndex = 1;
             this.navigationPane1.Text = "Thiết lập";
+            this.navigationPane1.Visible = false;
             // 
             // navigationPage1
             // 
@@ -750,13 +753,13 @@
             this.navigationPage1.Controls.Add(this.labelControl2);
             this.navigationPage1.Controls.Add(this.txtPath);
             this.navigationPage1.Name = "navigationPage1";
-            this.navigationPage1.Size = new System.Drawing.Size(1165, 538);
+            this.navigationPage1.Size = new System.Drawing.Size(1144, 482);
             // 
             // btnSetupdbpath
             // 
             this.btnSetupdbpath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSetupdbpath.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnSetupdbpath.ImageOptions.Image")));
-            this.btnSetupdbpath.Location = new System.Drawing.Point(1095, 72);
+            this.btnSetupdbpath.Location = new System.Drawing.Point(1074, 72);
             this.btnSetupdbpath.Name = "btnSetupdbpath";
             this.btnSetupdbpath.Size = new System.Drawing.Size(46, 34);
             this.btnSetupdbpath.TabIndex = 11;
@@ -766,7 +769,7 @@
             // 
             this.btnDuongdanthumuc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDuongdanthumuc.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnDuongdanthumuc.ImageOptions.Image")));
-            this.btnDuongdanthumuc.Location = new System.Drawing.Point(1095, 18);
+            this.btnDuongdanthumuc.Location = new System.Drawing.Point(1074, 18);
             this.btnDuongdanthumuc.Name = "btnDuongdanthumuc";
             this.btnDuongdanthumuc.Size = new System.Drawing.Size(46, 34);
             this.btnDuongdanthumuc.TabIndex = 8;
@@ -778,7 +781,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtdbPath.Location = new System.Drawing.Point(246, 77);
             this.txtdbPath.Name = "txtdbPath";
-            this.txtdbPath.Size = new System.Drawing.Size(828, 27);
+            this.txtdbPath.Size = new System.Drawing.Size(807, 27);
             this.txtdbPath.TabIndex = 11;
             // 
             // labelControl4
@@ -804,7 +807,7 @@
             this.txtPath.Font = new System.Drawing.Font("Tahoma", 8F);
             this.txtPath.Location = new System.Drawing.Point(246, 26);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(828, 27);
+            this.txtPath.Size = new System.Drawing.Size(807, 27);
             this.txtPath.TabIndex = 6;
             // 
             // navigationPage2
@@ -816,7 +819,7 @@
             this.navigationPage2.Controls.Add(this.labelControl6);
             this.navigationPage2.Controls.Add(this.txtUsername);
             this.navigationPage2.Name = "navigationPage2";
-            this.navigationPage2.Size = new System.Drawing.Size(1165, 538);
+            this.navigationPage2.Size = new System.Drawing.Size(1147, 495);
             // 
             // simpleButton6
             // 
@@ -864,7 +867,7 @@
             this.navigationPage3.Controls.Add(this.gcDinhdanh);
             this.navigationPage3.Controls.Add(this.panelControl2);
             this.navigationPage3.Name = "navigationPage3";
-            this.navigationPage3.Size = new System.Drawing.Size(1165, 538);
+            this.navigationPage3.Size = new System.Drawing.Size(1147, 495);
             // 
             // gcDinhdanh
             // 
@@ -874,7 +877,7 @@
             this.gcDinhdanh.Location = new System.Drawing.Point(28, 239);
             this.gcDinhdanh.MainView = this.gridView2;
             this.gcDinhdanh.Name = "gcDinhdanh";
-            this.gcDinhdanh.Size = new System.Drawing.Size(1122, 285);
+            this.gcDinhdanh.Size = new System.Drawing.Size(1104, 242);
             this.gcDinhdanh.TabIndex = 1;
             this.gcDinhdanh.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -901,7 +904,7 @@
             this.panelControl2.Controls.Add(this.labelControl7);
             this.panelControl2.Location = new System.Drawing.Point(28, 18);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1122, 174);
+            this.panelControl2.Size = new System.Drawing.Size(1104, 174);
             this.panelControl2.TabIndex = 0;
             // 
             // btnLuudinhdanh
@@ -965,7 +968,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDiengiai.Location = new System.Drawing.Point(560, 45);
             this.txtDiengiai.Name = "txtDiengiai";
-            this.txtDiengiai.Size = new System.Drawing.Size(511, 27);
+            this.txtDiengiai.Size = new System.Drawing.Size(493, 27);
             this.txtDiengiai.TabIndex = 3;
             // 
             // labelControl8
@@ -997,12 +1000,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1358, 651);
+            this.ClientSize = new System.Drawing.Size(1340, 608);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Sao viet  Tax";
+            this.Text = "frmMain";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
