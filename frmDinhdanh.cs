@@ -15,6 +15,8 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid.Columns;
+using System.Reflection;
+using System.IO;
 
 namespace SaovietTax
 {
@@ -141,12 +143,25 @@ namespace SaovietTax
         }
         private void InitDB()
         {
-            // Đường dẫn đến cơ sở dữ liệu Access và mật khẩu
-            //dbPath = @"C:\S.T.E 25\S.T.E 25\DATA\KT2025.mdb"; // Thay đổi đường dẫn này
-            dbPath = ConfigurationManager.AppSettings["dbpath"]; 
-            string filePath = ConfigurationManager.AppSettings["dbpath"];
-            if (string.IsNullOrEmpty(filePath))
-                return;
+            string appPath = Assembly.GetExecutingAssembly().Location;
+
+            // Lấy thư mục chứa ứng dụng
+            string directoryPath = Path.GetDirectoryName(appPath);
+
+            // Xóa phần \bin\Debug để lấy đường dẫn gốc
+            string rootDirectory = Path.GetFullPath(Path.Combine(directoryPath, @"..\.."));
+
+            // Tạo đường dẫn đến file dpPath.txt trong thư mục hoadon
+            string filePaths = Path.Combine(rootDirectory, "hoadon", "dpPath.txt");
+            try
+            {
+                string content = File.ReadAllText(filePaths);
+                dbPath = content;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi khi đọc file: " + ex.Message);
+            } 
             // Đọc toàn bộ nội dung tệp
             string password = "1@35^7*9)1";
             connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={dbPath};Jet OLEDB:Database Password={password};";
