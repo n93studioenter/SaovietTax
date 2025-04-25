@@ -35,6 +35,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Security.Cryptography;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Toolkit.Uwp.Notifications;
+using static SaovietTax.frmMain;
 namespace SaovietTax
 {
     public partial class frmMain : DevExpress.XtraEditors.XtraForm
@@ -137,6 +138,11 @@ namespace SaovietTax
                 gridControl2.DataSource = bindingSource2;
             GridStripRow(gridControl1.MainView as GridView);
             GridStripRow(gridControl2.MainView as GridView);
+
+            gridView1.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
+            gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
+            gridView2.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
+            gridView2.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
         }
         public void GridStripRow(GridView gridView)
         {
@@ -492,7 +498,7 @@ namespace SaovietTax
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
-         
+
             InitDB();
 
             InitData();
@@ -524,7 +530,10 @@ namespace SaovietTax
         }
         private void LoadXmlFiles(string path,int type)
         {
-
+            if (type == 1)
+                people = new BindingList<FileImport>();
+            if (type == 2)
+                people2 = new BindingList<FileImport>();
             BindingList<FileImport> peopleTemp = new BindingList<FileImport>();
             progressBarControl1.EditValue = 0;
             Application.DoEvents(); 
@@ -589,7 +598,7 @@ namespace SaovietTax
             //} 
             foreach (string file in files)
             {
-
+                
                 progressPercentage = (filesLoaded * 100) / totalCount;
                 filesLoaded += 1;
                 progressBarControl1.EditValue = progressPercentage;
@@ -686,13 +695,21 @@ namespace SaovietTax
                     mst = nBanNode.SelectSingleNode("MST")?.InnerText;
                    if(string.IsNullOrEmpty(mst))
                     {
-                        string getdc= root.SelectSingleNode("//NMua//DChi").InnerText;
-                        if(string.IsNullOrEmpty(getdc))
-                        InitCustomer(type == 1 ? 2 : 3, "", ten, "", mst);
+                        if (root.SelectSingleNode("//NMua//DChi")!= null)
+                        {
+                            string getdc = root.SelectSingleNode("//NMua//DChi").InnerText;
+                            if (string.IsNullOrEmpty(getdc))
+                                InitCustomer(type == 1 ? 2 : 3, "", ten, "", mst);
+                            else
+                            {
+                                InitCustomer(type == 1 ? 2 : 3, "", ten, getdc, mst);
+                            }
+                        }
                         else
                         {
-                            InitCustomer(type == 1 ? 2 : 3, "", ten,getdc, mst);
+                            InitCustomer(type == 1 ? 2 : 3, "", ten, "", mst);
                         }
+                       
                     }
                 }
 
@@ -739,13 +756,15 @@ namespace SaovietTax
                 }
 
                 //Kiểm tra thêm mới khách hàng
+                if (mst == null)
+                    mst = "";
                 string querykh = @" SELECT TOP 1 *  FROM KhachHang As kh
 WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
                 DataTable result = ExecuteQuery(querykh, new OleDbParameter("?", mst));
                 if (result.Rows.Count == 0 && !string.IsNullOrEmpty(mst))
                 {
                     string diachi = nBanNode.SelectSingleNode("DChi")?.InnerText;
-                    var Sohieu = GetLastFourDigits(mst);
+                    var Sohieu = GetLastFourDigits(mst.Replace("-",""));
                     ten = Helpers.ConvertUnicodeToVni(ten);
                     if (diachi != null)
                         diachi = Helpers.ConvertUnicodeToVni(diachi);
@@ -837,7 +856,8 @@ ORDER BY  MaSo DESC";
                 var hhdVuList = xmlDoc.SelectNodes("//HHDVu");
                 //Mật định tài khoản 
                 //Kiểm tra Đã tồn tại số hóa đơn và số hiệu
-                if (!peopleTemp.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
+                //if (!peopleTemp.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
+                if (!peopleTemp.Any(m => m.SHDon== SHDon && m.KHHDon == KHHDon))
                 {
                     string diachi = nBanNode.SelectSingleNode("DChi")?.InnerText;
                     if (string.IsNullOrEmpty(mst) && string.IsNullOrEmpty(diachi))
@@ -854,6 +874,7 @@ ORDER BY  MaSo DESC";
                 }
                 for (int i = 0; i < hhdVuList.Count; i++)
                 {
+                   
                     try
                     {
                         string tkno = "";
@@ -862,39 +883,43 @@ ORDER BY  MaSo DESC";
                         {
                             var THHDVu = hhdVuList[i].SelectSingleNode("THHDVu").InnerText;
                             var DVTinh = hhdVuList[i].SelectSingleNode("DVTinh").InnerText;
-
-                            var SLuong = hhdVuList[i].SelectSingleNode("SLuong").InnerText;
-                            var DGia = "";
-                            if (hhdVuList[i].SelectSingleNode("DGia") != null)
-                                DGia = hhdVuList[i].SelectSingleNode("DGia").InnerText;
-                            else
-                                DGia = "0";
-                            string newName = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(THHDVu.Trim()));
-                            //Kiểm tra trong database xem có sản phẩm chưa, nếu chưa có thì thêm mới
-                            query = @"SELECT * FROM Vattu 
+                            if (!string.IsNullOrEmpty(DVTinh))
+                            {
+                                var SLuong = hhdVuList[i].SelectSingleNode("SLuong").InnerText;
+                                var DGia = "";
+                                if (hhdVuList[i].SelectSingleNode("DGia") != null)
+                                    DGia = hhdVuList[i].SelectSingleNode("DGia").InnerText;
+                                else
+                                    DGia = "0";
+                                string newName = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(THHDVu.Trim()));
+                                //Kiểm tra trong database xem có sản phẩm chưa, nếu chưa có thì thêm mới
+                                query = @"SELECT * FROM Vattu 
 WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
-                            //int rs = (int)ExecuteQuery(query, new OleDbParameter("?", "SAdsd")).Rows[0][0];
-                            var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh).ToLower()));
-                            //Kiểm tra thêm trong list
-                            var checkold = peopleTemp.LastOrDefault().fileImportDetails.Where(m => m.Ten == newName && m.DVT == Helpers.ConvertUnicodeToVni(DVTinh)).FirstOrDefault();
-                            string sohieu = "";
-                            if (getdata.Rows.Count == 0)
-                            {
-                                if (checkold == null)
-                                    sohieu = GenerateResultString(NormalizeVietnameseString(THHDVu.Trim()));
+                                //int rs = (int)ExecuteQuery(query, new OleDbParameter("?", "SAdsd")).Rows[0][0];
+                                var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh).ToLower()));
+                                //Kiểm tra thêm trong list
+                                string newdvt = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(DVTinh)).ToLower();
+                                var checkold = peopleTemp.ToList().Where(n=>n.fileImportDetails.Any(m => m.Ten.ToLower() == newName.ToLower() && m.DVT.ToLower() == newdvt)).FirstOrDefault();
+                                string sohieu = "";
+                                if (getdata.Rows.Count == 0)
+                                {
+                                    if (checkold == null)
+                                        sohieu = GenerateResultString(NormalizeVietnameseString(THHDVu.Trim()));
+                                    else
+                                        sohieu = checkold.fileImportDetails.Where(m => m.Ten.ToLower() == newName.ToLower() && m.DVT.ToLower() == newdvt).FirstOrDefault().SoHieu;
+                                }
                                 else
-                                    sohieu = checkold.SoHieu;
-                            }
-                            else
-                                sohieu = getdata.Rows[0]["SoHieu"].ToString();
+                                    sohieu = getdata.Rows[0]["SoHieu"].ToString();
 
-                            //Gán giá trị cho các giá trị ""
-                            DGia = !string.IsNullOrEmpty(DGia) ? DGia : "0";
-                            SLuong = !string.IsNullOrEmpty(SLuong) ? SLuong : "0";
-                            //Thiết lập MÃ ctrinh2 và tkno cho detail 
-                            FileImportDetail fileImportDetail = new FileImportDetail(newName, peopleTemp.LastOrDefault().ID, sohieu, double.Parse(SLuong), double.Parse(DGia), Helpers.ConvertUnicodeToVni(DVTinh), mct, tkno);
-                            peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
+                                //Gán giá trị cho các giá trị ""
+                                DGia = !string.IsNullOrEmpty(DGia) ? DGia : "0";
+                                SLuong = !string.IsNullOrEmpty(SLuong) ? SLuong : "0";
+                                //Thiết lập MÃ ctrinh2 và tkno cho detail 
+                                FileImportDetail fileImportDetail = new FileImportDetail(newName, peopleTemp.LastOrDefault().ID, sohieu.ToUpper(), double.Parse(SLuong), double.Parse(DGia), Helpers.ConvertUnicodeToVni(DVTinh), mct, tkno);
+                                peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
+                            }
+                           
                         }
                         else
                         {
@@ -976,12 +1001,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             string[] conditions = row["KeyValue"].ToString().Split('&');
                             string name = Helpers.ConvertUnicodeToVni((string)row["KeyValue"]);
                             int hasdata = 0;
+                            string key = "";
                             foreach (string condition in conditions)
                             {
                                 string[] parts = Regex.Split(condition, @"([><=%]+)"); // Vẫn giữ % để linh hoạt nếu cần
                                 if (parts.Length == 3)
                                 {
-                                    string key = parts[0];
+                                     key = parts[0];
                                     string operatorStr = parts[1];
                                     string valueStr = parts[2];
                                     if (key == "Ten")
@@ -1012,10 +1038,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             }
                             if (hasdata == conditions.Count() && item.TKNo == "0")
                             {
-                                item.TKNo = row["TKNo"].ToString();
+                                if (key != "TongTien")
+                                    item.TKNo = row["TKNo"].ToString();
                                 item.TKCo = row["TKCo"].ToString();
                                 item.TkThue = int.Parse(row["TkThue"].ToString());
-                                if (string.IsNullOrEmpty(item.Noidung))
+                                if (string.IsNullOrEmpty(item.Noidung) && key == "MST" && item.TKNo=="6422")
                                     item.Noidung = row["Type"].ToString();
                             }
                             //if (item.fileImportDetails.Any(m => m.Ten.Contains(name)))
@@ -1089,7 +1116,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             //    XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             //    return;
             //}
-
+            progressBarControl1.EditValue = 0;
             LoadXmlFiles(savedPath,1);
            LoadExcel(savedPath,1);
            LoadDataGridview(1);
@@ -1225,7 +1252,7 @@ WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
                         if (result.Rows.Count == 0)
                         {
                             diachi = worksheet.Cell(i, 8).Value.ToString();
-                            var Sohieu = GetLastFourDigits(mst);
+                            var Sohieu = GetLastFourDigits(mst.Replace("-",""));
                             ten = Helpers.ConvertUnicodeToVni(ten);
                             diachi = Helpers.ConvertUnicodeToVni(diachi);
                             //Kiểm tra sohieu có trùng nữa ko
@@ -1285,7 +1312,8 @@ WHERE kh.SoHieu = ?";
                                 {
 
                                     if (string.IsNullOrEmpty(item.Noidung))
-                                        item.Noidung = row["Type"].ToString();
+                                        item.Noidung = row["Type"].ToString();;
+                                    item.TKCo = row[4].ToString();
                                 }
                             }
                         }
@@ -1711,9 +1739,14 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             if (DoTask > Endtask)
             {
                 Driver.Quit(); // Đóng WebDriver 
+                StringBuilder sb = new StringBuilder();
+                foreach (var itm in dictionMonth)
+                {
+                    sb.AppendLine($"Tháng {itm.Key} có {itm.Value} hóa đơn");
+                }
                 new ToastContentBuilder()
-      .AddText("Đã tải xong")
-      .Show(); // Hiển thị thông báo
+    .AddText(sb.ToString())
+    .Show(); // Hiển thị thông báo
                 return;
 
             }
@@ -2510,7 +2543,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 .Pause(TimeSpan.FromSeconds(1))
                 .Click()
                 .Perform();
-
+            Thread.Sleep(2000); // Hoặc sử dụng WebDriverWait để chờ điều kiện phù hợp
             //Tải file excel
             Xulymaytinhtien(wait);
         }
@@ -2531,7 +2564,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         }
         #endregion
         #region Database Excute, query
-        string mstNull = "0101010101";
+        string mstNull = "00";
         static string ConvertToTenDigitNumber(string input)
         {
             // Tính tổng mã ASCII
@@ -2728,6 +2761,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             str = str.Replace("ỏ", "o");
             str = str.Replace("ô", "o");
             str = str.Replace("ơ", "o");
+            str = str.Replace("'", "");
             return str;
         }
         private static Random random = new Random(); // Tạo Random tĩnh để tái sử dụng
@@ -2796,8 +2830,28 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         public string hiddenValue { get; set; }
         private void GridcontrolKeyup(KeyEventArgs e, GridView gridView)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
+            
+                if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
+                var selectedCells = gridView1.GetSelectedCells();
+
+                // Kiểm tra nếu có ít nhất một ô được chọn
+                if (selectedCells.Length > 0)
+                {
+                    // Lấy giá trị của ô đầu tiên
+                    var firstCell = selectedCells[0];
+                    var firstValue = gridView1.GetRowCellValue(firstCell.RowHandle, firstCell.Column.FieldName);
+
+                    // Lặp qua tất cả các ô đã chọn
+                    foreach (var cell in selectedCells)
+                    {
+                        // Gán giá trị của ô đầu tiên cho các ô khác
+                        gridView1.SetRowCellValue(cell.RowHandle, cell.Column.FieldName, firstValue);
+                    }
+
+                    // Ngăn chặn việc xử lý sự kiện nhấn phím tiếp theo
+                    e.Handled = true;
+                }
                 if (gridView.IsEditing)
                 {
                     // Đóng trình chỉnh sửa
@@ -2830,10 +2884,10 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                     gridView.SetRowCellValue(nextRowHandle, gridView.FocusedColumn, currentValue);
                     if (gridView.FocusedColumn == gridView.Columns["TKNo"])
                     {
-                        currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.Columns["TKCo"]).ToString();
-                        gridView.SetRowCellValue(nextRowHandle, gridView.Columns["TKCo"], currentValue);
-                        currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.Columns["Noidung"]).ToString();
-                        gridView.SetRowCellValue(nextRowHandle, gridView.Columns["Noidung"], currentValue);
+                        //currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.Columns["TKCo"]).ToString();
+                        //gridView.SetRowCellValue(nextRowHandle, gridView.Columns["TKCo"], currentValue);
+                        //currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.Columns["Noidung"]).ToString();
+                        //gridView.SetRowCellValue(nextRowHandle, gridView.Columns["Noidung"], currentValue);
                     }
 
                     // Di chuyển tiêu điểm đến ô trong hàng tiếp theo
@@ -2935,12 +2989,14 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 if (item.TkThue == 0)
                 {
-                    if (item.TKNo == "6422" || item.TKNo == "6421")
+                    if (item.TKNo.Contains("64"))
                         item.TkThue = 1331;
-                    if (item.TKNo == "152")
+                    if (item.TKNo.Contains("15"))
                         item.TkThue = 1331;
-                    if (item.TKNo == "5111" || item.TKNo == "5112" || item.TKNo == "5113")
+                    if (item.TKNo.Contains("511"))
                         item.TkThue = 33311;
+                    if (item.TkThue == 0)
+                        item.TkThue = 1331;
                 }
 
                 string query = @"
@@ -2972,7 +3028,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 if (a > 0)
                 {
-                    if (item.TKNo != "6422" && item.TKNo != "64221" && !item.TKNo.Contains("154|"))
+                    if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || item.TKNo.Contains("154"))
                     {
                         string tableName = "tbImport";
                         query = $"SELECT MAX(ID) FROM {tableName}";
@@ -3079,6 +3135,11 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
             foreach (var item in people2)
             {
+                //Đảo ngược tk
+                string temp = "";
+                temp = item.TKCo;
+                item.TKCo = item.TKNo;
+                item.TKNo = temp;
                 if (string.IsNullOrEmpty(item.Mst))
                     item.Mst = mstNull;
                 if (!item.Checked)
@@ -3114,11 +3175,11 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 if (item.TkThue == 0)
                 {
-                    if (item.TKNo == "6422" || item.TKNo == "6421")
+                    if (item.TKNo.Contains("64"))
                         item.TkThue = 1331;
-                    if (item.TKNo == "152" || item.TKNo=="153" || item.TKNo == "156")
+                    if (item.TKNo.Contains("15"))
                         item.TkThue = 1331;
-                    if (item.TKNo == "5111" || item.TKNo == "5112" || item.TKNo == "5113")
+                    if (item.TKNo.Contains("511"))
                         item.TkThue = 33311;
                     if (item.TkThue == 0)
                         item.TkThue = 1331;
@@ -3151,7 +3212,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 if (a > 0)
                 {
-                    if (item.TKNo != "6422" && item.TKNo != "64221" && !item.TKNo.Contains("154|") && item.TKNo!="5113")
+                    if (item.TKNo.Contains("5111"))
                     {
                         string tableName = "tbImport";
                         query = $"SELECT MAX(ID) FROM {tableName}";
@@ -3354,8 +3415,15 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             new OleDbParameter("?", DVTinh)
                 };
 
+                try
+                {
+                    int a = ExecuteQueryResult(query, parameters);
+                }
                 // Thực thi truy vấn và lấy kết quả
-                int a = ExecuteQueryResult(query, parameters);
+               catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message+"   "+ newName +"  so hieu: "+ sohieu);
+                }
             }
         }
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -3510,6 +3578,11 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         private void xtraTabPage1_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void gridControl1_KeyDown(object sender, KeyEventArgs e)
+        {
+           
         }
 
         public static string NormalizeVietnameseString(string input)
