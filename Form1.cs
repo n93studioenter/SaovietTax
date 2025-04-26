@@ -36,6 +36,8 @@ using System.Security.Cryptography;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Toolkit.Uwp.Notifications;
 using static SaovietTax.frmMain;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.Diagnostics;
 namespace SaovietTax
 {
     public partial class frmMain : DevExpress.XtraEditors.XtraForm
@@ -129,21 +131,29 @@ namespace SaovietTax
         private void LoadDataGridview(int type)
         {
             if (type == 1)
-                bindingSource.DataSource = people;
-            if (type == 2)
-                bindingSource2.DataSource = people2;
-            if (type == 1)
-                gridControl1.DataSource = bindingSource;
-            if (type == 2)
-                gridControl2.DataSource = bindingSource2;
+            {
+                bindingSource.DataSource = people; // Gán dữ liệu cho bindingSource
+                gridControl1.DataSource = bindingSource; // Gán dữ liệu cho gridControl
+                gridView1.OptionsDetail.EnableMasterViewMode = true; // Bật tính năng Master-Detail
+
+                // Chỉ khởi tạo GridView chi tiết nếu chưa được khởi tạo
+               
+            }
+            else if (type == 2)
+            {
+                gridControl2.DataSource = bindingSource2; // Gán dữ liệu cho gridControl2
+            }
+
+            // Các thiết lập khác
             GridStripRow(gridControl1.MainView as GridView);
             GridStripRow(gridControl2.MainView as GridView);
 
             gridView1.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
             gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
-            gridView2.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
-            gridView2.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
+            gridView3.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
+            gridView3.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
         }
+
         public void GridStripRow(GridView gridView)
         {
             if (gridView != null)
@@ -504,11 +514,10 @@ namespace SaovietTax
             InitData();
             string fileName = Path.GetFileName(dbPath.Trim());
             new ToastContentBuilder()
-          .AddText("Đang đăng nhập vào database " + fileName)
-          .Show(); // Hiển thị thông báo
+            .AddText("Đang đăng nhập vào database " + fileName)
+            .Show(); // Hiển thị thông báo
             CheckDB();
-            ControlsSetup();
-            LoadDataDinhDanh();
+            ControlsSetup(); 
         }
         #endregion
         #region Xử lý xml
@@ -1118,8 +1127,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             //}
             progressBarControl1.EditValue = 0;
             LoadXmlFiles(savedPath,1);
-           LoadExcel(savedPath,1);
-           LoadDataGridview(1);
+            LoadExcel(savedPath,1);
+            LoadDataGridview(1);
 
             LoadXmlFiles(savedPath, 2);
             LoadDataGridview(2);
@@ -1323,54 +1332,7 @@ WHERE kh.SoHieu = ?";
             }
 
         }
-        private void btnDuongdanthumuc_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                folderBrowserDialog.Description = "Chọn thư mục bạn muốn lưu.";
-                // folderBrowserDialog.rootFolder = Environment.SpecialFolder.MyComputer; // Thay đổi thư mục gốc nếu cần
-
-                DialogResult result = folderBrowserDialog.ShowDialog();
-
-                if (result == DialogResult.OK)
-                {
-                    string selectedPath = folderBrowserDialog.SelectedPath;
-
-                    // Lưu đường dẫn thư mục vào App.config
-                    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                    config.AppSettings.Settings["LastFilePath"].Value = selectedPath;
-                    config.Save(ConfigurationSaveMode.Modified);
-                    ConfigurationManager.RefreshSection("appSettings");
-
-                    savedPath = selectedPath;
-                    txtPath.Text = savedPath;
-                }
-                else if (result == DialogResult.Cancel)
-                {
-                    // MessageBox.Show("Không có thư mục nào được chọn.");
-                }
-            }
-        }
-
-        private void btnSetupdbpath_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            // Cài đặt thuộc tính cho hộp thoại
-            openFileDialog.Filter = "Access Database Files (*.mdb)|*.mdb|All Files (*.*)|*.*";
-            openFileDialog.Title = "Chọn tệp MDB";
-
-            // Hiển thị hộp thoại và kiểm tra nếu người dùng chọn tệp
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                // Lưu đường dẫn tệp vào TextBox
-                txtdbPath.Text = openFileDialog.FileName;
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                config.AppSettings.Settings["dbpath"].Value = txtdbPath.Text;
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
-            }
-        }
+        
         public static ChromeDriver Driver { get; private set; }
         #endregion
 
@@ -2547,21 +2509,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             //Tải file excel
             Xulymaytinhtien(wait);
         }
-        private void simpleButton6_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(txtUsername.Text) || string.IsNullOrEmpty(txtPassword.Text))
-            {
-                XtraMessageBox.Show("Vui lòng nhập thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["username"].Value = txtuser.Text;
-            config.AppSettings.Settings["password"].Value = txtpass.Text;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-            XtraMessageBox.Show("Cập nhật tài khoản thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        }
+       
         #endregion
         #region Database Excute, query
         string mstNull = "00";
@@ -2788,16 +2736,6 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
         private void gridControl1_DoubleClick(object sender, EventArgs e)
         {
-
-        }
-
-        private void gridControl1_MouseClick(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void gridControl1_Click(object sender, EventArgs e)
-        {
             GridView gridView = gridControl1.MainView as GridView;
             var hitInfo = gridView.CalcHitInfo(gridView.GridControl.PointToClient(MousePosition));
 
@@ -2806,7 +2744,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
             if (hitInfo.InRowCell)
             {
                 int columnIndex = hitInfo.Column.VisibleIndex; // Chỉ số cột
-                if (columnIndex != 0)
+                if (columnIndex != 1)
                     return;
                 WebBrowser webBrowser1 = new WebBrowser
                 {
@@ -2825,6 +2763,16 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
 
                 webBrowser1.Navigate("file:///" + filePath.Replace("\\", "/"));
             }
+        }
+
+        private void gridControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void gridControl1_Click(object sender, EventArgs e)
+        {
+           
         }
 
         public string hiddenValue { get; set; }
@@ -3300,6 +3248,12 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
+            if(people.Count==0 && people2.Count == 0)
+            {
+                XtraMessageBox.Show("Không có dữ liệu để xử lý!", "Thông báo",
+                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             if (chkDauvao.Checked)
                 ImportHDDauvao();
             if (chkDaura.Checked)
@@ -3436,38 +3390,7 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
                 File.WriteAllText(savedPath + "\\status.txt", "");
         }
 
-        private void btnLuudinhdanh_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(txtTukhoa.Text) || string.IsNullOrEmpty(txtTKNo.Text) || string.IsNullOrEmpty(txtTKCo.Text) || string.IsNullOrEmpty(txtTKThue.Text))
-            {
-                XtraMessageBox.Show("Vui lòng nhập thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            string query = @"
-        INSERT INTO tbDinhdanhtaikhoan (KeyValue,TKNo,TKCo,TKThue,Type)
-        VALUES (?,?,?,?,?)";
-            OleDbParameter[] parameters = new OleDbParameter[]
-{
-        new OleDbParameter("?",txtTukhoa.Text),
-           new OleDbParameter("?",txtTKNo.Text),
-                 new OleDbParameter("?",txtTKCo.Text),
-             new OleDbParameter("?",txtTKThue.Text),
-              new OleDbParameter("?",txtDiengiai.Text)
-};
-
-            // Thực thi truy vấn và lấy kết quả
-            int a = ExecuteQueryResult(query, parameters);
-            LoadDataDinhDanh();
-        }
-        private void LoadDataDinhDanh()
-        {
-            if (string.IsNullOrEmpty(savedPath) || string.IsNullOrEmpty(dbPath))
-                return;
-            string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-
-            result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
-            gcDinhdanh.DataSource = result;
-        }
+        
 
         private void btnMdtk_Click(object sender, EventArgs e)
         {
@@ -3585,9 +3508,60 @@ By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 
            
         }
 
+        private void btnOpenFolder_Click(object sender, EventArgs e)
+        { 
+            Process.Start("explorer.exe", savedPath);
+          
+        }
+
+        private void simpleButton1_Click(object sender, EventArgs e)
+        {
+            
+
+            Process.Start(dbPath.Trim());
+
+        }
+
+        private void gridView1_MasterRowEmpty(object sender, MasterRowEmptyEventArgs e)
+        {
+            GridView view = sender as GridView;
+            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            if (dt != null)
+                e.IsEmpty = !people.Any(m => m.fileImportDetails.Any(j=>j.ParentId==dt.ID));
+        }
+
+        private void gridView1_MasterRowGetChildList(object sender, MasterRowGetChildListEventArgs e)
+        {
+            GridView view = sender as GridView;
+            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            if (dt != null)
+            {
+                var fileImportDetails = dt.fileImportDetails;
+                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+                e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
+            }
+        }
+
+        private void gridView1_MasterRowGetRelationCount(object sender, MasterRowGetRelationCountEventArgs e)
+        {
+            e.RelationCount = 1;
+        }
+
+        private void gridView1_MasterRowGetRelationName(object sender, MasterRowGetRelationNameEventArgs e)
+        {
+            e.RelationName = "Detail";
+        }
+        static string RemoveLeadingSpecialCharacters(string input)
+        {
+            // Sử dụng LINQ để lấy các ký tự không phải là ký tự đặc biệt
+            return new string(input.SkipWhile(c => !char.IsLetterOrDigit(c)).ToArray());
+        }
         public static string NormalizeVietnameseString(string input)
         {
-
+            //Bỏ đi ký tự đặc biệt đầu chữ
+            input = RemoveLeadingSpecialCharacters(input);
+            //Bỏ đi tab
+            input= input.Replace("\t", ""); // Thay thế ký tự tab bằng chuỗi rỗng
             input = input.Normalize(NormalizationForm.FormC);
 
             if (string.IsNullOrEmpty(input))
