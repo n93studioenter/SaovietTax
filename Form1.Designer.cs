@@ -78,22 +78,24 @@
             this.gridColumn10 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.lblDpPath = new DevExpress.XtraEditors.LabelControl();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
+            this.dtDenngay = new DevExpress.XtraEditors.DateEdit();
             this.chkDaura = new DevExpress.XtraEditors.CheckEdit();
+            this.dtTungay = new DevExpress.XtraEditors.DateEdit();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
             this.chkDauvao = new DevExpress.XtraEditors.CheckEdit();
-            this.comboBoxEdit2 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.txtpass = new System.Windows.Forms.TextBox();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl12 = new DevExpress.XtraEditors.LabelControl();
-            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.labelControl13 = new DevExpress.XtraEditors.LabelControl();
             this.txtuser = new System.Windows.Forms.TextBox();
             this.progressBarControl1 = new DevExpress.XtraEditors.ProgressBarControl();
+            this.comboBoxEdit2 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.btnimport = new DevExpress.XtraEditors.SimpleButton();
             this.btnMdtk = new DevExpress.XtraEditors.SimpleButton();
             this.btnChonthang = new DevExpress.XtraEditors.SimpleButton();
             this.btnTaicoquanthue = new DevExpress.XtraEditors.SimpleButton();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.fileImportDetailBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
@@ -112,13 +114,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtDenngay.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtDenngay.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkDaura.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtTungay.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtTungay.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkDauvao.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.progressBarControl1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -217,7 +223,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1276, 206);
+            this.gridControl1.Size = new System.Drawing.Size(1276, 178);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -369,7 +375,7 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1308, 529);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1304, 518);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1});
@@ -381,9 +387,11 @@
             this.xtraTabPage1.Controls.Add(this.lblDpPath);
             this.xtraTabPage1.Controls.Add(this.panelControl3);
             this.xtraTabPage1.Controls.Add(this.progressBarControl1);
+            this.xtraTabPage1.Controls.Add(this.comboBoxEdit2);
             this.xtraTabPage1.Controls.Add(this.panelControl1);
+            this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1302, 495);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1302, 487);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
@@ -392,9 +400,9 @@
             this.panelControl4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panelControl4.Controls.Add(this.simpleButton1);
             this.panelControl4.Controls.Add(this.btnOpenFolder);
-            this.panelControl4.Location = new System.Drawing.Point(1234, 3);
+            this.panelControl4.Location = new System.Drawing.Point(1230, 3);
             this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(65, 160);
+            this.panelControl4.Size = new System.Drawing.Size(65, 185);
             this.panelControl4.TabIndex = 10;
             // 
             // simpleButton1
@@ -421,10 +429,10 @@
             this.xtraTabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.xtraTabControl2.Location = new System.Drawing.Point(11, 207);
+            this.xtraTabControl2.Location = new System.Drawing.Point(11, 227);
             this.xtraTabControl2.Name = "xtraTabControl2";
             this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1282, 240);
+            this.xtraTabControl2.Size = new System.Drawing.Size(1278, 209);
             this.xtraTabControl2.TabIndex = 8;
             this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage3,
@@ -437,7 +445,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1276, 206);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1276, 178);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -467,7 +475,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1276, 206);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1276, 178);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -497,7 +505,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1276, 206);
+            this.gridControl2.Size = new System.Drawing.Size(1276, 178);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3});
@@ -634,7 +642,7 @@
             this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Purple;
             this.lblDpPath.Appearance.Options.UseFont = true;
             this.lblDpPath.Appearance.Options.UseForeColor = true;
-            this.lblDpPath.Location = new System.Drawing.Point(11, 461);
+            this.lblDpPath.Location = new System.Drawing.Point(11, 450);
             this.lblDpPath.Name = "lblDpPath";
             this.lblDpPath.Size = new System.Drawing.Size(170, 19);
             this.lblDpPath.TabIndex = 7;
@@ -642,38 +650,63 @@
             // 
             // panelControl3
             // 
+            this.panelControl3.Controls.Add(this.dtDenngay);
             this.panelControl3.Controls.Add(this.chkDaura);
+            this.panelControl3.Controls.Add(this.dtTungay);
             this.panelControl3.Controls.Add(this.labelControl3);
             this.panelControl3.Controls.Add(this.chkDauvao);
-            this.panelControl3.Controls.Add(this.comboBoxEdit2);
             this.panelControl3.Controls.Add(this.txtpass);
             this.panelControl3.Controls.Add(this.labelControl1);
             this.panelControl3.Controls.Add(this.labelControl12);
-            this.panelControl3.Controls.Add(this.comboBoxEdit1);
             this.panelControl3.Controls.Add(this.labelControl13);
             this.panelControl3.Controls.Add(this.txtuser);
             this.panelControl3.Location = new System.Drawing.Point(11, 3);
             this.panelControl3.Name = "panelControl3";
-            this.panelControl3.Size = new System.Drawing.Size(611, 165);
+            this.panelControl3.Size = new System.Drawing.Size(833, 185);
             this.panelControl3.TabIndex = 6;
+            // 
+            // dtDenngay
+            // 
+            this.dtDenngay.EditValue = null;
+            this.dtDenngay.Location = new System.Drawing.Point(551, 101);
+            this.dtDenngay.Name = "dtDenngay";
+            this.dtDenngay.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dtDenngay.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dtDenngay.Size = new System.Drawing.Size(276, 29);
+            this.dtDenngay.TabIndex = 22;
             // 
             // chkDaura
             // 
-            this.chkDaura.Location = new System.Drawing.Point(399, 128);
+            this.chkDaura.Location = new System.Drawing.Point(559, 146);
             this.chkDaura.Name = "chkDaura";
             this.chkDaura.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.chkDaura.Properties.Appearance.Options.UseFont = true;
             this.chkDaura.Properties.Caption = "Tải hóa đơn đầu ra";
             this.chkDaura.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
             this.chkDaura.Properties.CheckBoxOptions.SvgImageSize = new System.Drawing.Size(15, 15);
-            this.chkDaura.Size = new System.Drawing.Size(207, 26);
+            this.chkDaura.Size = new System.Drawing.Size(229, 26);
             this.chkDaura.TabIndex = 21;
+            // 
+            // dtTungay
+            // 
+            this.dtTungay.EditValue = null;
+            this.dtTungay.Location = new System.Drawing.Point(142, 102);
+            this.dtTungay.Name = "dtTungay";
+            this.dtTungay.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dtTungay.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.dtTungay.Size = new System.Drawing.Size(269, 29);
+            this.dtTungay.TabIndex = 23;
+            this.dtTungay.EditValueChanged += new System.EventHandler(this.dtTungay_EditValueChanged);
             // 
             // labelControl3
             // 
             this.labelControl3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl3.Location = new System.Drawing.Point(348, 89);
+            this.labelControl3.Location = new System.Drawing.Point(466, 106);
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(73, 19);
             this.labelControl3.TabIndex = 7;
@@ -682,7 +715,7 @@
             // chkDauvao
             // 
             this.chkDauvao.EditValue = true;
-            this.chkDauvao.Location = new System.Drawing.Point(142, 127);
+            this.chkDauvao.Location = new System.Drawing.Point(142, 146);
             this.chkDauvao.Name = "chkDauvao";
             this.chkDauvao.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.chkDauvao.Properties.Appearance.Options.UseFont = true;
@@ -692,22 +725,11 @@
             this.chkDauvao.Size = new System.Drawing.Size(251, 26);
             this.chkDauvao.TabIndex = 20;
             // 
-            // comboBoxEdit2
-            // 
-            this.comboBoxEdit2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBoxEdit2.Location = new System.Drawing.Point(448, 82);
-            this.comboBoxEdit2.Name = "comboBoxEdit2";
-            this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit2.Size = new System.Drawing.Size(158, 27);
-            this.comboBoxEdit2.TabIndex = 6;
-            // 
             // txtpass
             // 
             this.txtpass.Location = new System.Drawing.Point(142, 49);
             this.txtpass.Name = "txtpass";
-            this.txtpass.Size = new System.Drawing.Size(458, 27);
+            this.txtpass.Size = new System.Drawing.Size(686, 27);
             this.txtpass.TabIndex = 19;
             this.txtpass.TextChanged += new System.EventHandler(this.txtpass_TextChanged_1);
             // 
@@ -715,7 +737,7 @@
             // 
             this.labelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl1.Location = new System.Drawing.Point(11, 88);
+            this.labelControl1.Location = new System.Drawing.Point(5, 105);
             this.labelControl1.Name = "labelControl1";
             this.labelControl1.Size = new System.Drawing.Size(65, 19);
             this.labelControl1.TabIndex = 2;
@@ -729,17 +751,6 @@
             this.labelControl12.TabIndex = 18;
             this.labelControl12.Text = "Mật khẩu";
             // 
-            // comboBoxEdit1
-            // 
-            this.comboBoxEdit1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBoxEdit1.Location = new System.Drawing.Point(142, 82);
-            this.comboBoxEdit1.Name = "comboBoxEdit1";
-            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(166, 27);
-            this.comboBoxEdit1.TabIndex = 1;
-            // 
             // labelControl13
             // 
             this.labelControl13.Location = new System.Drawing.Point(5, 19);
@@ -752,7 +763,7 @@
             // 
             this.txtuser.Location = new System.Drawing.Point(142, 16);
             this.txtuser.Name = "txtuser";
-            this.txtuser.Size = new System.Drawing.Size(458, 27);
+            this.txtuser.Size = new System.Drawing.Size(686, 27);
             this.txtuser.TabIndex = 16;
             this.txtuser.TextChanged += new System.EventHandler(this.txtuser_TextChanged_1);
             // 
@@ -760,10 +771,22 @@
             // 
             this.progressBarControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBarControl1.Location = new System.Drawing.Point(11, 174);
+            this.progressBarControl1.Location = new System.Drawing.Point(13, 194);
             this.progressBarControl1.Name = "progressBarControl1";
-            this.progressBarControl1.Size = new System.Drawing.Size(1282, 27);
+            this.progressBarControl1.Size = new System.Drawing.Size(1278, 27);
             this.progressBarControl1.TabIndex = 3;
+            // 
+            // comboBoxEdit2
+            // 
+            this.comboBoxEdit2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxEdit2.Location = new System.Drawing.Point(814, 442);
+            this.comboBoxEdit2.Name = "comboBoxEdit2";
+            this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit2.Size = new System.Drawing.Size(76, 29);
+            this.comboBoxEdit2.TabIndex = 6;
+            this.comboBoxEdit2.Visible = false;
             // 
             // panelControl1
             // 
@@ -771,15 +794,15 @@
             this.panelControl1.Controls.Add(this.btnMdtk);
             this.panelControl1.Controls.Add(this.btnChonthang);
             this.panelControl1.Controls.Add(this.btnTaicoquanthue);
-            this.panelControl1.Location = new System.Drawing.Point(628, 3);
+            this.panelControl1.Location = new System.Drawing.Point(850, 3);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(374, 165);
+            this.panelControl1.Size = new System.Drawing.Size(361, 185);
             this.panelControl1.TabIndex = 1;
             // 
             // btnimport
             // 
             this.btnimport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnimport.ImageOptions.Image")));
-            this.btnimport.Location = new System.Drawing.Point(5, 126);
+            this.btnimport.Location = new System.Drawing.Point(5, 142);
             this.btnimport.Name = "btnimport";
             this.btnimport.Size = new System.Drawing.Size(350, 34);
             this.btnimport.TabIndex = 2;
@@ -789,7 +812,7 @@
             // btnMdtk
             // 
             this.btnMdtk.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMdtk.ImageOptions.Image")));
-            this.btnMdtk.Location = new System.Drawing.Point(5, 50);
+            this.btnMdtk.Location = new System.Drawing.Point(5, 53);
             this.btnMdtk.Name = "btnMdtk";
             this.btnMdtk.Size = new System.Drawing.Size(350, 34);
             this.btnMdtk.TabIndex = 9;
@@ -799,7 +822,7 @@
             // btnChonthang
             // 
             this.btnChonthang.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnChonthang.ImageOptions.Image")));
-            this.btnChonthang.Location = new System.Drawing.Point(5, 90);
+            this.btnChonthang.Location = new System.Drawing.Point(5, 97);
             this.btnChonthang.Name = "btnChonthang";
             this.btnChonthang.Size = new System.Drawing.Size(350, 34);
             this.btnChonthang.TabIndex = 8;
@@ -816,6 +839,18 @@
             this.btnTaicoquanthue.Text = "Tải dữ liệu từ cơ quan thuế";
             this.btnTaicoquanthue.Click += new System.EventHandler(this.btnTaicoquanthue_Click);
             // 
+            // comboBoxEdit1
+            // 
+            this.comboBoxEdit1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxEdit1.Location = new System.Drawing.Point(715, 442);
+            this.comboBoxEdit1.Name = "comboBoxEdit1";
+            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit1.Size = new System.Drawing.Size(84, 29);
+            this.comboBoxEdit1.TabIndex = 1;
+            this.comboBoxEdit1.Visible = false;
+            // 
             // fileImportDetailBindingSource
             // 
             this.fileImportDetailBindingSource.DataSource = typeof(SaovietTax.frmMain.FileImportDetail);
@@ -824,7 +859,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1308, 529);
+            this.ClientSize = new System.Drawing.Size(1304, 518);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
@@ -854,13 +889,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
             this.panelControl3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtDenngay.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtDenngay.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkDaura.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtTungay.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtTungay.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkDauvao.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.progressBarControl1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).EndInit();
             this.ResumeLayout(false);
 
@@ -932,5 +971,7 @@
         private DevExpress.XtraGrid.Columns.GridColumn colMaCT2;
         private DevExpress.XtraGrid.Columns.GridColumn colTKNo2;
         private DevExpress.XtraGrid.Columns.GridColumn colSohieu2;
+        private DevExpress.XtraEditors.DateEdit dtDenngay;
+        private DevExpress.XtraEditors.DateEdit dtTungay;
     }
 }

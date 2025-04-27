@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ClosedXML.Excel.XLPredefinedFormat;
 
 namespace SaovietTax
 {
     public static class Helpers
     {
+      
         private static readonly Dictionary<char, string> UnicodeToVniMap = new Dictionary<char, string>
 {
     // Chữ thường
@@ -71,6 +73,12 @@ namespace SaovietTax
             {'Ỵ', "Î"}, {'ỵ', "î"}, {'Ỷ', "YÛ"}, {'ỷ', "yû"},
             {'Ỹ', "YÕ"}, {'ỹ', "yõ"}
 };
+
+        public static string InsertZero(string text)
+        {
+            int lenght = int.Parse(text);
+            return lenght.ToString("D8");
+        }
         public static string ConvertUnicodeToVni(string input)
         {
             StringBuilder output = new StringBuilder();
