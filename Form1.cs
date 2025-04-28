@@ -1013,7 +1013,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 if (hhdVuList.Count == 1)
                                 {
                                     FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception", "", "","");
-                                    peopleTemp.LastOrDefault().TKNo = "3311";
+                                    peopleTemp.LastOrDefault().TKNo = "331";
                                     peopleTemp.LastOrDefault().TKCo = "711";
                                     peopleTemp.LastOrDefault().TkThue = 1331;
                                     peopleTemp.LastOrDefault().Noidung = "Chiếc khấu thương mại";
@@ -1163,10 +1163,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         if (item.TkThue == 0)
                             item.TkThue = int.Parse(row["TkThue"].ToString());
                         //Cho truong hop 331 711
-                        if (item.TKNo == "3311")
+                        if (item.TKNo == "331")
                         {
-                            item.TKNo = "711";
-                            item.TKCo = "3311";
+                            //item.TKNo = "711";
+                            //item.TKCo = "3311";
                         }
                     }
                 }
@@ -3077,7 +3077,7 @@ WHERE kh.SoHieu = ?";
 
                 if (a > 0)
                 {
-                    if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || item.TKNo.Contains("154"))
+                    if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || item.TKNo.Contains("154") || item.TKNo.Contains("711"))
                     {
                         string tableName = "tbImport";
                         query = $"SELECT MAX(ID) FROM {tableName}";
@@ -3101,7 +3101,11 @@ WHERE kh.SoHieu = ?";
                                     it.TKNo = "152";
                                 }
                             }
-
+                            if (item.TKNo == "711")
+                            {
+                                it.TKNo = "711";
+                                it.TKCo = "331";
+                            }
                             query = @"
                         INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten,MaCT,TKNo,TKCo)
                         VALUES (?, ?, ?, ?, ?, ?,?,?,?)";
@@ -3354,12 +3358,12 @@ WHERE kh.SoHieu = ?";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            if(people.Count==0 && people2.Count == 0)
-            {
-                XtraMessageBox.Show("Không có dữ liệu để xử lý!", "Thông báo",
-                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            //if(people.Count==0 && people2.Count == 0)
+            //{
+            //    XtraMessageBox.Show("Không có dữ liệu để xử lý!", "Thông báo",
+            //                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
             if (chkDauvao.Checked)
                 ImportHDVao();
             if (chkDaura.Checked)
@@ -3751,6 +3755,27 @@ WHERE kh.SoHieu = ?";
                 // Đảo ngược giá trị
                 gridView1.SetRowCellValue(e.RowHandle, e.Column, !currentValue);
             }
+        }
+
+        private void gridView3_RowCellClick(object sender, RowCellClickEventArgs e)
+        {
+            if (e.Column.FieldName == "Checked") // Thay đổi tên cột cho phù hợp
+            {
+                // Lấy giá trị hiện tại của checkbox
+                bool currentValue = (bool)gridView3.GetRowCellValue(e.RowHandle, e.Column);
+
+                // Đảo ngược giá trị
+                gridView3.SetRowCellValue(e.RowHandle, e.Column, !currentValue);
+            }
+        }
+
+        private void dtDenngay_EditValueChanged(object sender, EventArgs e)
+        {
+            DateTime fromDate = (DateTime)dtTungay.EditValue;
+
+            DateTime toDate = fromDate.AddMonths(1).AddDays(-1); 
+            if (dtDenngay.DateTime > toDate)
+                dtDenngay.EditValue = toDate;
         }
 
         public static string NormalizeVietnameseString(string input)

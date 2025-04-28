@@ -48,10 +48,10 @@
             this.colSHDon = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colNLap = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTen = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colNoidung = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTongTien = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKCo = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colTongTien = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colNoidung = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colChecked = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colPath = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -183,6 +183,8 @@
             // colDongia2
             // 
             this.colDongia2.Caption = "Đơn giá";
+            this.colDongia2.DisplayFormat.FormatString = "N0";
+            this.colDongia2.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colDongia2.FieldName = "Dongia";
             this.colDongia2.MinWidth = 30;
             this.colDongia2.Name = "colDongia2";
@@ -265,10 +267,10 @@
             this.colSHDon,
             this.colNLap,
             this.colTen,
-            this.colNoidung,
+            this.colTongTien,
             this.colTKNo,
             this.colTKCo,
-            this.colTongTien,
+            this.colNoidung,
             this.colChecked,
             this.colPath});
             this.gridView1.GridControl = this.gridControl1;
@@ -322,14 +324,17 @@
             this.colTen.VisibleIndex = 3;
             this.colTen.Width = 369;
             // 
-            // colNoidung
+            // colTongTien
             // 
-            this.colNoidung.FieldName = "Noidung";
-            this.colNoidung.MinWidth = 30;
-            this.colNoidung.Name = "colNoidung";
-            this.colNoidung.Visible = true;
-            this.colNoidung.VisibleIndex = 4;
-            this.colNoidung.Width = 402;
+            this.colTongTien.DisplayFormat.FormatString = "N0";
+            this.colTongTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colTongTien.FieldName = "TongTien";
+            this.colTongTien.MinWidth = 30;
+            this.colTongTien.Name = "colTongTien";
+            this.colTongTien.OptionsColumn.AllowEdit = false;
+            this.colTongTien.Visible = true;
+            this.colTongTien.VisibleIndex = 4;
+            this.colTongTien.Width = 94;
             // 
             // colTKNo
             // 
@@ -365,17 +370,14 @@
             this.colTKCo.VisibleIndex = 6;
             this.colTKCo.Width = 74;
             // 
-            // colTongTien
+            // colNoidung
             // 
-            this.colTongTien.DisplayFormat.FormatString = "N0";
-            this.colTongTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colTongTien.FieldName = "TongTien";
-            this.colTongTien.MinWidth = 30;
-            this.colTongTien.Name = "colTongTien";
-            this.colTongTien.OptionsColumn.AllowEdit = false;
-            this.colTongTien.Visible = true;
-            this.colTongTien.VisibleIndex = 7;
-            this.colTongTien.Width = 94;
+            this.colNoidung.FieldName = "Noidung";
+            this.colNoidung.MinWidth = 30;
+            this.colNoidung.Name = "colNoidung";
+            this.colNoidung.Visible = true;
+            this.colNoidung.VisibleIndex = 7;
+            this.colNoidung.Width = 402;
             // 
             // colChecked
             // 
@@ -439,6 +441,7 @@
             this.gridView3.GridControl = this.gridControl2;
             this.gridView3.Name = "gridView3";
             this.gridView3.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView3_RowClick);
+            this.gridView3.RowCellClick += new DevExpress.XtraGrid.Views.Grid.RowCellClickEventHandler(this.gridView3_RowCellClick);
             this.gridView3.MasterRowEmpty += new DevExpress.XtraGrid.Views.Grid.MasterRowEmptyEventHandler(this.gridView3_MasterRowEmpty);
             this.gridView3.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView3_MasterRowGetChildList);
             this.gridView3.MasterRowGetRelationName += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationNameEventHandler(this.gridView3_MasterRowGetRelationName);
@@ -725,6 +728,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dtDenngay.Size = new System.Drawing.Size(276, 29);
             this.dtDenngay.TabIndex = 22;
+            this.dtDenngay.EditValueChanged += new System.EventHandler(this.dtDenngay_EditValueChanged);
             // 
             // chkDaura
             // 
