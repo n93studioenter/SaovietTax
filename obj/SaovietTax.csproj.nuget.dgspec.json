@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\TCP\\Saoviet\\SaovietTax\\SaovietTax\\SaovietTax.csproj": {}
+    "C:\\TCP\\Saoviet\\SourcePmTrungGiang\\SaovietTax\\SaovietTax\\SaovietTax.csproj": {}
   },
   "projects": {
-    "C:\\TCP\\Saoviet\\SaovietTax\\SaovietTax\\SaovietTax.csproj": {
+    "C:\\TCP\\Saoviet\\SourcePmTrungGiang\\SaovietTax\\SaovietTax\\SaovietTax.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\TCP\\Saoviet\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
+        "projectUniqueName": "C:\\TCP\\Saoviet\\SourcePmTrungGiang\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
         "projectName": "SaovietTax",
-        "projectPath": "C:\\TCP\\Saoviet\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
+        "projectPath": "C:\\TCP\\Saoviet\\SourcePmTrungGiang\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\TCP\\Saoviet\\SaovietTax\\SaovietTax\\obj\\",
+        "outputPath": "C:\\TCP\\Saoviet\\SourcePmTrungGiang\\SaovietTax\\SaovietTax\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "UsingMicrosoftNETSdk": false,

@@ -3124,7 +3124,7 @@ WHERE kh.SoHieu = ?";
                             };
 
                             int resl = ExecuteQueryResult(query, parameters);
-                            InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu, Helpers.ConvertUnicodeToVni(it.Ten));
+                            InsertHangHoa(Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(it.DVT)), it.SoHieu, it.Ten);
                         }
                     }
                 }
@@ -3312,7 +3312,7 @@ WHERE kh.SoHieu = ?";
                             };
 
                             int resl = ExecuteQueryResult(query, parameters);
-                            InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu, Helpers.ConvertUnicodeToVni(it.Ten));
+                            InsertHangHoa(Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(it.DVT)), it.SoHieu,it.Ten);
                         }
                     }
                 }
@@ -3393,9 +3393,11 @@ WHERE kh.SoHieu = ?";
             // Trước khi insert vật tư, kiểm tra phân loại vật tư trước
             string km = Helpers.ConvertUnicodeToVni("khuyến mãi").ToLower();
             string searchTerm = "%" + km + "%";
+            string km2 = Helpers.ConvertUnicodeToVni("khuyến mại").ToLower();
+            string searchTerm2 = "%" + km2 + "%";
 
-            string querydinhdanh = @"SELECT * FROM PhanLoaiVattu WHERE TenPhanLoai LIKE ?"; // Sử dụng ? thay cho @mst trong OleDb
-            var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm));
+            string querydinhdanh = @"SELECT * FROM PhanLoaiVattu WHERE LCase(TenPhanLoai) LIKE ? OR LCase(TenPhanLoai) LIKE ?";
+            var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTerm), new OleDbParameter("?", searchTerm2));
 
             // Nếu chưa có thì thêm mới
             if (resultkm.Rows.Count == 0)
@@ -3415,13 +3417,12 @@ WHERE kh.SoHieu = ?";
                 int rr = ExecuteQueryResult(query, parameterss);
             }
 
+            //query = @"SELECT * FROM Vattu 
+            //  WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             query = @"SELECT * FROM Vattu 
-              WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
-
-            var getdata = ExecuteQuery(query,
-                new OleDbParameter("?", newName.ToLower()),
-                new OleDbParameter("?", DVTinh.ToLower()));
-
+WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
+            var getdata = ExecuteQuery(query,new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", DVTinh.ToLower()));
+            //var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh).ToLower()));
             if (getdata.Rows.Count == 0)
             {
                 query = @"
@@ -3436,11 +3437,11 @@ WHERE kh.SoHieu = ?";
                 else
                 {
                     // Nếu chưa có nhóm tạm thì tạo
-                    string nt = Helpers.ConvertUnicodeToVni("Nhóm tạm").ToLower();
+                    string nt = Helpers.ConvertUnicodeToVni("Nhóm hàng tạm").ToLower();
                     string searchTemp = "%" + nt + "%";
 
-                    string quryNhomtam = @"SELECT * FROM PhanLoaiVattu WHERE TenPhanLoai LIKE ?";
-                    var resultnt = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTemp));
+                    string quryNhomtam = @"SELECT * FROM PhanLoaiVattu WHERE LCase(TenPhanLoai) LIKE ?";
+                    var resultnt = ExecuteQuery(quryNhomtam, new OleDbParameter("?", searchTemp));
 
                     if (resultnt.Rows.Count == 0)
                     {
@@ -3451,7 +3452,7 @@ WHERE kh.SoHieu = ?";
 
                         var parameterss = new OleDbParameter[]
                         {
-                    new OleDbParameter("?", "NT"),
+                    new OleDbParameter("?", "NHT"),
                     new OleDbParameter("?", nt),
                     new OleDbParameter("?", 1),
                     new OleDbParameter("?", 39)
@@ -3459,7 +3460,7 @@ WHERE kh.SoHieu = ?";
 
                         int rr = ExecuteQueryResult(query, parameterss);
                         quryNhomtam = @"SELECT * FROM PhanLoaiVattu WHERE TenPhanLoai LIKE ?";
-                        resultnt = ExecuteQuery(querydinhdanh, new OleDbParameter("?", searchTemp));
+                        resultnt = ExecuteQuery(quryNhomtam, new OleDbParameter("?", searchTemp));
 
                         if (resultnt.Rows.Count > 0)
                         {
