@@ -79,8 +79,26 @@ namespace SaovietTax
             int lenght = int.Parse(text);
             return lenght.ToString("D8");
         }
+        static string RemoveLeadingSpecialCharacters(string input)
+        {
+            // Sử dụng LINQ để lấy các ký tự không phải là ký tự đặc biệt
+            return new string(input.SkipWhile(c => !char.IsLetterOrDigit(c)).ToArray());
+        }
+        public static string NormalizeVietnameseString(string input)
+        {
+            //Bỏ đi ký tự đặc biệt đầu chữ
+            input = RemoveLeadingSpecialCharacters(input);
+            //Bỏ đi tab
+            input = input.Replace("\t", ""); // Thay thế ký tự tab bằng chuỗi rỗng
+            input = input.Normalize(NormalizationForm.FormC);
+
+            if (string.IsNullOrEmpty(input))
+                return input;
+            return input;
+        }
         public static string ConvertUnicodeToVni(string input)
         {
+            input = NormalizeVietnameseString(input);
             StringBuilder output = new StringBuilder();
 
             foreach (char c in input)

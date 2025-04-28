@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -39,6 +40,7 @@
             this.colDVT = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colMaCT2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.coltkco2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.fileImportBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -47,23 +49,12 @@
             this.colNLap = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTen = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colNoidung = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colTKCo = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTKCo = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTongTien = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colChecked = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colPath = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
-            this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
-            this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
-            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
-            this.btnOpenFolder = new DevExpress.XtraEditors.SimpleButton();
-            this.xtraTabControl2 = new DevExpress.XtraTab.XtraTabControl();
-            this.xtraTabPage3 = new DevExpress.XtraTab.XtraTabPage();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lblSofiles = new System.Windows.Forms.Label();
-            this.xtraTabPage4 = new DevExpress.XtraTab.XtraTabPage();
-            this.label2 = new System.Windows.Forms.Label();
-            this.lblSofiles2 = new System.Windows.Forms.Label();
+            this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridControl2 = new DevExpress.XtraGrid.GridControl();
             this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -76,6 +67,18 @@
             this.gridColumn8 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn9 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn10 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
+            this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
+            this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
+            this.btnOpenFolder = new DevExpress.XtraEditors.SimpleButton();
+            this.xtraTabControl2 = new DevExpress.XtraTab.XtraTabControl();
+            this.xtraTabPage3 = new DevExpress.XtraTab.XtraTabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblSofiles = new System.Windows.Forms.Label();
+            this.xtraTabPage4 = new DevExpress.XtraTab.XtraTabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblSofiles2 = new System.Windows.Forms.Label();
             this.lblDpPath = new DevExpress.XtraEditors.LabelControl();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
             this.dtDenngay = new DevExpress.XtraEditors.DateEdit();
@@ -101,6 +104,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
@@ -110,8 +116,6 @@
             this.xtraTabControl2.SuspendLayout();
             this.xtraTabPage3.SuspendLayout();
             this.xtraTabPage4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dtDenngay.Properties.CalendarTimeProperties)).BeginInit();
@@ -137,7 +141,8 @@
             this.colDongia2,
             this.colDVT,
             this.colMaCT2,
-            this.colTKNo2});
+            this.colTKNo2,
+            this.coltkco2});
             this.gridView2.GridControl = this.gridControl1;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsView.ShowGroupPanel = false;
@@ -148,6 +153,7 @@
             this.colTen2.FieldName = "Ten";
             this.colTen2.MinWidth = 30;
             this.colTen2.Name = "colTen2";
+            this.colTen2.OptionsColumn.AllowEdit = false;
             this.colTen2.Visible = true;
             this.colTen2.VisibleIndex = 0;
             this.colTen2.Width = 112;
@@ -158,6 +164,7 @@
             this.colSohieu2.FieldName = "SoHieu";
             this.colSohieu2.MinWidth = 30;
             this.colSohieu2.Name = "colSohieu2";
+            this.colSohieu2.OptionsColumn.AllowEdit = false;
             this.colSohieu2.Visible = true;
             this.colSohieu2.VisibleIndex = 1;
             this.colSohieu2.Width = 112;
@@ -168,6 +175,7 @@
             this.colSoluong2.FieldName = "Soluong";
             this.colSoluong2.MinWidth = 30;
             this.colSoluong2.Name = "colSoluong2";
+            this.colSoluong2.OptionsColumn.AllowEdit = false;
             this.colSoluong2.Visible = true;
             this.colSoluong2.VisibleIndex = 2;
             this.colSoluong2.Width = 112;
@@ -178,6 +186,7 @@
             this.colDongia2.FieldName = "Dongia";
             this.colDongia2.MinWidth = 30;
             this.colDongia2.Name = "colDongia2";
+            this.colDongia2.OptionsColumn.AllowEdit = false;
             this.colDongia2.Visible = true;
             this.colDongia2.VisibleIndex = 3;
             this.colDongia2.Width = 112;
@@ -188,6 +197,7 @@
             this.colDVT.FieldName = "DVT";
             this.colDVT.MinWidth = 30;
             this.colDVT.Name = "colDVT";
+            this.colDVT.OptionsColumn.AllowEdit = false;
             this.colDVT.Visible = true;
             this.colDVT.VisibleIndex = 4;
             this.colDVT.Width = 112;
@@ -210,6 +220,16 @@
             this.colTKNo2.VisibleIndex = 5;
             this.colTKNo2.Width = 112;
             // 
+            // coltkco2
+            // 
+            this.coltkco2.Caption = "TKCo";
+            this.coltkco2.FieldName = "TKCo";
+            this.coltkco2.MinWidth = 30;
+            this.coltkco2.Name = "coltkco2";
+            this.coltkco2.Visible = true;
+            this.coltkco2.VisibleIndex = 6;
+            this.coltkco2.Width = 112;
+            // 
             // gridControl1
             // 
             this.gridControl1.DataSource = this.fileImportBindingSource;
@@ -223,7 +243,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1276, 178);
+            this.gridControl1.Size = new System.Drawing.Size(1301, 235);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -246,18 +266,22 @@
             this.colNLap,
             this.colTen,
             this.colNoidung,
-            this.colTKCo,
             this.colTKNo,
+            this.colTKCo,
             this.colTongTien,
             this.colChecked,
             this.colPath});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsDetail.ShowDetailTabs = false;
+            this.gridView1.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView1_RowClick);
+            this.gridView1.RowCellClick += new DevExpress.XtraGrid.Views.Grid.RowCellClickEventHandler(this.gridView1_RowCellClick);
             this.gridView1.MasterRowEmpty += new DevExpress.XtraGrid.Views.Grid.MasterRowEmptyEventHandler(this.gridView1_MasterRowEmpty);
             this.gridView1.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView1_MasterRowGetChildList);
             this.gridView1.MasterRowGetRelationName += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationNameEventHandler(this.gridView1_MasterRowGetRelationName);
             this.gridView1.MasterRowGetRelationCount += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationCountEventHandler(this.gridView1_MasterRowGetRelationCount);
+            this.gridView1.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridView1_CustomRowCellEdit);
+            this.gridView1.ShownEditor += new System.EventHandler(this.gridView1_ShownEditor);
             // 
             // colID
             // 
@@ -283,6 +307,7 @@
             this.colNLap.FieldName = "NLap";
             this.colNLap.MinWidth = 30;
             this.colNLap.Name = "colNLap";
+            this.colNLap.OptionsColumn.AllowEdit = false;
             this.colNLap.Visible = true;
             this.colNLap.VisibleIndex = 2;
             this.colNLap.Width = 89;
@@ -292,6 +317,7 @@
             this.colTen.FieldName = "Ten";
             this.colTen.MinWidth = 30;
             this.colTen.Name = "colTen";
+            this.colTen.OptionsColumn.AllowEdit = false;
             this.colTen.Visible = true;
             this.colTen.VisibleIndex = 3;
             this.colTen.Width = 369;
@@ -304,23 +330,6 @@
             this.colNoidung.Visible = true;
             this.colNoidung.VisibleIndex = 4;
             this.colNoidung.Width = 402;
-            // 
-            // colTKCo
-            // 
-            this.colTKCo.AppearanceCell.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.colTKCo.AppearanceCell.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Information;
-            this.colTKCo.AppearanceCell.Options.UseFont = true;
-            this.colTKCo.AppearanceCell.Options.UseForeColor = true;
-            this.colTKCo.AppearanceHeader.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.colTKCo.AppearanceHeader.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Information;
-            this.colTKCo.AppearanceHeader.Options.UseFont = true;
-            this.colTKCo.AppearanceHeader.Options.UseForeColor = true;
-            this.colTKCo.FieldName = "TKCo";
-            this.colTKCo.MinWidth = 30;
-            this.colTKCo.Name = "colTKCo";
-            this.colTKCo.Visible = true;
-            this.colTKCo.VisibleIndex = 5;
-            this.colTKCo.Width = 74;
             // 
             // colTKNo
             // 
@@ -336,8 +345,25 @@
             this.colTKNo.MinWidth = 30;
             this.colTKNo.Name = "colTKNo";
             this.colTKNo.Visible = true;
-            this.colTKNo.VisibleIndex = 6;
+            this.colTKNo.VisibleIndex = 5;
             this.colTKNo.Width = 68;
+            // 
+            // colTKCo
+            // 
+            this.colTKCo.AppearanceCell.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.colTKCo.AppearanceCell.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Information;
+            this.colTKCo.AppearanceCell.Options.UseFont = true;
+            this.colTKCo.AppearanceCell.Options.UseForeColor = true;
+            this.colTKCo.AppearanceHeader.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.colTKCo.AppearanceHeader.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Information;
+            this.colTKCo.AppearanceHeader.Options.UseFont = true;
+            this.colTKCo.AppearanceHeader.Options.UseForeColor = true;
+            this.colTKCo.FieldName = "TKCo";
+            this.colTKCo.MinWidth = 30;
+            this.colTKCo.Name = "colTKCo";
+            this.colTKCo.Visible = true;
+            this.colTKCo.VisibleIndex = 6;
+            this.colTKCo.Width = 74;
             // 
             // colTongTien
             // 
@@ -346,6 +372,7 @@
             this.colTongTien.FieldName = "TongTien";
             this.colTongTien.MinWidth = 30;
             this.colTongTien.Name = "colTongTien";
+            this.colTongTien.OptionsColumn.AllowEdit = false;
             this.colTongTien.Visible = true;
             this.colTongTien.VisibleIndex = 7;
             this.colTongTien.Width = 94;
@@ -369,147 +396,31 @@
             this.colPath.Name = "colPath";
             this.colPath.Width = 112;
             // 
-            // xtraTabControl1
+            // gridView4
             // 
-            this.xtraTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
-            this.xtraTabControl1.Name = "xtraTabControl1";
-            this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1304, 518);
-            this.xtraTabControl1.TabIndex = 0;
-            this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
-            this.xtraTabPage1});
-            // 
-            // xtraTabPage1
-            // 
-            this.xtraTabPage1.Controls.Add(this.panelControl4);
-            this.xtraTabPage1.Controls.Add(this.xtraTabControl2);
-            this.xtraTabPage1.Controls.Add(this.lblDpPath);
-            this.xtraTabPage1.Controls.Add(this.panelControl3);
-            this.xtraTabPage1.Controls.Add(this.progressBarControl1);
-            this.xtraTabPage1.Controls.Add(this.comboBoxEdit2);
-            this.xtraTabPage1.Controls.Add(this.panelControl1);
-            this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
-            this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1302, 487);
-            this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
-            this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
-            // 
-            // panelControl4
-            // 
-            this.panelControl4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelControl4.Controls.Add(this.simpleButton1);
-            this.panelControl4.Controls.Add(this.btnOpenFolder);
-            this.panelControl4.Location = new System.Drawing.Point(1230, 3);
-            this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(65, 185);
-            this.panelControl4.TabIndex = 10;
-            // 
-            // simpleButton1
-            // 
-            this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(10, 49);
-            this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(50, 34);
-            this.simpleButton1.TabIndex = 10;
-            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
-            // 
-            // btnOpenFolder
-            // 
-            this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFolder.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenFolder.ImageOptions.Image")));
-            this.btnOpenFolder.Location = new System.Drawing.Point(6, 5);
-            this.btnOpenFolder.Name = "btnOpenFolder";
-            this.btnOpenFolder.Size = new System.Drawing.Size(50, 34);
-            this.btnOpenFolder.TabIndex = 9;
-            this.btnOpenFolder.Click += new System.EventHandler(this.btnOpenFolder_Click);
-            // 
-            // xtraTabControl2
-            // 
-            this.xtraTabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.xtraTabControl2.Location = new System.Drawing.Point(11, 227);
-            this.xtraTabControl2.Name = "xtraTabControl2";
-            this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1278, 209);
-            this.xtraTabControl2.TabIndex = 8;
-            this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
-            this.xtraTabPage3,
-            this.xtraTabPage4});
-            this.xtraTabControl2.Click += new System.EventHandler(this.xtraTabControl2_Click);
-            // 
-            // xtraTabPage3
-            // 
-            this.xtraTabPage3.Controls.Add(this.label1);
-            this.xtraTabPage3.Controls.Add(this.lblSofiles);
-            this.xtraTabPage3.Controls.Add(this.gridControl1);
-            this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1276, 178);
-            this.xtraTabPage3.Text = "HĐ đầu vào";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.label1.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(393, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(115, 19);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Tổng số file :";
-            // 
-            // lblSofiles
-            // 
-            this.lblSofiles.AutoSize = true;
-            this.lblSofiles.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.lblSofiles.Location = new System.Drawing.Point(514, 16);
-            this.lblSofiles.Name = "lblSofiles";
-            this.lblSofiles.Size = new System.Drawing.Size(24, 19);
-            this.lblSofiles.TabIndex = 5;
-            this.lblSofiles.Text = "...";
-            // 
-            // xtraTabPage4
-            // 
-            this.xtraTabPage4.Controls.Add(this.label2);
-            this.xtraTabPage4.Controls.Add(this.lblSofiles2);
-            this.xtraTabPage4.Controls.Add(this.gridControl2);
-            this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1276, 178);
-            this.xtraTabPage4.Text = "HĐ Đầu ra";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(394, 16);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(104, 19);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Tổng số file :";
-            // 
-            // lblSofiles2
-            // 
-            this.lblSofiles2.AutoSize = true;
-            this.lblSofiles2.Location = new System.Drawing.Point(504, 16);
-            this.lblSofiles2.Name = "lblSofiles2";
-            this.lblSofiles2.Size = new System.Drawing.Size(24, 19);
-            this.lblSofiles2.TabIndex = 7;
-            this.lblSofiles2.Text = "...";
+            this.gridView4.GridControl = this.gridControl2;
+            this.gridView4.Name = "gridView4";
             // 
             // gridControl2
             // 
             this.gridControl2.DataSource = this.fileImportBindingSource;
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+            gridLevelNode2.LevelTemplate = this.gridView4;
+            gridLevelNode2.RelationName = "Level1";
+            this.gridControl2.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
+            gridLevelNode2});
             this.gridControl2.Location = new System.Drawing.Point(0, 0);
             this.gridControl2.LookAndFeel.SkinName = "Office 2016 Colorful";
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1276, 178);
+            this.gridControl2.Size = new System.Drawing.Size(1301, 235);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView3});
+            this.gridView3,
+            this.gridView4});
             this.gridControl2.Click += new System.EventHandler(this.gridControl2_Click);
+            this.gridControl2.DoubleClick += new System.EventHandler(this.gridControl2_DoubleClick);
             this.gridControl2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridControl2_KeyUp);
             // 
             // gridView3
@@ -527,6 +438,11 @@
             this.gridColumn10});
             this.gridView3.GridControl = this.gridControl2;
             this.gridView3.Name = "gridView3";
+            this.gridView3.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView3_RowClick);
+            this.gridView3.MasterRowEmpty += new DevExpress.XtraGrid.Views.Grid.MasterRowEmptyEventHandler(this.gridView3_MasterRowEmpty);
+            this.gridView3.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView3_MasterRowGetChildList);
+            this.gridView3.MasterRowGetRelationName += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationNameEventHandler(this.gridView3_MasterRowGetRelationName);
+            this.gridView3.MasterRowGetRelationCount += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationCountEventHandler(this.gridView3_MasterRowGetRelationCount);
             // 
             // gridColumn1
             // 
@@ -542,6 +458,7 @@
             this.gridColumn2.FieldName = "SHDon";
             this.gridColumn2.MinWidth = 30;
             this.gridColumn2.Name = "gridColumn2";
+            this.gridColumn2.OptionsColumn.AllowEdit = false;
             this.gridColumn2.Visible = true;
             this.gridColumn2.VisibleIndex = 1;
             this.gridColumn2.Width = 90;
@@ -551,6 +468,7 @@
             this.gridColumn3.FieldName = "NLap";
             this.gridColumn3.MinWidth = 30;
             this.gridColumn3.Name = "gridColumn3";
+            this.gridColumn3.OptionsColumn.AllowEdit = false;
             this.gridColumn3.Visible = true;
             this.gridColumn3.VisibleIndex = 2;
             this.gridColumn3.Width = 89;
@@ -560,6 +478,7 @@
             this.gridColumn4.FieldName = "Ten";
             this.gridColumn4.MinWidth = 30;
             this.gridColumn4.Name = "gridColumn4";
+            this.gridColumn4.OptionsColumn.AllowEdit = false;
             this.gridColumn4.Visible = true;
             this.gridColumn4.VisibleIndex = 3;
             this.gridColumn4.Width = 369;
@@ -614,6 +533,7 @@
             this.gridColumn8.FieldName = "TongTien";
             this.gridColumn8.MinWidth = 30;
             this.gridColumn8.Name = "gridColumn8";
+            this.gridColumn8.OptionsColumn.AllowEdit = false;
             this.gridColumn8.Visible = true;
             this.gridColumn8.VisibleIndex = 4;
             this.gridColumn8.Width = 94;
@@ -623,6 +543,7 @@
             this.gridColumn9.FieldName = "Checked";
             this.gridColumn9.MinWidth = 30;
             this.gridColumn9.Name = "gridColumn9";
+            this.gridColumn9.OptionsColumn.AllowEdit = false;
             this.gridColumn9.Visible = true;
             this.gridColumn9.VisibleIndex = 8;
             this.gridColumn9.Width = 68;
@@ -635,6 +556,134 @@
             this.gridColumn10.Name = "gridColumn10";
             this.gridColumn10.Width = 112;
             // 
+            // xtraTabControl1
+            // 
+            this.xtraTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
+            this.xtraTabControl1.Name = "xtraTabControl1";
+            this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
+            this.xtraTabControl1.Size = new System.Drawing.Size(1329, 575);
+            this.xtraTabControl1.TabIndex = 0;
+            this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
+            this.xtraTabPage1});
+            // 
+            // xtraTabPage1
+            // 
+            this.xtraTabPage1.Controls.Add(this.panelControl4);
+            this.xtraTabPage1.Controls.Add(this.xtraTabControl2);
+            this.xtraTabPage1.Controls.Add(this.lblDpPath);
+            this.xtraTabPage1.Controls.Add(this.panelControl3);
+            this.xtraTabPage1.Controls.Add(this.progressBarControl1);
+            this.xtraTabPage1.Controls.Add(this.comboBoxEdit2);
+            this.xtraTabPage1.Controls.Add(this.panelControl1);
+            this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
+            this.xtraTabPage1.Name = "xtraTabPage1";
+            this.xtraTabPage1.Size = new System.Drawing.Size(1327, 544);
+            this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
+            this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
+            // 
+            // panelControl4
+            // 
+            this.panelControl4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelControl4.Controls.Add(this.simpleButton1);
+            this.panelControl4.Controls.Add(this.btnOpenFolder);
+            this.panelControl4.Location = new System.Drawing.Point(1255, 3);
+            this.panelControl4.Name = "panelControl4";
+            this.panelControl4.Size = new System.Drawing.Size(65, 185);
+            this.panelControl4.TabIndex = 10;
+            // 
+            // simpleButton1
+            // 
+            this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
+            this.simpleButton1.Location = new System.Drawing.Point(10, 49);
+            this.simpleButton1.Name = "simpleButton1";
+            this.simpleButton1.Size = new System.Drawing.Size(50, 34);
+            this.simpleButton1.TabIndex = 10;
+            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
+            // 
+            // btnOpenFolder
+            // 
+            this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenFolder.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenFolder.ImageOptions.Image")));
+            this.btnOpenFolder.Location = new System.Drawing.Point(6, 5);
+            this.btnOpenFolder.Name = "btnOpenFolder";
+            this.btnOpenFolder.Size = new System.Drawing.Size(50, 34);
+            this.btnOpenFolder.TabIndex = 9;
+            this.btnOpenFolder.Click += new System.EventHandler(this.btnOpenFolder_Click);
+            // 
+            // xtraTabControl2
+            // 
+            this.xtraTabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.xtraTabControl2.Location = new System.Drawing.Point(11, 227);
+            this.xtraTabControl2.Name = "xtraTabControl2";
+            this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
+            this.xtraTabControl2.Size = new System.Drawing.Size(1303, 266);
+            this.xtraTabControl2.TabIndex = 8;
+            this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
+            this.xtraTabPage3,
+            this.xtraTabPage4});
+            this.xtraTabControl2.Click += new System.EventHandler(this.xtraTabControl2_Click);
+            this.xtraTabControl2.DoubleClick += new System.EventHandler(this.xtraTabControl2_DoubleClick);
+            // 
+            // xtraTabPage3
+            // 
+            this.xtraTabPage3.Controls.Add(this.label1);
+            this.xtraTabPage3.Controls.Add(this.lblSofiles);
+            this.xtraTabPage3.Controls.Add(this.gridControl1);
+            this.xtraTabPage3.Name = "xtraTabPage3";
+            this.xtraTabPage3.Size = new System.Drawing.Size(1301, 235);
+            this.xtraTabPage3.Text = "HĐ đầu vào";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label1.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.label1.Location = new System.Drawing.Point(393, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(115, 19);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Tổng số file :";
+            // 
+            // lblSofiles
+            // 
+            this.lblSofiles.AutoSize = true;
+            this.lblSofiles.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.lblSofiles.Location = new System.Drawing.Point(514, 16);
+            this.lblSofiles.Name = "lblSofiles";
+            this.lblSofiles.Size = new System.Drawing.Size(24, 19);
+            this.lblSofiles.TabIndex = 5;
+            this.lblSofiles.Text = "...";
+            // 
+            // xtraTabPage4
+            // 
+            this.xtraTabPage4.Controls.Add(this.label2);
+            this.xtraTabPage4.Controls.Add(this.lblSofiles2);
+            this.xtraTabPage4.Controls.Add(this.gridControl2);
+            this.xtraTabPage4.Name = "xtraTabPage4";
+            this.xtraTabPage4.Size = new System.Drawing.Size(1301, 235);
+            this.xtraTabPage4.Text = "HĐ Đầu ra";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(394, 16);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(104, 19);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Tổng số file :";
+            // 
+            // lblSofiles2
+            // 
+            this.lblSofiles2.AutoSize = true;
+            this.lblSofiles2.Location = new System.Drawing.Point(504, 16);
+            this.lblSofiles2.Name = "lblSofiles2";
+            this.lblSofiles2.Size = new System.Drawing.Size(24, 19);
+            this.lblSofiles2.TabIndex = 7;
+            this.lblSofiles2.Text = "...";
+            // 
             // lblDpPath
             // 
             this.lblDpPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -642,7 +691,7 @@
             this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Purple;
             this.lblDpPath.Appearance.Options.UseFont = true;
             this.lblDpPath.Appearance.Options.UseForeColor = true;
-            this.lblDpPath.Location = new System.Drawing.Point(11, 450);
+            this.lblDpPath.Location = new System.Drawing.Point(11, 507);
             this.lblDpPath.Name = "lblDpPath";
             this.lblDpPath.Size = new System.Drawing.Size(170, 19);
             this.lblDpPath.TabIndex = 7;
@@ -773,7 +822,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarControl1.Location = new System.Drawing.Point(13, 194);
             this.progressBarControl1.Name = "progressBarControl1";
-            this.progressBarControl1.Size = new System.Drawing.Size(1278, 27);
+            this.progressBarControl1.Size = new System.Drawing.Size(1303, 27);
             this.progressBarControl1.TabIndex = 3;
             // 
             // comboBoxEdit2
@@ -784,7 +833,7 @@
             this.comboBoxEdit2.Name = "comboBoxEdit2";
             this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit2.Size = new System.Drawing.Size(76, 29);
+            this.comboBoxEdit2.Size = new System.Drawing.Size(101, 29);
             this.comboBoxEdit2.TabIndex = 6;
             this.comboBoxEdit2.Visible = false;
             // 
@@ -847,7 +896,7 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(84, 29);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(109, 29);
             this.comboBoxEdit1.TabIndex = 1;
             this.comboBoxEdit1.Visible = false;
             // 
@@ -859,7 +908,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1304, 518);
+            this.ClientSize = new System.Drawing.Size(1329, 575);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
@@ -872,6 +921,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).EndInit();
             this.xtraTabControl1.ResumeLayout(false);
             this.xtraTabPage1.ResumeLayout(false);
@@ -884,8 +936,6 @@
             this.xtraTabPage3.PerformLayout();
             this.xtraTabPage4.ResumeLayout(false);
             this.xtraTabPage4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
             this.panelControl3.PerformLayout();
@@ -973,5 +1023,7 @@
         private DevExpress.XtraGrid.Columns.GridColumn colSohieu2;
         private DevExpress.XtraEditors.DateEdit dtDenngay;
         private DevExpress.XtraEditors.DateEdit dtTungay;
+        private DevExpress.XtraGrid.Columns.GridColumn coltkco2;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
     }
 }
