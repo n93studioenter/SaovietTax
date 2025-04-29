@@ -41,6 +41,7 @@ using System.Diagnostics;
 using System.Globalization;
 using DevExpress.Utils;
 using Windows.UI.Xaml.Controls;
+using DocumentFormat.OpenXml.Spreadsheet;
 namespace SaovietTax
 {
     public partial class frmMain : DevExpress.XtraEditors.XtraForm
@@ -556,6 +557,8 @@ namespace SaovietTax
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN");
             dtTungay.DateTime = new DateTime(DateTime.Now.Year,DateTime.Now.Month, 1);
             dtDenngay.DateTime = DateTime.Now;
+            progressPanel1.Caption = "Đang xử lý...";
+            progressPanel1.Description = "Vui lòng chờ...";
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
@@ -1019,14 +1022,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh).ToLower()));
                                 //Kiểm tra thêm trong list
                                 string newdvt = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(DVTinh)).ToLower();
-                                var checkold = peopleTemp.ToList().Where(n=>n.fileImportDetails.Any(m => m.Ten.ToLower() == newName.ToLower() && m.DVT.ToLower() == newdvt)).FirstOrDefault();
+                                var checkold = peopleTemp.ToList().Where(n=>n.fileImportDetails.Any(m => m.Ten.ToLower() == newName.ToLower() && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(m.DVT.ToLower())) == newdvt)).FirstOrDefault();
+                                 
                                 string sohieu = "";
                                 if (getdata.Rows.Count == 0)
                                 {
                                     if (checkold == null)
                                         sohieu = GenerateResultString(NormalizeVietnameseString(THHDVu.Trim()));
                                     else
-                                        sohieu = checkold.fileImportDetails.Where(m => m.Ten.ToLower() == newName.ToLower() && m.DVT.ToLower() == newdvt).FirstOrDefault().SoHieu;
+                                        sohieu = checkold.fileImportDetails.Where(m => m.Ten.ToLower() == newName.ToLower() && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(m.DVT.ToLower())) == newdvt).FirstOrDefault().SoHieu;
                                 }
                                 else
                                     sohieu = getdata.Rows[0]["SoHieu"].ToString();
@@ -3408,14 +3412,14 @@ WHERE kh.SoHieu = ?";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            
+            progressPanel1.Visible = true; 
             if (chkDauvao.Checked)
             {
                 foreach (var it in people)
                 {
                     string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
                     var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", it.TKNo + "%"));
-                    if (resultkm.Rows.Count > 0)
+                    if (resultkm.Rows.Count > 1)
                     {
                         XtraMessageBox.Show("Tài khoản " + it.TKNo + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
@@ -3430,7 +3434,7 @@ WHERE kh.SoHieu = ?";
                 {
                     string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
                     var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", it.TKNo + "%"));
-                    if (resultkm.Rows.Count > 0)
+                    if (resultkm.Rows.Count >1)
                     {
                         XtraMessageBox.Show("Tài khoản "+it.TKNo+" có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
@@ -3438,6 +3442,7 @@ WHERE kh.SoHieu = ?";
                 }
                 ImportHDRa();
             }
+            progressPanel1.Visible = false;
         }
         bool isClick = false;
         public void InsertHangHoa(string DVTinh, string sohieu, string newName)
@@ -3680,22 +3685,22 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView1_MasterRowEmpty(object sender, MasterRowEmptyEventArgs e)
         {
-            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            if (dt != null)
-                e.IsEmpty = !people.Any(m => m.fileImportDetails.Any(j=>j.ParentId==dt.ID));
+            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            //if (dt != null)
+            //    e.IsEmpty = !people.Any(m => m.fileImportDetails.Any(j=>j.ParentId==dt.ID));
         }
 
         private void gridView1_MasterRowGetChildList(object sender, MasterRowGetChildListEventArgs e)
         {
-            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            if (dt != null)
-            {
-                var fileImportDetails = dt.fileImportDetails;
-                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
-                e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
-            }
+            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            //if (dt != null)
+            //{
+            //    var fileImportDetails = dt.fileImportDetails;
+            //    fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+            //    e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
+            //}
         }
 
         private void gridView1_MasterRowGetRelationCount(object sender, MasterRowGetRelationCountEventArgs e)
@@ -3770,23 +3775,23 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView3_MasterRowEmpty(object sender, MasterRowEmptyEventArgs e)
         {
-            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            if (dt != null)
-                e.IsEmpty = !people2.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
+            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            //if (dt != null)
+            //    e.IsEmpty = !people2.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
         }
 
         private void gridView3_MasterRowGetChildList(object sender, MasterRowGetChildListEventArgs e)
         {
 
-            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            if (dt != null)
-            {
-                var fileImportDetails = dt.fileImportDetails;
-                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
-                e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
-            }
+            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            //if (dt != null)
+            //{
+            //    var fileImportDetails = dt.fileImportDetails;
+            //    fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+            //    e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
+            //}
         }
 
         private void gridView3_MasterRowGetRelationCount(object sender, MasterRowGetRelationCountEventArgs e)
@@ -3847,6 +3852,68 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             DateTime toDate = fromDate.AddMonths(1).AddDays(-1); 
             if (dtDenngay.DateTime > toDate)
                 dtDenngay.EditValue = toDate;
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            string query = "SELECT * FROM tbimport"; 
+            var kq = ExecuteQuery(query, null);
+            if (kq.Rows.Count > 0)
+            {
+                foreach (DataRow item in kq.Rows)
+                {
+                    query = "SELECT * FROM HoaDon where SoHD=?  and KyHieu=? ";
+                    var parameters = new OleDbParameter[]
+                         {
+            new OleDbParameter("?", item["SHDon"]),          // Sử dụng chỉ số mà không cần tên
+            new OleDbParameter("?", item["KHHDon"])  // Thêm ký tự % cho LIKE
+                         };
+                    var kq2 = ExecuteQuery(query, parameters);
+                    if (kq2.Rows.Count > 0)
+                        continue;
+                    //Nếu ko có thì xóa
+                    query = "Delete  FROM tbimportdetail where ParentId=? ";
+                     parameters = new OleDbParameter[]
+                       {
+            new OleDbParameter("?", item["ID"]),   
+                       };
+                    var kq3 = ExecuteQuery(query, parameters);
+                    //
+                    query = "Delete  FROM tbimport where ID=? ";
+                    parameters = new OleDbParameter[]
+                      {
+            new OleDbParameter("?", item["ID"]),
+                      };
+                    var kq4 = ExecuteQuery(query, parameters);
+                }
+            }
+
+            XtraMessageBox.Show("Đã xóa dữ liệu dư thứa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void chkDaura_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!chkDauvao.Checked)
+            {
+                xtraTabControl2.SelectedTabPageIndex = 2;
+            }
+            if (!chkDaura.Checked)
+                xtraTabControl2.SelectedTabPageIndex = 0;
+        }
+
+        private void chkDauvao_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!chkDauvao.Checked)
+            {
+                if (chkDaura.Checked)
+                {
+                    xtraTabControl2.SelectedTabPageIndex = 2;
+                }
+            }
+            if (chkDauvao.Checked)
+            {
+                xtraTabControl2.SelectedTabPageIndex =0;
+            }
         }
 
         public static string NormalizeVietnameseString(string input)

@@ -69,7 +69,9 @@
             this.gridColumn10 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
+            this.progressPanel1 = new DevExpress.XtraWaitForm.ProgressPanel();
             this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
+            this.btnRefresh = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.btnOpenFolder = new DevExpress.XtraEditors.SimpleButton();
             this.xtraTabControl2 = new DevExpress.XtraTab.XtraTabControl();
@@ -245,7 +247,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1299, 233);
+            this.gridControl1.Size = new System.Drawing.Size(1294, 216);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -416,7 +418,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1301, 235);
+            this.gridControl2.Size = new System.Drawing.Size(1294, 174);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -572,6 +574,7 @@
             // 
             // xtraTabPage1
             // 
+            this.xtraTabPage1.Controls.Add(this.progressPanel1);
             this.xtraTabPage1.Controls.Add(this.panelControl4);
             this.xtraTabPage1.Controls.Add(this.xtraTabControl2);
             this.xtraTabPage1.Controls.Add(this.lblDpPath);
@@ -581,13 +584,29 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1325, 542);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1320, 538);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
+            // 
+            // progressPanel1
+            // 
+            this.progressPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressPanel1.Appearance.BackColor = System.Drawing.Color.Transparent;
+            this.progressPanel1.Appearance.Options.UseBackColor = true;
+            this.progressPanel1.ContentAlignment = System.Drawing.ContentAlignment.MiddleCenter;
+            this.progressPanel1.LineAnimationElementType = DevExpress.Utils.Animation.LineAnimationElementType.Rectangle;
+            this.progressPanel1.Location = new System.Drawing.Point(11, 445);
+            this.progressPanel1.Name = "progressPanel1";
+            this.progressPanel1.Size = new System.Drawing.Size(1295, 57);
+            this.progressPanel1.TabIndex = 6;
+            this.progressPanel1.Text = "progressPanel1";
+            this.progressPanel1.Visible = false;
             // 
             // panelControl4
             // 
             this.panelControl4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelControl4.Controls.Add(this.btnRefresh);
             this.panelControl4.Controls.Add(this.simpleButton1);
             this.panelControl4.Controls.Add(this.btnOpenFolder);
             this.panelControl4.Location = new System.Drawing.Point(1253, 3);
@@ -595,12 +614,22 @@
             this.panelControl4.Size = new System.Drawing.Size(65, 185);
             this.panelControl4.TabIndex = 10;
             // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRefresh.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnRefresh.ImageOptions.Image")));
+            this.btnRefresh.Location = new System.Drawing.Point(10, 89);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(50, 34);
+            this.btnRefresh.TabIndex = 11;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
             this.simpleButton1.Location = new System.Drawing.Point(10, 49);
             this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(50, 34);
+            this.simpleButton1.Size = new System.Drawing.Size(48, 34);
             this.simpleButton1.TabIndex = 10;
             this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
             // 
@@ -610,7 +639,7 @@
             this.btnOpenFolder.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenFolder.ImageOptions.Image")));
             this.btnOpenFolder.Location = new System.Drawing.Point(6, 5);
             this.btnOpenFolder.Name = "btnOpenFolder";
-            this.btnOpenFolder.Size = new System.Drawing.Size(50, 34);
+            this.btnOpenFolder.Size = new System.Drawing.Size(54, 34);
             this.btnOpenFolder.TabIndex = 9;
             this.btnOpenFolder.Click += new System.EventHandler(this.btnOpenFolder_Click);
             // 
@@ -622,7 +651,7 @@
             this.xtraTabControl2.Location = new System.Drawing.Point(11, 227);
             this.xtraTabControl2.Name = "xtraTabControl2";
             this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1301, 264);
+            this.xtraTabControl2.Size = new System.Drawing.Size(1301, 251);
             this.xtraTabControl2.TabIndex = 8;
             this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage3,
@@ -636,7 +665,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1299, 233);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1294, 216);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -666,7 +695,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1301, 235);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1294, 174);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -726,7 +755,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dtDenngay.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dtDenngay.Size = new System.Drawing.Size(276, 29);
+            this.dtDenngay.Size = new System.Drawing.Size(276, 27);
             this.dtDenngay.TabIndex = 22;
             this.dtDenngay.EditValueChanged += new System.EventHandler(this.dtDenngay_EditValueChanged);
             // 
@@ -741,6 +770,7 @@
             this.chkDaura.Properties.CheckBoxOptions.SvgImageSize = new System.Drawing.Size(15, 15);
             this.chkDaura.Size = new System.Drawing.Size(229, 26);
             this.chkDaura.TabIndex = 21;
+            this.chkDaura.CheckedChanged += new System.EventHandler(this.chkDaura_CheckedChanged);
             // 
             // dtTungay
             // 
@@ -751,7 +781,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.dtTungay.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.dtTungay.Size = new System.Drawing.Size(269, 29);
+            this.dtTungay.Size = new System.Drawing.Size(269, 27);
             this.dtTungay.TabIndex = 23;
             this.dtTungay.EditValueChanged += new System.EventHandler(this.dtTungay_EditValueChanged);
             // 
@@ -777,6 +807,7 @@
             this.chkDauvao.Properties.CheckBoxOptions.SvgImageSize = new System.Drawing.Size(15, 15);
             this.chkDauvao.Size = new System.Drawing.Size(251, 26);
             this.chkDauvao.TabIndex = 20;
+            this.chkDauvao.CheckedChanged += new System.EventHandler(this.chkDauvao_CheckedChanged);
             // 
             // txtpass
             // 
@@ -837,7 +868,7 @@
             this.comboBoxEdit2.Name = "comboBoxEdit2";
             this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit2.Size = new System.Drawing.Size(99, 29);
+            this.comboBoxEdit2.Size = new System.Drawing.Size(99, 27);
             this.comboBoxEdit2.TabIndex = 6;
             this.comboBoxEdit2.Visible = false;
             // 
@@ -900,7 +931,7 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(107, 29);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(107, 27);
             this.comboBoxEdit1.TabIndex = 1;
             this.comboBoxEdit1.Visible = false;
             // 
@@ -1029,5 +1060,7 @@
         private DevExpress.XtraEditors.DateEdit dtTungay;
         private DevExpress.XtraGrid.Columns.GridColumn coltkco2;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
+        private DevExpress.XtraEditors.SimpleButton btnRefresh;
+        private DevExpress.XtraWaitForm.ProgressPanel progressPanel1;
     }
 }
