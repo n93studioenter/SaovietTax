@@ -620,7 +620,40 @@ namespace SaovietTax
             int toMonth = int.Parse(dtDenngay.DateTime.Month.ToString());   // Thay đổi theo tháng kết thúc (ví dụ: 7 cho tháng 7)
             // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
             var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories)
-                .Where(file => IsFileInMonthRange(file, path, dtTungay.DateTime.Month, dtDenngay.DateTime.Month));
+                .Where(file => IsFileInMonthRange(file, path, dtTungay.DateTime.Month, dtDenngay.DateTime.Month)).ToList();
+            //Lọc thêm điều kiện theo ngày
+
+            List<string> lstdelete = new List<string>();
+            foreach (var item in files)
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                string fullPath = item;
+                using (StreamReader reader = new StreamReader(fullPath, Encoding.UTF8))
+                {
+                    try
+                    {
+                        xmlDoc.Load(reader); // Tải file XML
+                    }
+                    catch (XmlException ex)
+                    {
+                        Console.WriteLine($"Lỗi khi tải file XML: {ex.Message}");
+                        return;
+                    }
+                    XmlNode root = xmlDoc.DocumentElement;
+                    XmlNode nTTChungNode = root.SelectSingleNode("//TTChung");
+                    DateTime NLap = DateTime.Parse(nTTChungNode.SelectSingleNode("NLap")?.InnerText);
+                    if (NLap >= dtTungay.DateTime && NLap <= dtDenngay.DateTime)
+                        continue;
+                    else
+                        lstdelete.Add(item);
+
+                }
+            }
+            foreach(var item in lstdelete)
+            {
+                files.Remove(item);
+            }
+
             int countXml = files.Count();
             Dictionary<string, string> lstHodpn = new Dictionary<string, string>();
             //Lấy danh sách hóa đơn để kiểm tra cho excel
@@ -646,10 +679,15 @@ namespace SaovietTax
                     while (!currentCell.IsEmpty())
                     {
                         var getid = worksheet.Cell(demdong + 7, 1).Value.ToString().Trim();
+                        DateTime getNgayLap= DateTime.Parse(worksheet.Cell(demdong + 7, 5).Value.ToString().Trim());
                         int id = 0;
                         if (int.TryParse(getid, out id))
                         {
-                            rowCount++; // Tăng số dòng
+                            if(getNgayLap>=dtTungay.DateTime && getNgayLap <= dtDenngay.DateTime)
+                            {
+                                rowCount++; // Tăng số dòng
+                            }
+
                             demdong++;
                         }
                         currentCell = currentCell.Worksheet.Row(currentCell.Address.RowNumber + 1).Cell("A"); // Chuyển xuống ô bên dưới
@@ -1257,13 +1295,23 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                                            // Lấy giá trị của ô A6
                     int rowCount = 0;
                     var currentCell = worksheet.Cell("A6"); // Bắt đầu từ ô A6
-
+                    int demdong = 0;
                     // Kiểm tra các ô bắt đầu từ A6 cho đến khi gặp ô trống
                     while (!currentCell.IsEmpty())
                     {
-                        rowCount++; // Tăng số dòng
-                        currentCell = currentCell.Worksheet.Row(currentCell.Address.RowNumber + 1).Cell("A"); // Chuyển xuống ô bên dưới
-
+                        try
+                        {
+                            DateTime getNgayLap = DateTime.Parse(worksheet.Cell(demdong + 7, 5).Value.ToString().Trim());
+                            if (getNgayLap >= dtTungay.DateTime && getNgayLap <= dtDenngay.DateTime)
+                                rowCount++; // Tăng số dòng
+                            currentCell = currentCell.Worksheet.Row(currentCell.Address.RowNumber + 1).Cell("A"); // Chuyển xuống ô bên dưới
+                            demdong += 1;
+                        }
+                        catch(Exception ex)
+                        {
+                            break;
+                        }
+                     
                     }
                     string SHDon = "";
                     string KHHDon = "";
@@ -1282,7 +1330,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     DateTime NLap = new DateTime();
                     string diengiai = "";
                     int total = rowCount + 7;
-                    for (int i = 7; i < (total - 1); i++)
+                    for (int i = 7; i <= (total - 1); i++)
                     {
                         if (totalCount > 0)
                             progressPercentage = (filesLoaded * 100) / totalCount;
@@ -1762,6 +1810,7 @@ WHERE kh.SoHieu = ?";
                             Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
                             isnext = false;
                             currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+
                         }
                     }
 
@@ -2500,6 +2549,7 @@ WHERE kh.SoHieu = ?";
                     Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
                     isnext = false;
                     currentRow++; // Vẫn tiếp tục với dòng tiếp theo
+                    Driver.Quit(); // Đóng WebDriver  
                 }
             }
             if (lstHas.Count == 0)
@@ -3117,7 +3167,7 @@ WHERE kh.SoHieu = ?";
                         new OleDbParameter("?", it.Soluong),
                         new OleDbParameter("?", it.Dongia),
                         new OleDbParameter("?", Helpers.ConvertUnicodeToVni(it.DVT)),
-                        new OleDbParameter("?", Helpers.ConvertUnicodeToVni(it.Ten)),
+                        new OleDbParameter("?", it.Ten),
                         new OleDbParameter("?", it.MaCT),
                         new OleDbParameter("?", it.TKNo),
                          new OleDbParameter("?", it.TKCo)
@@ -3305,7 +3355,7 @@ WHERE kh.SoHieu = ?";
                         new OleDbParameter("?", it.Soluong),
                         new OleDbParameter("?", it.Dongia),
                             new OleDbParameter("?", Helpers.ConvertUnicodeToVni(it.DVT)),
-                        new OleDbParameter("?", Helpers.ConvertUnicodeToVni(it.Ten)),
+                        new OleDbParameter("?", it.Ten),
                         new OleDbParameter("?", it.MaCT),
                         new OleDbParameter("?", it.TKNo),
                          new OleDbParameter("?", it.TKCo),
@@ -3358,16 +3408,36 @@ WHERE kh.SoHieu = ?";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            //if(people.Count==0 && people2.Count == 0)
-            //{
-            //    XtraMessageBox.Show("Không có dữ liệu để xử lý!", "Thông báo",
-            //                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //    return;
-            //}
+            
             if (chkDauvao.Checked)
+            {
+                foreach (var it in people)
+                {
+                    string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
+                    var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", it.TKNo + "%"));
+                    if (resultkm.Rows.Count > 0)
+                    {
+                        XtraMessageBox.Show("Tài khoản " + it.TKNo + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
                 ImportHDVao();
+            }
             if (chkDaura.Checked)
+            {
+                //Kiểm tra lại tài khoản trước
+                foreach(var it in people2)
+                {
+                    string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
+                    var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", it.TKNo + "%"));
+                    if (resultkm.Rows.Count > 0)
+                    {
+                        XtraMessageBox.Show("Tài khoản "+it.TKNo+" có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
                 ImportHDRa();
+            }
         }
         bool isClick = false;
         public void InsertHangHoa(string DVTinh, string sohieu, string newName)
