@@ -42,6 +42,8 @@ using System.Globalization;
 using DevExpress.Utils;
 using Windows.UI.Xaml.Controls;
 using DocumentFormat.OpenXml.Spreadsheet;
+using static DevExpress.Data.Helpers.ExpressiveSortInfo;
+using DocumentFormat.OpenXml.Bibliography;
 namespace SaovietTax
 {
     public partial class frmMain : DevExpress.XtraEditors.XtraForm
@@ -812,6 +814,10 @@ namespace SaovietTax
                 if (nBanNode != null)
                 {
                     ten = nBanNode.SelectSingleNode("Ten")?.InnerText;
+                    if (string.IsNullOrEmpty(ten))
+                    {
+                        ten = nBanNode.SelectSingleNode("HVTNMHang")?.InnerText;
+                    }
                     mst = nBanNode.SelectSingleNode("MST")?.InnerText;
                    if(string.IsNullOrEmpty(mst))
                     {
@@ -1258,13 +1264,50 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
 
         }
+        private void XulyfilEexcel(int type,int month)
+        {
+            string filePath = savedPath;
+            filePath += (type == 1 ? "\\HDVao" : "\\HDRa");
+            // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
+            var excelFiles = Directory.EnumerateFiles(filePath, "*.xlsx", SearchOption.AllDirectories).Where(file => IsFileInMonthRange(file, filePath, month, month)).ToList(); ; // Kiểm tra xem file có nằm trong khoảng tháng
+            for (int j = 0; j < excelFiles.Count; j++)
+            {
+                using (var workbook = new XLWorkbook(excelFiles[j]))
+                {
+                    var worksheet = workbook.Worksheet(1); // Lấy worksheet đầu tiên
+                    int rowCount = 0;
+                    var currentCell = worksheet.Cell("A6"); // Bắt đầu từ ô A6
+                    int demdong = 0;
+                    var rowsToDelete = new List<int>();
+
+                    for (int i = 7; i <= worksheet.LastRowUsed().RowNumber(); i++)
+                    {
+                        var row = worksheet.Row(i);
+                        var data = row.Cell(5);
+                        var dateCell = row.Cell(5).GetValue<string>();
+                        DateTime getDate = DateTime.Parse(dateCell);
+                        // Kiểm tra xem ngày có nhỏ hơn 12 không
+                        if (getDate.Month != month)
+                        {
+                            rowsToDelete.Add(i);
+                        }
+                    }
+                    // Xóa các dòng từ dưới lên
+                    foreach (var rowNumber in rowsToDelete.OrderByDescending(r => r))
+                    {
+                        worksheet.Row(rowNumber).Delete();
+                    }
+                    workbook.SaveAs(excelFiles[j]);
+                }
+            }
+        }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
             //if (string.IsNullOrEmpty(savedPath))
             //{
             //    XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             //    return;
-            //}
+            //} 
             XulyFolder();
             progressBarControl1.EditValue = 0;
             LoadXmlFiles(savedPath,1);
@@ -2594,12 +2637,22 @@ WHERE kh.SoHieu = ?";
                 try
                 {
                     File.Move(excelFiles[0], destFilePath);
+                    if (dtDenngay.DateTime.Month != dtTungay.DateTime.Month)
+                    {
+                        var pp3 = savedPath + "\\HDVao\\" + (dtDenngay.DateTime.Month);
+                         string destFilePath2 = System.IO.Path.Combine(pp3, fileName); // Tạo đường dẫn đích
+                        File.Copy(destFilePath, destFilePath2);
+                        XulyfilEexcel(1, DoTask);
+                        XulyfilEexcel(1, (DoTask + 1));
+                    }
+                    //Đọc File excel
                 }
                 catch (Exception ex)
                 {
                     File.Delete(excelFiles[0]);
                 }
             }
+           
         }
         private void Cucthuekhngnhanma(WebDriverWait wait)
         {
@@ -2709,18 +2762,20 @@ WHERE kh.SoHieu = ?";
                 }
                 else
                 {
-
-                    Sohieu = RemoveVietnameseDiacritics(Ten.Split(' ').LastOrDefault());
-                    Sohieu = CapitalizeFirstLetter(Sohieu);
-                    Ten = Helpers.ConvertUnicodeToVni(Ten);
-                    // Thao tác nếu Diachi không rỗng
-                    //Kiem tra so hieu da có chưa
-                    string qury = @"SELECT TOP 1 * FROM KhachHang AS kh
-                         WHERE kh.SoHieu = ?"; // Sử dụng ? thay cho @mst trong OleDb
-                    DataTable rs = ExecuteQuery(qury, new OleDbParameter("?", Sohieu));
-                    if (rs.Rows.Count == 0)
+                    if(Ten!=null)
                     {
-                        Mst = ConvertToTenDigitNumber(Sohieu).ToString();
+                        Sohieu = RemoveVietnameseDiacritics(Ten.Split(' ').LastOrDefault());
+                        Sohieu = CapitalizeFirstLetter(Sohieu);
+                        Ten = Helpers.ConvertUnicodeToVni(Ten);
+                        // Thao tác nếu Diachi không rỗng
+                        //Kiem tra so hieu da có chưa
+                        string qury = @"SELECT TOP 1 * FROM KhachHang AS kh
+                         WHERE kh.SoHieu = ?"; // Sử dụng ? thay cho @mst trong OleDb
+                        DataTable rs = ExecuteQuery(qury, new OleDbParameter("?", Sohieu));
+                        if (rs.Rows.Count == 0)
+                        {
+                            Mst = ConvertToTenDigitNumber(Sohieu).ToString();
+                        }
                     }
                 }
             }
@@ -3412,7 +3467,8 @@ WHERE kh.SoHieu = ?";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            progressPanel1.Visible = true; 
+            progressPanel1.Visible = true;
+            Application.DoEvents();
             if (chkDauvao.Checked)
             {
                 foreach (var it in people)
