@@ -103,10 +103,11 @@ namespace SaovietTax
             public double TongTien { get; set; }
             public int Vat { get; set; }
             public int Type { get; set; }
+            public bool isAcess { get; set; }
 
             public string SoHieuTP { get; set; }
             public List<FileImportDetail> fileImportDetails;
-            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP)
+            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP,bool isacess)
             {
                 ID = Id;
                 SHDon = shdon;
@@ -126,6 +127,7 @@ namespace SaovietTax
                 Checked = noidung.Contains("(*)") ? false : true;
                 Path = path;
                 SoHieuTP = tenTP;
+                isAcess = isacess;
             }
 
         }
@@ -557,21 +559,90 @@ namespace SaovietTax
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("vi-VN");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN");
-            dtTungay.DateTime = new DateTime(DateTime.Now.Year,DateTime.Now.Month, 1);
+            var files = Directory.EnumerateFiles(savedPath + @"\HDVao", "*.xml", SearchOption.AllDirectories).ToList();
+
+            //if (files.Count > 0)
+            //{
+            //    string[] parts = files.FirstOrDefault().Split('\\');
+            //    int number = int.Parse(parts[6]);
+            //    dtTungay.DateTime = new DateTime(DateTime.Now.Year, number, 1);
+            //    dtDenngay.DateTime = DateTime.Now;
+            //}
+            //else
+            //{
+            //    dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            //    dtDenngay.DateTime = DateTime.Now;
+            //}
+            dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             dtDenngay.DateTime = DateTime.Now;
             progressPanel1.Caption = "Đang xử lý...";
             progressPanel1.Description = "Vui lòng chờ...";
         }
+        private void Testimg()
+        {
+            string base64Data = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAsMCwyMDAsNDAiPjxwYXRoIGZpbGw9IiMyMjIiIGQ9Ik0xNjUuNzYgMzQuOTVMMTY1LjcxIDM0LjkwTDE2NS43MCAzNC44OFExNjEuNTggMzQuMzggMTU5Ljc1IDMyLjkzTDE1OS42MyAzMi44MUwxNTkuNzIgMzIuOTFRMTU3Ljg4IDMxLjQ0IDE1Ny40NiAyOC40NEwxNTcuNTEgMjguNDlMMTU3LjUxIDI4LjQ4UTE1Ny4zOCAyOC4wMSAxNTcuMDQgMjMuMjZMMTU3LjA4IDIzLjMwTDE1Ny4wOCAyMy4zMFExNTcuMTYgMjIuMTYgMTU3LjA4IDIwLjkwTDE1Ny4wMSAyMC44M0wxNTcuMDYgMjAuODhRMTU2LjgxIDE1Ljc2IDE1OS4wMiAxNC4wMUwxNTkuMDggMTQuMDdMMTU5LjExIDE0LjA5UTE2MS43OSAxMi4wMiAxNjkuNTUgMTEuMzNMMTY5LjQ5IDExLjI3TDE2OS41NiAxMS4zM1ExNzAuODkgMTEuMTggMTcyLjUyIDExLjIyTDE3Mi41MSAxMS4yMEwxNzIuNjEgMTEuMzBRMTcyLjU3IDExLjI3IDE3NS41NCAxMS4yN0wxNzUuMzkgMTEuMTFMMTc1LjUzIDExLjI2UTE3Ni4zOSAxMS4yOCAxNzguMTAgMTEuNDNMMTc3Ljk1IDExLjI4TDE3Ny45NCAxMS4yN1ExNzcuNTAgMTIuMjcgMTc2LjQ3IDE1LjM1TDE3Ni41MSAxNS40MEwxNzYuNDYgMTUuMzRRMTc0LjM5IDE0LjE1IDE3MS4zOCAxNC4xNUwxNzEuNDAgMTQuMTdMMTcxLjQ5IDE0LjI1UTE3MC42MiAxNC4xNSAxNjkuODIgMTQuMjNMMTY5Ljg5IDE0LjI5TDE2OS44NyAxNC4yN1ExNjQuNzcgMTQuNzQgMTYyLjI2IDE2LjcxTDE2Mi4xOSAxNi42NEwxNjIuMTkgMTYuNjRRMTYwLjIxIDE4LjI5IDE2MC4wNiAyMS42NEwxNjAuMTYgMjEuNzRMMTYwLjA0IDIxLjYxUTE2MC4wMiAyMi4yNCAxNjAuMDYgMjMuNTBMMTYwLjEwIDIzLjU0TDE2MC4xNiAyMy42MFExNjAuMTggMjguMzQgMTYyLjU4IDMwLjQzTDE2Mi41NSAzMC40MUwxNjIuNTAgMzAuMzVRMTY0Ljc2IDMyLjM5IDE2OS43NSAzMi42OUwxNjkuNjkgMzIuNjNMMTY5LjgxIDMyLjc2UTE3Mi44NSAzMi44MyAxNzUuODYgMzEuMDRMMTc1Ljg1IDMxLjAyTDE3NS44MCAzMC45N1ExNzYuNTcgMzMuODggMTc3LjE4IDM1LjI1TDE3Ny4xNiAzNS4yM0wxNzcuMDEgMzUuMDhRMTc0Ljk1IDM1LjM4IDE3My4zMSAzNS4zNEwxNzMuMzIgMzUuMzVMMTczLjM0IDM1LjM3UTE2OC44NSAzNS4yOSAxNjUuNzIgMzQuOTFaTTE4MC44NyAzOC42N0wxODAuNzggMzguNTlMMTgwLjg2IDM4LjY3UTE3OS4xMCAzNS42OCAxNzguNDEgMzMuMTBMMTc4LjQyIDMzLjExTDE3OC40MyAzMy4xMVExNzguMDUgMzMuNDIgMTc3LjA2IDMzLjgwTDE3Ni45MCAzMy42NEwxNzcuMDcgMzMuODBRMTc2LjU4IDMyLjg2IDE3Ni4zOSAzMi4wMkwxNzYuNTMgMzIuMTZMMTc2LjA4IDMwLjM4TDE3Ni4xMiAzMC40M1ExNzIuODcgMzIuNTAgMTY5Ljc0IDMyLjM4TDE2OS43NCAzMi4zOEwxNjkuNTcgMzIuMjFRMTY1LjM0IDMyLjA2IDE2My4wMiAzMC4zMUwxNjMuMDUgMzAuMzRMMTYzLjEwIDMwLjM5UTE2MS45NSAyOC41NSAxNjIuMDMgMjUuNjJMMTYyLjAzIDI1LjYyTDE2Mi4wMiAyNS42MVExNjIuMDcgMjEuMDIgMTY0LjU1IDE4Ljg5TDE2NC43MSAxOS4wNUwxNjQuNzAgMTkuMDRRMTY2Ljg1IDE3LjE1IDE3MS41MyAxNi41NEwxNzEuMzcgMTYuMzlMMTcxLjU0IDE2LjU1UTE3Mi4xNSAxNi4yNSAxNzIuODcgMTYuMjVMMTcyLjk4IDE2LjM1TDE3Mi45NCAxNi4zMlExNzUuODIgMTYuNDIgMTc3LjkxIDE3Ljk0TDE3Ny44MCAxNy44MkwxNzcuOTMgMTcuOTVRMTc4LjI3IDE1LjY3IDE3OS40OSAxMi40M0wxNzkuNjEgMTIuNTVMMTc5LjU4IDEyLjUyUTE3OS4zOSAxMi42MCAxNzguODQgMTIuNTRMMTc4LjgzIDEyLjUzTDE3OC42NyAxMi4zOFExNzguMTQgMTIuMzUgMTc3Ljg4IDEyLjM1TDE3Ny45MCAxMi4zN0wxNzcuODMgMTIuMzBRMTc4LjA5IDExLjg0IDE3OC41NSAxMC44NUwxNzguNTkgMTAuODlMMTc4LjUzIDEwLjgyUTE3OC4zMSAxMC44NCAxNzUuODIgMTAuNzZMMTc1LjkyIDEwLjg3TDE3NS44MiAxMC43NlExNzMuMzggMTAuNzQgMTcyLjc0IDEwLjc4TDE3Mi42NCAxMC42OEwxNzIuNjIgMTAuNjZRMTYyLjE1IDExLjA1IDE1OC42OSAxMy42NEwxNTguODEgMTMuNzZMMTU4Ljc2IDEzLjcxUTE1Ni43NSAxNS41NCAxNTYuNzUgMTkuNDZMMTU2LjYxIDE5LjMzTDE1Ni43MCAxOS40MVExNTYuNjkgMjAuNTEgMTU2LjgwIDIzLjIxTDE1Ni43NSAyMy4xNkwxNTYuODkgMjMuMzBRMTU2Ljg5IDI2LjcyIDE1Ny4xMSAyOC40M0wxNTcuMTggMjguNDlMMTU3LjIxIDI4LjUzUTE1Ny41OCAzMS42NCAxNTkuMTggMzMuMTdMMTU5LjEyIDMzLjEwTDE1OS4xMCAzMy4wOFExNTkuNjQgMzMuODEgMTYwLjg5IDM0Ljk1TDE2MC44OSAzNC45NUwxNjAuODYgMzQuOTJRMTY0LjEyIDM2LjY5IDE2OS4zNyAzNy40NUwxNjkuMzggMzcuNDdMMTY5LjQ2IDM3LjU1UTE3NS44MCAzOC40MCAxODAuNzkgMzguNTlaIi8+PHBhdGggZD0iTTggMTMgQzkyIDM1LDExMSAxOCwxOTEgOSIgc3Ryb2tlPSIjNTU1IiBmaWxsPSJub25lIi8+PHBhdGggZmlsbD0iIzIyMiIgZD0iTTExMC4yMCAxNC41NUwxMTAuMjAgMTQuNTRMMTA4LjcwIDE0LjcyTDEwOC42MyAxNC42NVExMDYuNDggMTQuODYgMTA2LjI1IDE2Ljk4TDEwNi4yNyAxNi44OUwxMDYuMzMgMTYuOTVRMTA2LjI3IDE3LjcwIDEwNi4zMSAxOC42OUwxMDYuMjcgMTguNjVMMTA2LjI4IDE4LjY2UTEwNi4yMyAyMC41MSAxMDcuNDkgMjEuODVMMTA3LjYwIDIxLjk1TDEwNy40NSAyMS44MVExMDguNjcgMjMuMTAgMTEwLjU3IDIyLjk1TDExMC43NiAyMy4xNEwxMTAuNzIgMjMuMTBRMTEyLjcxIDIyLjg4IDExMy40NyAyMS45NkwxMTMuNDAgMjEuODlMMTEzLjUwIDIxLjk5UTExNC42MiAyMS4xNCAxMTQuODkgMTguODlMMTE0Ljg1IDE4Ljg1TDExNC43MyAxOC43NFExMTUuMDYgMTYuNTUgMTEzLjgxIDE1LjcxTDExMy44NCAxNS43NUwxMTMuOTAgMTUuODFRMTEyLjk3IDE0Ljk1IDExMC4zMSAxNC42NVpNMTE2LjM2IDIzLjkwTDExNi4zMSAyMy44NUwxMTQuOTkgMjYuMTFMMTE1LjA3IDI2LjE5UTExMi4zNSAzMC45NyAxMDguNTggMzUuMDVMMTA4LjUzIDM0Ljk5TDEwOC41OCAzNS4wNVExMDcuMDIgMzUuMjcgMTA0LjMyIDM2LjA3TDEwNC4zMyAzNi4wOUwxMDQuMzEgMzYuMDdRMTA5LjU3IDI5LjcyIDExMi43MyAyNC45MkwxMTIuNzcgMjQuOTZMMTEyLjgwIDI0Ljk5UTExMS42NiAyNS41MiAxMTAuMDIgMjUuNjBMMTEwLjAzIDI1LjYwTDExMC4wNSAyNS42MlExMDcuMDggMjUuODEgMTA1LjU1IDIzLjgzTDEwNS40OSAyMy43N0wxMDUuNjIgMjMuOTBRMTA0LjQwIDIyLjMwIDEwMy4zMCAxNy43M0wxMDMuMTEgMTcuNTRMMTAzLjI0IDE3LjY3UTEwMy4yMSAxNy4xOSAxMDMuMDYgMTYuMjVMMTAzLjAyIDE2LjIyTDEwMy4wMCAxNi4yMFExMDIuOTMgMTUuMzQgMTAyLjkzIDE0Ljg5TDEwMi44OSAxNC44NUwxMDIuODIgMTQuNzhRMTAyLjk0IDEzLjExIDEwNC4wMSAxMi41MEwxMDMuOTkgMTIuNDhMMTA0LjAxIDEyLjUxUTEwNS4xOCAxMS42OSAxMDcuMDQgMTEuNjlMMTA3LjEyIDExLjc3TDEwNy4xNSAxMS44MFExMTAuMTcgMTEuNjIgMTEwLjE3IDExLjYyTDExMC4zMyAxMS43OEwxMTAuMjYgMTEuNzFRMTEyLjUyIDExLjgzIDExMy43NyAxMi4wM0wxMTMuNjAgMTEuODVMMTEzLjc0IDExLjk5UTExNS43MiAxMi4xMSAxMTYuNjQgMTIuNjBMMTE2Ljc2IDEyLjczTDExNi43OSAxMi43NlExMTguMTUgMTMuNTEgMTE4LjM0IDE1LjI2TDExOC4yNCAxNS4xNkwxMTguMzYgMTUuMjhRMTE4LjM0IDE5LjQ5IDExOC4xNSAxOC4xNkwxMTguMTcgMTguMTdMMTE4LjEzIDE4LjE0UTExNy44MCAyMC4zMSAxMTcuNTcgMjEuMTVMMTE3LjUxIDIxLjA5TDExNy40OSAyMS4wOFExMTcuMTggMjIuNTUgMTE2LjQyIDIzLjk2Wk0xMTguMjIgMjYuMjZMMTE4LjMwIDI2LjM0TDExOC4zMCAyNi4zM1ExMTkuMTYgMjQuMDAgMTE5LjcwIDE5LjcwTDExOS43MiAxOS43M0wxMTkuNjkgMTkuNjlRMTIwLjExIDE3LjY0IDEyMC4wNyAxNi43NkwxMTkuOTkgMTYuNjlMMTE5Ljk0IDE2LjYzUTEyMC4wMSAxNC44NyAxMTguODMgMTMuOTZMMTE4LjgwIDEzLjk0TDExOC40MiAxMy43NEwxMTguNDQgMTMuNzZRMTE4LjE4IDEzLjAxIDExNy4yNyAxMi4zNkwxMTcuMjEgMTIuMzFMMTE3LjM0IDEyLjQzUTExNS4wOSAxMS40OCAxMTAuMjkgMTEuMzNMMTEwLjI2IDExLjI5TDExMC4xMyAxMS4xNlExMDkuMjAgMTEuMTkgMTA2Ljc3IDExLjE5TDEwNi43NSAxMS4xN0wxMDYuNzUgMTEuMTdRMTA1LjA4IDExLjI1IDEwMy42MCAxMS45NEwxMDMuNjcgMTIuMDFMMTAzLjY3IDEyLjAyUTEwMi40MyAxMi43MSAxMDIuNTAgMTQuNTRMMTAyLjQ4IDE0LjUyTDEwMi40NiAxNC41MFExMDIuNjQgMTUuNDAgMTAyLjgzIDE3LjQxTDEwMi44MiAxNy40MEwxMDMuMDAgMTcuNTlRMTAzLjUwIDIwLjEwIDEwMy43NiAyMC45NEwxMDMuODQgMjEuMDFMMTAzLjg4IDIxLjA1UTEwNC4zNyAyMi44NCAxMDUuMzIgMjQuMTNMMTA1LjI3IDI0LjA4TDEwNS4zMCAyNC4xMVExMDUuNTAgMjQuMzkgMTA1Ljg4IDI0Ljc3TDEwNS45NyAyNC44NUwxMDYuMDQgMjQuOTNRMTA2LjE3IDI1LjI1IDEwNi44MiAyNi4xNkwxMDYuODEgMjYuMTZMMTA2Ljk1IDI2LjMwUTEwOC40MyAyNy42NiAxMTAuMzggMjcuODVMMTEwLjI3IDI3Ljc1TDExMC4yMyAyNy43MVExMDguMzcgMzAuNDIgMTA2LjgxIDMyLjMyTDEwNi45MiAzMi40M0wxMDMuMTkgMzYuNzBMMTAzLjI4IDM2Ljc5UTEwNS41MSAzNi4wMSAxMDcuMTUgMzUuNjdMMTA3LjAxIDM1LjUzTDEwNy4wMCAzNS41MlExMDYuMzYgMzYuNTEgMTA0LjgwIDM4LjIzTDEwNC44MiAzOC4yNUwxMDQuNzUgMzguMThRMTA3LjkyIDM3LjM1IDExMS4wNCAzNy4zMUwxMTAuOTggMzcuMjVMMTExLjA3IDM3LjM0UTExMy4yNyAzNC42MyAxMTcuNjEgMjcuMzlMMTE3LjYzIDI3LjQyTDExNy42MCAyNy40N0wxMTcuNTYgMjcuNDJRMTE3Ljg5IDI2Ljc2IDExOC4yMyAyNi4yN1pNMTEyLjI3IDE3LjA3TDExMi4yMCAxNy4wMEwxMTIuMTMgMTYuOTNRMTEyLjkyIDE3LjAwIDExMy4zOCAxNy4xMUwxMTMuMjIgMTYuOTVMMTEzLjIyIDE2Ljk2UTExMy45OCAxNy4xOCAxMTQuMzYgMTcuMzBMMTE0LjI3IDE3LjIwTDExNC40MCAxNy4zNFExMTQuNTIgMTcuNzIgMTE0LjYwIDE4LjE0TDExNC41OSAxOC4xNEwxMTQuNDUgMTcuOTlRMTE0LjUzIDE4LjQxIDExNC40MSAxOC44MEwxMTQuNTAgMTguODhMMTE0LjU1IDE4LjkzUTExNC40MiAyMC41NSAxMTMuMjQgMjEuNjZMMTEzLjMxIDIxLjczTDExMy4xOSAyMS42MVExMTIuMzUgMjIuNzUgMTEwLjcyIDIyLjcxTDExMC41OSAyMi41OUwxMTAuNzMgMjIuNzNRMTEwLjI4IDIyLjY5IDEwOC43NiAyMi4zOUwxMDguNjcgMjIuMzBMMTA4Ljc3IDIyLjQwUTEwOC41OSAyMS41OCAxMDguNTkgMjAuODZMMTA4LjU0IDIwLjgwTDEwOC41OSAyMC44NVExMDguNDcgMjAuNTQgMTA4LjQ3IDIwLjMyTDEwOC4zOCAyMC4yM0wxMDguNDIgMjAuMjZRMTA4LjM2IDE4LjAwIDExMC42NCAxNy4yMEwxMTAuNjggMTcuMjRMMTEwLjcxIDE3LjI3UTExMS4zOCAxNy4wMiAxMTIuMjIgMTcuMDJaIi8+PHBhdGggZmlsbD0iIzIyMiIgZD0iTTEzNi40OCAyMS44NkwxMzYuNDggMjEuODdMMTM2LjUyIDIxLjkxUTEzOC4yNSAyMi4wMCAxNDAuMDggMjIuMDBMMTQwLjE1IDIyLjA3TDE0MC4xMiAyMi4wNFExNDEuODQgMjEuOTcgMTQzLjY2IDIxLjgyTDE0My42MCAyMS43NUwxNDMuNjAgMjEuNzVRMTQzLjYyIDIyLjU0IDE0My42MiAyMy4yNkwxNDMuNjIgMjMuMjVMMTQzLjY0IDI0LjYxTDE0My42MiAyNC41OVExNDEuMjkgMjQuNjIgMTM2LjUzIDI0LjczTDEzNi40OSAyNC43MEwxMzYuNTEgMjQuNzJRMTM2LjUxIDMwLjY1IDEzNS4zNyAzNS42NEwxMzUuMjEgMzUuNDhMMTM1LjI4IDM1LjU1UTEzMy4wOSAzNi4yNiAxMzEuNjEgMzcuMDVMMTMxLjUzIDM2Ljk4TDEzMS42MyAzNy4wOFExMzQuMDEgMzAuMzIgMTMzLjc0IDIzLjIwTDEzMy42MiAyMy4wOEwxMzMuNjYgMjMuMTJRMTMzLjM4IDE1Ljk0IDEzMC43MSA5LjI4TDEzMC43NyA5LjM0TDEzMC44MyA5LjQwUTEzNC40MSAxMS44NCAxMzkuMTYgMTIuMDZMMTM5LjI0IDEyLjE0TDEzOS4xOSAxMi4wOFExNDMuODMgMTIuMjQgMTQ3Ljk4IDEwLjQ5TDE0OC4wMiAxMC41M0wxNDcuOTkgMTAuNTBRMTQ3LjY0IDExLjI1IDE0Ny40MSAxMi4wNUwxNDcuNDYgMTIuMTBMMTQ2Ljk3IDEzLjcwTDE0Ny4wMiAxMy43NVExNDQuMzQgMTQuODcgMTQxLjM3IDE1LjAzTDE0MS4zMyAxNC45OUwxNDEuMjUgMTQuOTFRMTM4LjQzIDE1LjE3IDEzNS41NyAxNC40NUwxMzUuNTkgMTQuNDdMMTM1LjU3IDE0LjQ1UTEzNi4zMyAxNy45MSAxMzYuNTIgMjEuOTFaTTE0OC41NSA5LjczTDE0OC42OSA5Ljg2TDE0OC43MCA5Ljg3UTE0My45NyAxMS44OCAxMzkuMTAgMTEuNThMMTM5LjIzIDExLjcxTDEzOS4xMiAxMS42MFExMzMuNzkgMTEuMzAgMTMwLjA2IDguNDRMMTMwLjE4IDguNTZMMTMwLjAwIDguMzhRMTMyLjk5IDE1LjQ0IDEzMy4yOSAyMy4wNkwxMzMuMzUgMjMuMTJMMTMzLjE5IDIyLjk1UTEzMy42NyAzMS4wNSAxMzEuMTYgMzcuODNMMTMxLjE1IDM3LjgyTDEzMS4xNSAzNy44MlExMzEuNzAgMzcuMzAgMTMzLjA3IDM2LjY1TDEzMy4xNSAzNi43NEwxMzMuMTEgMzYuNjlRMTMyLjk1IDM3LjQ4IDEzMi4zOCAzOS4wMUwxMzIuMjkgMzguOTJMMTMyLjM5IDM5LjAyUTEzNC42NyAzNy45MSAxMzcuNTYgMzcuNDFMMTM3LjUwIDM3LjM1TDEzNy42MyAzNy40OFExMzguMjEgMzIuNTggMTM4LjQwIDI2Ljg2TDEzOC4yOSAyNi43NkwxMzguMzIgMjYuNzlRMTQwLjA3IDI2LjcyIDE0MS45MCAyNi43MkwxNDEuOTMgMjYuNzRMMTQyLjA5IDI2LjkxUTE0My44NSAyNi44NyAxNDUuNjcgMjcuMDZMMTQ1LjU1IDI2Ljk0TDE0NS41NiAyNi45NVExNDUuNTUgMjYuMTAgMTQ1LjU1IDI1LjE5TDE0NS41NSAyNS4xOEwxNDUuNDMgMjMuMTZMMTQ1LjUwIDIzLjI0UTE0NC42NiAyMy4yNyAxNDMuODIgMjMuMjdMMTQzLjg5IDIzLjM0TDE0My45MiAyMy4zN1ExNDMuODIgMjIuMzkgMTQzLjg5IDIxLjM2TDE0My45OCAyMS40NEwxNDMuOTkgMjEuNDZRMTQyLjY5IDIxLjcyIDE0MS4yOSAyMS43MkwxNDEuMTcgMjEuNjBMMTQxLjEzIDIxLjU3UTEzOS44MyAyMS42NyAxMzguNDYgMjEuNjNMMTM4LjUxIDIxLjY5TDEzOC4zNCAxOS4zOUwxMzguMzMgMTkuMzdRMTM4LjMwIDE4LjI4IDEzOC4xOSAxNy4yMUwxMzguMjIgMTcuMjVMMTM4LjE2IDE3LjE5UTEzOS4yMSAxNy4zMyAxNDAuMjAgMTcuMzNMMTQwLjEyIDE3LjI1TDE0MC4yNCAxNy4zNlExNDQuOTcgMTcuMzMgMTQ4LjU4IDE1LjQzTDE0OC40OSAxNS4zM0wxNDguNjIgMTUuNDZRMTQ5LjA4IDEzLjYwIDE0OS45OSAxMC45N0wxNTAuMDEgMTAuOTlMMTUwLjA0IDExLjAzUTE0OC42MyAxMS43NCAxNDcuODMgMTIuMDhMMTQ3Ljg2IDEyLjEyTDE0Ny45MiAxMi4xOFExNDguMTkgMTEuNDIgMTQ4LjY5IDkuODZaIi8+PHBhdGggZmlsbD0iIzExMSIgZD0iTTgyLjgyIDI1LjM5TDgyLjgyIDI1LjM5TDgyLjc5IDI1LjM2UTc5LjMyIDMxLjcxIDc1LjkwIDM1LjY3TDc1LjkxIDM1LjY4TDc1Ljk1IDM1LjcyUTc0LjA4IDM2LjE0IDcxLjY0IDM3LjAxTDcxLjU1IDM2LjkyTDcxLjcxIDM3LjA4UTc2LjU1IDMxLjQyIDgxLjMxIDIzLjAwTDgxLjI1IDIyLjk0TDgxLjMxIDIzLjAwUTc2Ljc0IDE2LjA4IDcwLjc3IDkuNjhMNzAuNjkgOS42MEw3MC43OSA5LjcxUTczLjY1IDEwLjg1IDc1Ljk0IDExLjM0TDc1Ljg3IDExLjI4TDc1LjkzIDExLjM0UTgwLjUxIDE2LjQ5IDgyLjk1IDIwLjQ1TDgzLjA1IDIwLjU1TDgzLjAxIDIwLjUyUTg1LjUwIDE2LjA4IDg5LjQyIDExLjY2TDg5LjQyIDExLjY2TDg5LjQ3IDExLjcxUTkxLjAyIDExLjM1IDk0LjIyIDEwLjU5TDk0LjIxIDEwLjU5TDk0LjMxIDEwLjY5UTg4LjIyIDE3LjEyIDg0Ljc2IDIzLjA2TDg0LjYzIDIyLjkzTDg0LjY2IDIyLjk2UTg5Ljg2IDMxLjY3IDk0LjI0IDM2LjIzTDk0LjMxIDM2LjMwTDk0LjM2IDM2LjM1UTkxLjcxIDM1LjUwIDg5LjYyIDM1LjI3TDg5LjUwIDM1LjE1TDg5LjUzIDM1LjE4UTg2Ljc0IDMyLjIwIDgyLjgyIDI1LjM4Wk04OS41MCAzNS41Nkw4OS41OCAzNS42NUw4OS40OCAzNS41NVE4OS43MSAzNS41MSA5MC4xNyAzNS42M0w5MC4yNiAzNS43Mkw5MC4zMyAzNS43OFE5MS4wNCAzNi40NiA5Mi41NiAzOC4wNkw5Mi42NiAzOC4xNkw5Mi41MyAzOC4wMlE5Ni4wMCAzOC45NSA5OS4wNCA0MC4zMkw5OS4wNCA0MC4zMUw5OS4wOCA0MC4zNVE5MS44NyAzMy42OCA4Ni43NyAyNC45Mkw4Ni44MiAyNC45N0w4Ni42OCAyNC44M1E5MC41NyAxOC4zMiA5Ni40NyAxMS40N0w5Ni40NCAxMS40NUw5Ni40NCAxMS40NVE5NS4wMCAxMi4xMCA5Mi44MyAxMi42M0w5Mi43OCAxMi41OEw5Mi43OSAxMi41OVE5My43MCAxMS43MiA5NS40NiA5LjkzTDk1LjM5IDkuODZMOTUuMzggOS44NVE5My4wMiAxMC43NyA4OS4zMyAxMS4zNEw4OS4yMiAxMS4yM0w4OS4zMSAxMS4zMlE4NS45NCAxNS4xOSA4My4zNiAxOS40OUw4My4zMSAxOS40NEw4My4yMSAxOS4zNFE4Mi40NiAxNy45MCA4MS4yNyAxNi40Mkw4MS4xOCAxNi4zM0w3OC45NCAxMy40M0w3OC41NCAxMy40MUw3OC41NCAxMy40MlE3OC40MyAxMy40NiA3OC4yMCAxMy4zOEw3OC4yNSAxMy40M0w3OC4yMCAxNS4zOFE3Ny40NiAxMi40OSA3NS45NyAxMC45M0w3NS45NiAxMC45MUw3NS45MCAxMC44NlE3Mi4yNiAxMC4xNCA2OS42NyA4Ljc3TDY5LjUxIDguNjFMNjkuNjIgOC43MlE3Ni4yOCAxNS45MiA4MC44NSAyMi45Nkw4MC45NCAyMy4wNUw4MC45NSAyMy4wNlE3Ni4zNyAzMS4xNSA3MC42MiAzNy43NEw3MC42OSAzNy44MUw3MC41OCAzNy43MFE3MS45OCAzNy4xMiA3NC4xMSAzNi41NUw3NC4yMCAzNi42NEw3Mi45MiAzOC4xMEw3Mi43NyAzNy45NVE3Mi43NiAzNy45NCA3MS40MyAzOS4yN0w3MS41OCAzOS40Mkw3MS40NiAzOS4zMVE3NC40OSAzOC4yNiA3Ny42NSAzNy43Nkw3Ny42NSAzNy43N0w3Ny42MCAzNy43MlE4MS41OCAzMy4xNyA4NC4xNyAyOC40MUw4NC4yNiAyOC41MEw4NC4zNSAyOC41OVE4Ni43MyAzMi42NSA4OS40NCAzNS41MVoiLz48cGF0aCBkPSJNMTggMzEgQzg2IDI0LDExNiAzOCwxODUgMzciIHN0cm9rZT0iIzQ0NCIgZmlsbD0ibm9uZSIvPjxwYXRoIGZpbGw9IiMxMTEiIGQ9Ik0yNi45NCAzNS4wNkwyNi45NiAzNS4wOEwyNC45MSAzNS4zMkwyNC44MiAzNS4yM1EyNC40MCAzNS4yNyAyMy40MyAzNS4zMkwyMy41NCAzNS40M0wyMy40MCAzNS4yOVEyMi41NCAzNS40NiAyMi4wNSAzNS40NkwyMi4wNSAzNS40N0wyMS45OCAzNS40MFEyMC4yOSAzNS4zNCAxOS4yNiAzNC41MEwxOS40MCAzNC42NEwxOS4zNyAzNC42MVEyMC4xNiAzMy41MCAyMS44MCAzMS4zN0wyMS43OSAzMS4zNUwyMS44NCAzMS40MFEyMy4wMCAzMi44OCAyNS4yMSAzMi42NUwyNS4yNyAzMi43MUwyNS4yMSAzMi42NFEyNi4xNiAzMi41NyAyNi44MSAzMS45M0wyNi43MyAzMS44NEwyNi44NCAzMS45NVEyNy4zOCAzMS4yMCAyNy4yNyAzMC4zMkwyNy40MyAzMC40OUwyNy4zMCAzMC4zNlEyNy4xNyAyNS43NCAyNy4yNSAyMS4xN0wyNy4yMSAyMS4xM0wyNy4yNiAyMS4xOVEyNy40MiAxNi43MCAyNy45NiAxMi4xMEwyNy45MCAxMi4wNEwyNy45MiAxMi4wNlEyOS43OCAxMS43OCAzMS45MSAxMC43NUwzMS45NiAxMC44MUwzMS44NCAxMC42OVEzMC4xNiAxNy42MSAzMC4xNiAyNC44NEwzMC4wOCAyNC43NkwzMC4xNyAyNC44NVEzMC4wNiAyOC4yOCAzMC41MSAzMS43OEwzMC41NCAzMS44MUwzMC42MiAzMS44OVEzMC41OCAzMi4xMiAzMC41OCAzMi40NkwzMC42OSAzMi41N0wzMC41NyAzMi40NVEzMC42NiAzMy4xMSAzMC40MyAzMy42NEwzMC4zOCAzMy41OUwzMC4zNiAzMy41N1EyOS44OCAzNC45MiAyNy4wNyAzNS4xOVpNMzEuOTQgMzcuOTdMMzEuOTcgMzguMDBMMzIuMjMgMzcuOTFMMzIuNjEgMzcuODdMMzIuODMgMzcuNzFMMzIuODggMzcuNzdRMzMuMjIgMzcuNTMgMzMuMjkgMzcuNDJMMzMuMjUgMzcuMzhMMzMuMjUgMzcuMzdRMzMuMzQgMzYuMTAgMzMuMDggMzUuMTFMMzMuMjAgMzUuMjNMMzMuMTggMzUuMjJRMzEuNjkgMjkuMjcgMzEuOTYgMjIuOTFMMzIuMDcgMjMuMDNMMzIuMDcgMjMuMDJRMzIuMjMgMTYuODIgMzQuMDIgMTAuOTJMMzQuMTYgMTEuMDZMMzQuMDIgMTAuOTNRMzMuMTggMTEuNjEgMzEuOTIgMTIuMzNMMzIuMDMgMTIuNDNMMzEuOTIgMTIuMzNRMzIuMTUgMTEuNjAgMzIuNTcgMTAuMDhMMzIuNDkgMTAuMDBMMzIuNDggOS45OVEzMC4wOCAxMS40NCAyNy40MSAxMS43NEwyNy4zOCAxMS43MUwyNy40NSAxMS43OFEyNy4wMyAxNi4xMSAyNi45NSAyMS4wNkwyNi44OCAyMC45OUwyNi44OSAyMS4wMFEyNi45NiAyNy4wNSAyNy4wNCAzMC40OEwyNi44NyAzMC4zMEwyNi44OSAzMC4zM1EyNi45MyAzMi4wOCAyNS4xOCAzMi4yNEwyNS4xOCAzMi4yM0wyNS4yMyAzMi4yOFEyMy40NSAzMi4zNCAyMS43OCAzMC43MEwyMS43NyAzMC43MEwyMS44MSAzMC43M1ExOS43NiAzMy4yNSAxOC44MSAzNC44MUwxOC43NiAzNC43NkwxOC43NyAzNC43N1ExOS40MCAzNS40MSAyMC40MyAzNS42NEwyMC41NyAzNS43N0wyMC41MyAzNS43M1EyMC41MSAzNS45NCAyMC4yNCAzNi4xN0wyMC4xMiAzNi4wNUwyMC4yNSAzNi4xN1EyMS43MiAzNy4xNSAyMy43MCAzNy40MkwyMy41MSAzNy4yM0wyMy42MCAzNy4zMlEyNC4wNCAzNy40MSAyNy4zMyAzNy43MkwyNy4zNCAzNy43M0wyNy4zNiAzNy43NFEzMC41MSAzNy45MSAzMS44OCAzNy45MVoiLz48cGF0aCBmaWxsPSIjMzMzIiBkPSJNNTYuMTcgMjcuMjNMNDYuODEgMTcuMTFMNDYuODIgMTcuMTJRNDcuNjQgMjAuNzkgNDcuNjQgMjQuNTJMNDcuNzIgMjQuNjBMNDcuNzIgMjQuNjBRNDcuNjggMzAuNTUgNDUuNjMgMzYuMTFMNDUuNzIgMzYuMTlMNDUuNjcgMzYuMTVRNDQuNTMgMzYuMzQgNDIuMjggMzcuMTBMNDIuMzggMzcuMjBMNDIuMjkgMzcuMTFRNDUuMTQgMzEuMzUgNDUuMTQgMjQuNjVMNDUuMDcgMjQuNTlMNDUuMDQgMjQuNTZRNDUuMTQgMTYuMDEgNDAuNjQgOC41OEw0MC42MiA4LjU2TDQwLjcyIDguNjZRNDEuMTEgOC43OCA0MS43OSA5LjIwTDQxLjgwIDkuMjFMNDEuNjYgOS4wN1E1My44NyAyMC40MCA2MS43MSAyOS42NUw2MS42MSAyOS41NUw2MS43NyAyOS43MVE2MS40OCAyNy4yOSA2MS40OCAyNC44NUw2MS4zNiAyNC43M0w2MS4zNyAyNC43NFE2MS4zMSAxNy40NCA2My44MiAxMS4yNEw2My45MiAxMS4zNEw2My44NSAxMS4yN1E2Ni4yOCAxMC44NCA2Ny44OCAxMC4xNkw2Ny44MCAxMC4wOEw2Ny45MSAxMC4xOVE2NC40NyAxNi4yMyA2NC4xNyAyMy4zOUw2NC4yNiAyMy40OEw2NC4xOSAyMy40MVE2My45OCAzMC44NiA2Ni45NSAzNy4wMkw2Ni44NiAzNi45M0w2Ni44MCAzNi44OFE2Ni4yMyAzNi44MCA2NS44MSAzNi42MUw2NS44NCAzNi42NEw2NS45MSAzNi43MFE2MS4zOSAzMi44MCA1Ni4xOCAyNy4yNEw1Ni4wNiAyNy4xMlpNNjkuNDkgNDAuMTRMNjkuNDIgNDAuMDZMNjkuNDkgNDAuMTNRNzAuMDAgNDAuMzQgNzAuNDIgNDAuNTNMNzAuMzcgNDAuNDhMNzEuMzMgNDAuOTRMNzEuMjMgNDAuODRRNjUuOTcgMzMuODAgNjUuOTcgMjQuNDNMNjYuMDIgMjQuNDhMNjYuMDQgMjQuNTBRNjYuMDAgMTcuMjMgNjkuMzIgMTAuOTlMNjkuMzYgMTEuMDNMNjkuMzAgMTAuOThRNjguNjUgMTEuMjAgNjcuMjQgMTEuODFMNjcuMzAgMTEuODdMNjcuMjggMTEuODRRNjcuNzUgMTEuMTAgNjguNTkgOS41NEw2OC40OSA5LjQ0TDY4LjUwIDkuNDVRNjYuMDIgMTAuMzEgNjMuNTggMTAuODlMNjMuNTkgMTAuOTBMNjMuNjUgMTAuOTZRNjEuMDcgMTcuNDggNjEuMDcgMjQuOTBMNjAuOTQgMjQuNzdMNjAuOTEgMjQuNzRRNjEuMDMgMjYuNzIgNjEuMjIgMjguNzBMNjEuMTAgMjguNTlMNjEuMTQgMjguNjJRNTYuNTMgMjIuOTkgNTEuNzcgMTguMzhMNTEuNzMgMTguMzRMNDEuNjggOC42N0w0MS43MCA4LjY5UTQxLjA4IDguMzMgMzkuODYgNy43NkwzOS45NCA3Ljg0TDM5Ljk3IDcuODdRNDQuNzkgMTUuNTUgNDQuNzkgMjQuNjVMNDQuNzggMjQuNjRMNDQuODQgMjQuNjlRNDQuODUgMzEuODIgNDEuNzYgMzcuODRMNDEuNzAgMzcuNzdMNDEuNzggMzcuODVRNDIuMDYgMzcuNzEgNDMuNzAgMzcuMTFMNDMuNjUgMzcuMDVMNDMuNzIgMzcuMTNRNDMuNDAgMzcuOTEgNDIuNTYgMzkuMzlMNDIuNTUgMzkuMzlMNDIuNDEgMzkuMjVRNDMuODggMzguODUgNDcuMzUgMzguMDVMNDcuMjQgMzcuOTVMNDcuMjggMzcuOThRNDkuNTYgMzEuODEgNDkuNTYgMjQuNjJMNDkuNjMgMjQuNjlMNDkuNjEgMjQuNjdRNDkuNTQgMjIuNTEgNDkuMzIgMjAuMzhMNDkuMzUgMjAuNDJMNDkuNDkgMjAuNTZRNjAuODEgMzMuMjAgNjkuNDEgNDAuMDVaIi8+PC9zdmc+";
+            byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+            // Tạo bitmap từ byte array
+            using (var ms = new MemoryStream(imageBytes))
+            using (var bitmap = new Bitmap(ms))
+            {
+                // Tiền xử lý ảnh để cải thiện OCR
+                var processedImage = PreprocessImage(bitmap);
+
+                // Sử dụng Tesseract để OCR
+                //using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+                //{
+                //    using (var page = engine.Process(processedImage))
+                //    {
+                //        string text = page.GetText();
+                //        text = Regex.Replace(text, @"\s+", "").Trim();
+                //        Console.WriteLine("Kết quả OCR: " + text);
+                //    }
+                //}
+            }
+        }
+        static Bitmap PreprocessImage(Bitmap original)
+        {
+            // Tạo ảnh mới với cùng kích thước
+            var newImage = new Bitmap(original.Width, original.Height);
+
+            // Chuyển sang grayscale và tăng độ tương phản
+            for (int x = 0; x < original.Width; x++)
+            {
+                for (int y = 0; y < original.Height; y++)
+                {
+                    System.Drawing.Color pixel = original.GetPixel(x, y);
+                    int grayValue = (int)(pixel.R * 0.3 + pixel.G * 0.59 + pixel.B * 0.11);
+                    newImage.SetPixel(x, y, grayValue < 128 ? System.Drawing.Color.Black : System.Drawing.Color.White);
+                }
+            }
+
+            return newImage;
+        }
+        private string MSTCongTY = "";
+        private void GetMST()
+        {
+            string query = "SELECT * FROM License";
+
+            // Tạo mảng tham số với giá trị cho câu lệnh SQL
+
+            var kq = ExecuteQuery(query, null);
+            if (kq.Rows.Count > 0)
+            {
+                MSTCongTY = kq.Rows[0]["MaSoThue"].ToString();
+            }
+        }
         private void frmMain_Load(object sender, EventArgs e)
         {
-            SetVietnameseCulture();
+         
             InitDB();
 
             InitData();
+            SetVietnameseCulture();
+            GetMST();
             string fileName = Path.GetFileName(dbPath.Trim());
-            new ToastContentBuilder()
-            .AddText("Đang đăng nhập vào database " + fileName)
-            .Show(); // Hiển thị thông báo
+            
             CheckDB();
             ControlsSetup();
            
@@ -612,6 +683,9 @@ namespace SaovietTax
 }
         private void LoadXmlFiles(string path,int type)
         {
+            progressPanel1.Visible = true;
+            lblThongbao.Text = "Bắt đầu chạy";
+            progressPanel1.Caption = "Bắt đầu chạy...";
             if (type == 1)
                 people = new BindingList<FileImport>();
             if (type == 2)
@@ -627,7 +701,8 @@ namespace SaovietTax
             var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories)
                 .Where(file => IsFileInMonthRange(file, path, dtTungay.DateTime.Month, dtDenngay.DateTime.Month)).ToList();
             //Lọc thêm điều kiện theo ngày
-
+            lblThongbao.Text = "Đếm file xml";
+            progressPanel1.Caption = "Đếm file xml...";
             List<string> lstdelete = new List<string>();
             foreach (var item in files)
             {
@@ -660,6 +735,8 @@ namespace SaovietTax
             }
 
             int countXml = files.Count();
+            lblThongbao.Text = "Đếm file excel";
+            progressPanel1.Caption = "Đếm file excel...";
             Dictionary<string, string> lstHodpn = new Dictionary<string, string>();
             //Lấy danh sách hóa đơn để kiểm tra cho excel
 
@@ -706,8 +783,7 @@ namespace SaovietTax
             if (rowCount > 0)
                 countExcel = rowCount;
 
-            totalCount = countXml + countExcel;
-
+            totalCount = countXml + countExcel; 
             if (type == 1)
                 lblSofiles.Text = totalCount.ToString();
             if (type == 2)
@@ -720,7 +796,8 @@ namespace SaovietTax
             //} 
             foreach (string file in files)
             {
-                
+                lblThongbao.Text = "Đọc file thứ "+(files.IndexOf(file) + 1);
+                progressPanel1.Caption = "Đọc file thứ " + (files.IndexOf(file) + 1) +"/ "+ totalCount;
                 progressPercentage = (filesLoaded * 100) / totalCount;
                 filesLoaded += 1;
                 progressBarControl1.EditValue = progressPercentage;
@@ -755,6 +832,18 @@ namespace SaovietTax
                 XmlNode nTTThanToan = root.SelectSingleNode("//LTSuat");
                 var nThTien = root.SelectNodes("//LTSuat//ThTien");
                 var nTSuat = root.SelectNodes("//LTSuat//TSuat");
+
+                bool isAcess = true;
+                if(type==1)
+                {
+                    string getmst =  root.SelectSingleNode("//NMua//MST").InnerText;
+                    isAcess =mstcongty == getmst ? true : false;
+                }
+                if (type == 2)
+                {
+                    string getmst = root.SelectSingleNode("//NBan//MST").InnerText;
+                    isAcess = mstcongty == getmst ? true : false;
+                }
                 string SHDon = "";
                 string KHHDon = "";
                 string ten = "";
@@ -784,6 +873,8 @@ namespace SaovietTax
             new OleDbParameter("KyHieu", KHHDon),          // Sử dụng chỉ số mà không cần tên
             new OleDbParameter("SoHD", "%" + SHDon + "%")  // Thêm ký tự % cho LIKE
                 };
+                lblThongbao.Text = "Kiểm tra hóa đơn ";
+                Application.DoEvents();
                 var kq = ExecuteQuery(query, parameters);
                 if (kq.Rows.Count > 0)
                 {
@@ -793,7 +884,8 @@ namespace SaovietTax
                 {
                     continue;
                 }
-
+                lblThongbao.Text = "Kiểm tra table import ";
+                Application.DoEvents();
                 query = "SELECT * FROM tbimport WHERE KHHDon = ? AND SHDon LIKE ?";
                 parameters = new OleDbParameter[]
               {
@@ -806,8 +898,8 @@ namespace SaovietTax
                     continue;
                 }
                 XmlNode nBanNode=null;
-                if (type==1)
-                 nBanNode = ndhDonNode.SelectSingleNode("NBan");
+                if (type == 1)
+                    nBanNode = ndhDonNode.SelectSingleNode("NBan");
                 if (type == 2)
                     nBanNode = ndhDonNode.SelectSingleNode("NMua");
                 //  XmlNode nMuaNode = ndhDonNode.SelectSingleNode("NMua");
@@ -845,7 +937,10 @@ namespace SaovietTax
                     {
                         XmlNode item = nTSuat[i];
                         if (item.InnerText != "KKKNT" && item.InnerText != "KCT")
-                            Vat = int.Parse(item.InnerText.Replace("%", ""));
+                        {
+                            if (Vat==null || Vat == 0)
+                                Vat = int.Parse(item.InnerText.Replace("%", ""));
+                        }
                         else
                             Vat = 0;
                     }
@@ -862,9 +957,7 @@ namespace SaovietTax
                         for (int i = 0; i < nThTien.Count; i++)
                         {
                             if (nThTien[i].InnerText != "0")
-                                Thanhtien = double.Parse(nThTien[i].InnerText.Replace('.', ','));
-                            else
-                                Thanhtien = 0;
+                                Thanhtien = double.Parse(nThTien[i].InnerText.Replace('.', ',')); 
                         }
                     }
                     else
@@ -886,6 +979,9 @@ namespace SaovietTax
                     mst = "";
                 string querykh = @" SELECT TOP 1 *  FROM KhachHang As kh
 WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
+
+                lblThongbao.Text = "Kiểm tra khách hàng";
+                Application.DoEvents();
                 DataTable result = ExecuteQuery(querykh, new OleDbParameter("?", mst));
                 if (result.Rows.Count == 0 && !string.IsNullOrEmpty(mst))
                 {
@@ -905,79 +1001,7 @@ WHERE kh.SoHieu = ?";
                     }
                     InitCustomer(type == 1 ? 2 : 3, Sohieu, ten, diachi, mst);
                 }
-
-                query = @" SELECT TOP 1 *  FROM KhachHang AS kh  
-INNER JOIN HoaDon AS hd ON kh.Maso = hd.MaKhachHang    
-WHERE kh.MST = ?  
-ORDER BY hd.MaSo DESC"; // Sử dụng ? thay cho @mst trong OleDb
-                result = ExecuteQuery(query, new OleDbParameter("?", mst));
-                if (result.Rows.Count > 10)
-                {
-                    SoHD = result.Rows[0]["SoHD"].ToString();
-
-                    query = @"Select top 2 * from ChungTu 
-where SoHieu = ?
-ORDER BY  MaSo DESC";
-                    result = ExecuteQuery(query, new OleDbParameter("?", SoHD));
-                    var index = 0;
-                    if (result.Rows.Count > 0)
-                    {
-                        foreach (DataRow row in result.Rows)
-                        {
-                            if (index == 0)
-                            {
-                                TkThue = int.Parse(row["MaTKNo"].ToString());  // Giả sử có cột "MaSo"; 
-                            }
-                            if (index == 1)
-                            {
-                                TkNo = int.Parse(row["MaTKNo"].ToString());  // Giả sử có cột "MaSo"; 
-                                TkCo = int.Parse(row["MaTKCo"].ToString());  // Giả sử có cột "MaSo"; 
-                                diengiai = Helpers.ConvertVniToUnicode(row["DienGiai"].ToString());
-                            }
-                            // Lấy giá trị từ cột cụ thể trong hàng hiện tại
-
-                            index += 1;
-                        }
-                    }
-                    // Tra cứu từ bảng HeThongTK
-                    query = @"Select   * from HeThongTK where MaTC = ?";
-                    result = ExecuteQuery(query, new OleDbParameter("?", TkNo));
-                    if (result.Rows.Count > 0)
-                    {
-                        TkNo = int.Parse(result.Rows[0]["SoHieu"].ToString());
-
-                        query = @"Select   * from HeThongTK where MaTC = ?";
-                        if (TkCo > 0)
-                        {
-                            result = ExecuteQuery(query, new OleDbParameter("?", TkCo));
-                            TkCo = int.Parse(result.Rows[0]["SoHieu"].ToString());
-                        }
-
-
-                        query = @"Select   * from HeThongTK where MaTC = ?";
-                        if (TkThue > 0)
-                        {
-                            result = ExecuteQuery(query, new OleDbParameter("?", TkThue));
-                            TkThue = int.Parse(result.Rows[0]["SoHieu"].ToString());
-                        }
-
-
-                    }
-                    else
-                    {
-                        //TkNo = 0;
-                        //TkCo = 1111;
-                        //TkThue = 1331;
-                    }
-                }
-                else
-                {
-
-                }
-                if (TkThue == 0)
-                {
-
-                }
+                 
                 //Add detail
                 var hhdVuList = xmlDoc.SelectNodes("//HHDVu");
                 //Mật định tài khoản 
@@ -996,8 +1020,11 @@ ORDER BY  MaSo DESC";
                         aa = CapitalizeFirstLetter(aa);
                         mst = ConvertToTenDigitNumber(aa).ToString();
                     }
-                        peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, ""));
+                        peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "",isAcess));
                 }
+
+                lblThongbao.Text = "Thêm danh sách sản phẩm con";
+                Application.DoEvents();
                 for (int i = 0; i < hhdVuList.Count; i++)
                 {
                    
@@ -1103,6 +1130,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             //Trường hợp không đủ info
             //Th1 có 1 sản phẩm và ko có đơn vị tính
+            string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+
+            result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
+            if (type == 1)
+                querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan where KeyValue like '%Ưu tiên vào%'"; // Sử dụng ? thay cho @mst trong OleDb
+            if (type == 2)
+                querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan where KeyValue like '%Ưu tiên ra%'"; // Sử dụng ? thay cho @mst trong OleDb
+
+           var result3 = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
             foreach (var item in peopleTemp)
             {
                 if (item.fileImportDetails.Count == 1 && string.IsNullOrEmpty(item.fileImportDetails[0].DVT))
@@ -1111,15 +1147,6 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     item.TKCo = "1111";
                     item.TkThue = 1331;
                 }
-            }
-            //Lấy danh sách định danh
-            string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-
-            result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
-            //Kiểm tra lại lại mã với Định danh
-            foreach (var item in peopleTemp)
-            {
-              
                 if (item.TKNo == "0")
                 {
                     //Nếu có con
@@ -1136,7 +1163,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 string[] parts = Regex.Split(condition, @"([><=%]+)"); // Vẫn giữ % để linh hoạt nếu cần
                                 if (parts.Length == 3)
                                 {
-                                     key = parts[0];
+                                    key = parts[0];
                                     string operatorStr = parts[1];
                                     string valueStr = parts[2];
                                     if (key == "Ten")
@@ -1171,7 +1198,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     item.TKNo = row["TKNo"].ToString();
                                 item.TKCo = row["TKCo"].ToString();
                                 item.TkThue = int.Parse(row["TkThue"].ToString());
-                                if (string.IsNullOrEmpty(item.Noidung) && key == "MST" && item.TKNo=="6422")
+                                if (string.IsNullOrEmpty(item.Noidung) && key == "MST" && item.TKNo == "6422")
                                     item.Noidung = row["Type"].ToString();
                             }
                             //if (item.fileImportDetails.Any(m => m.Ten.Contains(name)))
@@ -1189,18 +1216,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         item.TkThue = 1331;
                     }
                 }
-            }
-            //Nếu vẫn chưa có thì dùng ưu tiên
-            if (type == 1)
-                querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan where KeyValue like '%Ưu tiên vào%'"; // Sử dụng ? thay cho @mst trong OleDb
-            if (type == 2)
-                querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan where KeyValue like '%Ưu tiên ra%'"; // Sử dụng ? thay cho @mst trong OleDb
-
-            result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
-            foreach (var item in peopleTemp)
-            {
-               
-                if (result.Rows.Count > 0)
+                if (result3.Rows.Count > 0)
                 {
                     foreach (DataRow row in result.Rows)
                     {
@@ -1218,47 +1234,30 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
                     }
                 }
-
-            }
-            //Điền lại diễn giải
-            foreach (var item in peopleTemp)
-            {
                 if (item.fileImportDetails.Count > 0)
                 {
                     if (string.IsNullOrEmpty(item.Noidung))
                         item.Noidung = Helpers.ConvertVniToUnicode(item.fileImportDetails.FirstOrDefault().Ten);
                 }
+                foreach (var t2 in item.fileImportDetails)
+                {
+                    t2.TKNo = item.TKNo;
+                    t2.TKCo = item.TKCo;
+                }
+                if (item.isAcess == false)
+                {
+                    //item.Noidung = "Mã số thuế không hợp lệ";
+                    item.Checked = false;
+                }
             }
+             
             progressBarControl1.EditValue = 100;
             //Fill cho people
             if (type == 1)
                 people = peopleTemp;
             if (type == 2)
                 people2 = peopleTemp;
-
-            //Điền cho con
-            if (type == 1)
-            {
-                foreach(var t1 in people)
-                {
-                    foreach(var t2 in t1.fileImportDetails)
-                    {
-                        t2.TKNo = t1.TKNo;
-                        t2.TKCo = t1.TKCo;
-                    }
-                }
-            }
-            if (type == 2)
-            {
-                foreach (var t1 in people2)
-                {
-                    foreach (var t2 in t1.fileImportDetails)
-                    {
-                        t2.TKNo = t1.TKNo;
-                        t2.TKCo = t1.TKCo;
-                    }
-                }
-            }
+             
         }
         private void XulyFolder()
         {
@@ -1303,19 +1302,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
-            //if (string.IsNullOrEmpty(savedPath))
-            //{
-            //    XtraMessageBox.Show("Vui lòng thiết lập đường dẫn!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //    return;
-            //} 
+            progressPanel1.Visible = true;
             XulyFolder();
             progressBarControl1.EditValue = 0;
-            LoadXmlFiles(savedPath,1);
+            if (chkDauvao.Checked)
+                LoadXmlFiles(savedPath,1);
             LoadExcel(savedPath,1);
             LoadDataGridview(1);
-
-            LoadXmlFiles(savedPath, 2);
+            if (chkDaura.Checked)
+                LoadXmlFiles(savedPath, 2);
             LoadDataGridview(2);
+            progressPanel1.Visible = false;
+
         }
         public void LoadExcel(string filePath,int type)
         {
@@ -1385,6 +1383,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             progressPercentage = 0;
                             filesLoaded += 1;
                         progressBarControl1.EditValue = progressPercentage;
+                        progressPanel1.Caption = "Đọc file thứ " + (filesLoaded - 1) + "/ " + totalCount;
                         Application.DoEvents();
 
                         diengiai = "";
@@ -1481,7 +1480,7 @@ WHERE kh.SoHieu = ?";
 
                         if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
                         {
-                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 2, ""));
+                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 2, "",true));
                         }
                         //Load nội dung theo định danh
                         //Kiểm tra lại lại mã với Định danh
@@ -1796,9 +1795,7 @@ WHERE kh.SoHieu = ?";
                     rowCount = 100;
                     bool isnext = true;
 
-                    new ToastContentBuilder()
-                        .AddText("Đang tải tháng " + DoTask)
-                        .Show(); // Hiển thị thông báo
+                  
 
                     while (isnext)
                     {
@@ -1999,9 +1996,7 @@ WHERE kh.SoHieu = ?";
                 //   d.FindElement(By.CssSelector("button.ant-btn-icon-only i[aria-label='icon: user']")
                 Thread.Sleep(1000);
                 bool isPhantrang = false;
-                new ToastContentBuilder()
-         .AddText("Đang tải dữ liệu tháng  " + DoTask)
-                   .Show(); // Hiển thị thông báo
+                
                 try
                 {
                     while (isPhantrang == false)
@@ -3251,16 +3246,32 @@ WHERE kh.SoHieu = ?";
                     var htmlFiles = Directory.EnumerateFiles(htmlPath, "*.html", SearchOption.AllDirectories);
                     foreach (var it in htmlFiles)
                     {
-                        File.Move(it, it.Replace("HDVao", "HDVaoChonLoc"));
+                        try
+                            {
+                                File.Move(it, it.Replace("HDVao", "HDVaoChonLoc"));
+                            }
+                            catch(Exception ex)
+                            {
+
+                            }
+                        File.Delete(it);
                     }
 
                     try
                     {
-                        File.Move(item.Path, item.Path.Replace("HDVao", "HDVaoChonLoc"));
+                        
+                        try
+                        {
+                            File.Move(item.Path, item.Path.Replace("HDVao", "HDVaoChonLoc"));
+                        }
+                        catch (Exception ex)
+                        {
+                                File.Delete(item.Path);
+                            }
                     }
                     catch
                     {
-                        File.Delete(item.Path);
+                      
                     }
                 }
                 catch (Exception ex)
@@ -3467,8 +3478,7 @@ WHERE kh.SoHieu = ?";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            progressPanel1.Visible = true;
-            Application.DoEvents();
+            
             if (chkDauvao.Checked)
             {
                 foreach (var it in people)
@@ -3480,7 +3490,14 @@ WHERE kh.SoHieu = ?";
                         XtraMessageBox.Show("Tài khoản " + it.TKNo + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    if (it.isAcess == false)
+                    {
+                        XtraMessageBox.Show("Có file có Mã số thuế không đúng", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
+                progressPanel1.Visible = true;
+                Application.DoEvents();
                 ImportHDVao();
             }
             if (chkDaura.Checked)
@@ -3495,7 +3512,14 @@ WHERE kh.SoHieu = ?";
                         XtraMessageBox.Show("Tài khoản "+it.TKNo+" có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    if (it.isAcess == false)
+                    {
+                        XtraMessageBox.Show("Có file có Mã số thuế không đúng", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
+                progressPanel1.Visible = true;
+                Application.DoEvents();
                 ImportHDRa();
             }
             progressPanel1.Visible = false;
@@ -3785,7 +3809,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView1_CustomRowCellEdit(object sender, CustomRowCellEditEventArgs e)
         {
-            
+            // Lấy giá trị của cột 10
+            object cellValue = gridView1.GetRowCellValue(e.RowHandle, gridView1.Columns["isAcess"]);
+
+            // Nếu giá trị là false, vô hiệu hóa ô chỉnh sửa
+            //if (cellValue is bool && !(bool)cellValue)
+            //{
+            //    e.RepositoryItem = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
+            //    e.RepositoryItem.ReadOnly = true; // Hoặc có thể sử dụng một loại điều khiển khác
+            //}
         }
 
         private void gridView1_ShownEditor(object sender, EventArgs e)
@@ -3881,11 +3913,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             if (e.Column.FieldName == "Checked") // Thay đổi tên cột cho phù hợp
             {
-                // Lấy giá trị hiện tại của checkbox
-                bool currentValue = (bool)gridView1.GetRowCellValue(e.RowHandle, e.Column);
+               var getAcess= (bool)gridView1.GetRowCellValue(e.RowHandle, "isAcess");
+                if (getAcess)
+                {
+                    // Lấy giá trị hiện tại của checkbox
+                    bool currentValue = (bool)gridView1.GetRowCellValue(e.RowHandle, e.Column);
 
-                // Đảo ngược giá trị
-                gridView1.SetRowCellValue(e.RowHandle, e.Column, !currentValue);
+                    // Đảo ngược giá trị
+                    gridView1.SetRowCellValue(e.RowHandle, e.Column, !currentValue);
+                }
+                else
+                {
+                    gridView1.SetRowCellValue(e.RowHandle, e.Column, false);
+                }
             }
         }
 
@@ -3970,6 +4010,42 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 xtraTabControl2.SelectedTabPageIndex =0;
             }
+        }
+
+        private void gridView1_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+            // Lấy giá trị của cột 10 (chỉ số 9)
+            object cellValue = gridView1.GetRowCellValue(e.RowHandle, gridView1.Columns["isAcess"]);
+
+            // Nếu giá trị của cột 10 là false
+            if (cellValue is bool && !(bool)cellValue)
+            {
+                // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
+              //  e.Appearance.BackColor = System.Drawing.Color.Red; 
+            }
+        }
+
+        private void gridView4_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+          
+        }
+
+        private void gridView3_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+            object cellValue = gridView3.GetRowCellValue(e.RowHandle, gridView3.Columns["isAcess"]);
+
+            // Nếu giá trị của cột 10 là false
+            if (cellValue is bool && !(bool)cellValue)
+            {
+                // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
+                e.Appearance.BackColor = System.Drawing.Color.Red;
+                //   e.Appearance.ForeColor = System.Drawing.Color.DarkGray;
+            }
+        }
+
+        private void simpleButton2_Click(object sender, EventArgs e)
+        {
+
         }
 
         public static string NormalizeVietnameseString(string input)
