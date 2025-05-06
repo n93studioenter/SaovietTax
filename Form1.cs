@@ -551,7 +551,6 @@ namespace SaovietTax
                     // Thực thi lệnh SQL
                     command.ExecuteNonQuery();
                     Console.WriteLine("Kích thước cột Ten đã được thay đổi thành 255.");
-
                 }
             }
         }
@@ -561,20 +560,30 @@ namespace SaovietTax
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN");
             var files = Directory.EnumerateFiles(savedPath + @"\HDVao", "*.xml", SearchOption.AllDirectories).ToList();
 
-            //if (files.Count > 0)
-            //{
-            //    string[] parts = files.FirstOrDefault().Split('\\');
-            //    int number = int.Parse(parts[6]);
-            //    dtTungay.DateTime = new DateTime(DateTime.Now.Year, number, 1);
-            //    dtDenngay.DateTime = DateTime.Now;
-            //}
-            //else
-            //{
-            //    dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            //    dtDenngay.DateTime = DateTime.Now;
-            //}
-            dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            dtDenngay.DateTime = DateTime.Now;
+            try
+            {
+                if (files.Count > 0)
+                {
+                    string[] parts = files.FirstOrDefault().Split('\\');
+                    int number = int.Parse(parts[parts.Length - 2]);
+                    dtTungay.DateTime = new DateTime(DateTime.Now.Year, number, 1);
+                    // Thiết lập ngày kết thúc là ngày cuối cùng của tháng
+                    int lastDay = DateTime.DaysInMonth(DateTime.Now.Year, number);
+                    dtDenngay.DateTime = new DateTime(DateTime.Now.Year, number, lastDay);
+                }
+                else
+                {
+                    dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    dtDenngay.DateTime = DateTime.Now;
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                dtDenngay.DateTime = DateTime.Now;
+            }
+           
             progressPanel1.Caption = "Đang xử lý...";
             progressPanel1.Description = "Vui lòng chờ...";
         }
@@ -797,7 +806,8 @@ namespace SaovietTax
             foreach (string file in files)
             {
                 lblThongbao.Text = "Đọc file thứ "+(files.IndexOf(file) + 1);
-                progressPanel1.Caption = "Đọc file thứ " + (files.IndexOf(file) + 1) +"/ "+ totalCount;
+                //progressPanel1.Caption = "Đọc file thứ " + (files.IndexOf(file) + 1) +"/ "+ totalCount;
+                progressPanel1.Caption = "Đang load files...";
                 progressPercentage = (filesLoaded * 100) / totalCount;
                 filesLoaded += 1;
                 progressBarControl1.EditValue = progressPercentage;
@@ -1218,7 +1228,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
                 if (result3.Rows.Count > 0)
                 {
-                    foreach (DataRow row in result.Rows)
+                    foreach (DataRow row in result3.Rows)
                     {
                         if (string.IsNullOrEmpty(item.TKNo) || item.TKNo == "0")
                             item.TKNo = row["TKNo"].ToString();
@@ -1302,6 +1312,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
+             filesLoaded = 0;
+            totalCount = 0;
             progressPanel1.Visible = true;
             XulyFolder();
             progressBarControl1.EditValue = 0;
@@ -1555,6 +1567,37 @@ WHERE kh.SoHieu = ?";
         private int Sohoadoncuathan = 0;
         private void Taihoadon(int type)
         {
+            //Xử lý vòng lặp ngày
+            Dictionary<DateTime, DateTime> lstDicDate = new Dictionary<DateTime, DateTime>();
+            //Nếu trong 1 tháng
+            if (dtTungay.DateTime.Month == dtDenngay.DateTime.Month)
+            {
+                lstDicDate.Add(dtTungay.DateTime, dtDenngay.DateTime);
+            }
+            //Nếu khác tháng
+            else
+            {
+                int j = 0;
+                for (int i = dtTungay.DateTime.Month; i <= dtDenngay.DateTime.Month; i++)
+                {
+                    int lastDay = DateTime.DaysInMonth(dtTungay.DateTime.Year, i);
+                    // Tạo ngày cuối cùng của tháng
+                    DateTime lastDateOfMonth = new DateTime(dtTungay.DateTime.Year, i, lastDay);
+                    //Nếu lần đầu, từ ngày cặp đau tien lấy theo tu ngày
+                    if (j == 0)
+                        lstDicDate.Add(dtTungay.DateTime, lastDateOfMonth);
+                    //
+                    else
+                    {
+                        if(dtDenngay.DateTime< lastDateOfMonth)
+                        lstDicDate.Add(new DateTime(dtTungay.DateTime.Year, i, 1), dtDenngay.DateTime);
+                        else
+                            lstDicDate.Add(new DateTime(dtTungay.DateTime.Year, i, 1), lastDateOfMonth);
+                    }
+                    j++;
+                }
+            }
+            Driver = null;
             if (Driver == null)
             {
                 var options = new ChromeOptions();
@@ -1627,12 +1670,23 @@ WHERE kh.SoHieu = ?";
                     //Endtask = int.Parse(comboBoxEdit2.SelectedItem.ToString());
                     DoTask = dtTungay.DateTime.Month;
                     Endtask = dtDenngay.DateTime.Month;
-
+                   
                     if (type == 1)
-                        Xulysaudangnhap();
+                    {
+                        foreach (var item in lstDicDate)
+                        {
+                            Xulysaudangnhap(DateTime.Parse(item.Key.ToString()), DateTime.Parse(item.Value.ToString()));
+                        }
+                    }
                     if (type == 2)
-                        Xulysaudangnhap2();
-
+                    {
+                        foreach(var item in lstDicDate)
+                        {
+                            Xulysaudangnhap2(DateTime.Parse(item.Key.ToString()),DateTime.Parse(item.Value.ToString()));
+                        }
+                       
+                    }
+                    Driver.Close();
                 }
                 catch (Exception ex)
                 {
@@ -1643,7 +1697,8 @@ WHERE kh.SoHieu = ?";
         }
         int globaltype = 0;
         Dictionary<int, int> dictionMonth = new Dictionary<int, int>();
-        private void Xulychonngay(WebDriverWait wait,int type)
+        private int soThangtai=0;
+        private void Xulychonngay(WebDriverWait wait,int type,DateTime fd,DateTime td)
         {
 
             // Tìm input với class 'ant-calendar-input' và placeholder 'Chọn thời điểm'
@@ -1656,11 +1711,11 @@ WHERE kh.SoHieu = ?";
             IWebElement monthSelect = Driver.FindElement(By.CssSelector("a.ant-calendar-month-select[title='Chọn tháng']"));
             monthSelect.Click();
 
-            IWebElement monthItem = Driver.FindElement(By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 0" + DoTask.ToString() + "']"));
+            IWebElement monthItem = Driver.FindElement(By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 0" + fd.Month.ToString() + "']"));
             monthItem.Click();
 
             var elements = Driver.FindElements(By.CssSelector("div.ant-calendar-date"));
-            string xpath = $"//td[@role='gridcell' and @title='{dtTungay.DateTime.Day} tháng {dtTungay.DateTime.Month} năm 2025']";
+            string xpath = $"//td[@role='gridcell' and @title='{fd.Day} tháng {fd.Month} năm 2025']";
             var tdElement = Driver.FindElement(By.XPath(xpath));
 
             // Cuộn tới phần tử
@@ -1681,12 +1736,12 @@ WHERE kh.SoHieu = ?";
             monthSelect = Driver.FindElement(By.CssSelector("a.ant-calendar-month-select[title='Chọn tháng']"));
             monthSelect.Click();
 
-            monthItem = Driver.FindElement(By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 0" + dtDenngay.DateTime.Month.ToString() + "']"));
+            monthItem = Driver.FindElement(By.XPath("//a[contains(@class,'ant-calendar-month-panel-month') and text()='Thg 0" + td.Month.ToString() + "']"));
             monthItem.Click();
 
             elements = Driver.FindElements(By.CssSelector("div.ant-calendar-date"));
-            int day = dtDenngay.DateTime.Day;
-            int month = dtDenngay.DateTime.Month;
+            int day = td.Day;
+            int month = td.Month;
 
             // Tạo XPath động dựa trên ngày và tháng
             xpath = $"//td[@role='gridcell' and @title='{day} tháng {month} năm 2025']";
@@ -1700,15 +1755,16 @@ WHERE kh.SoHieu = ?";
             wait.Until(d => d.FindElement(By.XPath(xpath)).Displayed && d.FindElement(By.XPath(xpath)).Enabled);
             tdElement.Click();
         }
-        private void Xulysaudangnhap2()
+        private int oldRow = 1;
+        private void Xulysaudangnhap2(DateTime fromdate,DateTime todate)
         {
             Sohoadoncuathan = 0;
-            if (DoTask > Endtask)
-            {
-                Driver.Quit(); // Đóng WebDriver
-                this.Focus();
-                return;
-            }
+            //if (DoTask > Endtask)
+            //{
+            //    Driver.Quit(); // Đóng WebDriver
+            //    this.Focus();
+            //    return;
+            //}
 
             Thread.Sleep(1000);
 
@@ -1723,14 +1779,14 @@ WHERE kh.SoHieu = ?";
             string targetUrl = "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don";
             Driver.Navigate().GoToUrl(targetUrl);
             Thread.Sleep(1000);
-            Xulychonngay(wait,2);
+            Xulychonngay(wait,2, fromdate, todate);
             Thread.Sleep(2000);
             new Actions(Driver)
                 .SendKeys(Keys.Enter) // Tab lần 2
                 .Perform();
 
             var button = wait.Until(d => d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn') and .//span[text()='Tìm kiếm']])[1]")));
-            button.Click();
+            button.Click(); 
             waitLoading(wait);
             IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
             int rowCount = rows.Count;
@@ -1801,7 +1857,7 @@ WHERE kh.SoHieu = ?";
                     {
                         try
                         {
-                            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
                             var row = wait.Until(d =>
                             {
                                 try
@@ -1816,7 +1872,7 @@ WHERE kh.SoHieu = ?";
 
                             var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
                             var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
-
+                            oldRow += 1;
                             string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
                             OleDbParameter[] parameters = new OleDbParameter[]
                             {
@@ -1881,8 +1937,7 @@ WHERE kh.SoHieu = ?";
             Xulymaytinhtien2(wait);
             dictionMonth.Add(DoTask, Sohoadoncuathan);
             //DoTask += 1;
-            //Xulysaudangnhap2();
-            Driver.Quit(); // Đóng WebDriver
+            //Xulysaudangnhap2(); 
             this.Focus();
         }
         private void waitLoading(WebDriverWait wait)
@@ -1899,17 +1954,17 @@ WHERE kh.SoHieu = ?";
                 return displayValue == "none";
             });
         }
-        private void Xulysaudangnhap()
+        private void Xulysaudangnhap(DateTime fromdate, DateTime todate)
         {
             Sohoadoncuathan = 0;
-            if (DoTask > Endtask)
-            {
-                Driver.Quit(); // Đóng WebDriver 
-                StringBuilder sb = new StringBuilder();
-                this.Focus(); // Đặt focus cho form
-                return;
+            //if (DoTask > Endtask)
+            //{
+            //    Driver.Quit(); // Đóng WebDriver 
+            //    StringBuilder sb = new StringBuilder();
+            //    this.Focus(); // Đặt focus cho form
+            //    return;
 
-            }
+            //}
             Thread.Sleep(1000);
             if (Driver == null)
             {
@@ -1933,7 +1988,7 @@ WHERE kh.SoHieu = ?";
                  
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
                 Thread.Sleep(1000);
-                Xulychonngay(wait,1);
+                Xulychonngay(wait,1, fromdate, todate);
                 Thread.Sleep(1000);
                 new Actions(Driver)
 .SendKeys(Keys.Enter) // Tab lần 2
@@ -2022,7 +2077,7 @@ WHERE kh.SoHieu = ?";
                         {
                             try
                             {
-                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
                                 // Tìm dòng hiện tại
                                 var row = wait.Until(d =>
                                 {
@@ -2073,6 +2128,7 @@ WHERE kh.SoHieu = ?";
                                  d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
                                 button.Click();
                                 // Xử lý sau khi click (đợi tải, đóng popup,...)
+                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(20));
                                 waitLoading(wait);
                                 string fp = "";
                                 if (currentRow == 1)
@@ -2135,7 +2191,7 @@ WHERE kh.SoHieu = ?";
                     throw ex;
                 }
                 Thread.Sleep(1000);
-                Cucthuekhngnhanma(wait); 
+                Cucthuekhngnhanma(wait, fromdate,todate); 
             }
             catch (Exception ex)
             {
@@ -2310,17 +2366,18 @@ WHERE kh.SoHieu = ?";
                 int hasdata = 0;
                 bool isnext = true;
                 //while ((currentRow) <= rowCount)
+                bool isfirst = true;
                 while (isnext)
                 {
                     try
                     {
-                        wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                        wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
                         // Tìm dòng hiện tại
                         var row = wait.Until(d =>
                         {
                             try
                             {
-                                return d.FindElement(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{currentRow}]"));
+                                return d.FindElements(By.XPath($"(//tbody[@class='ant-table-tbody']/tr[contains(@class,'ant-table-row')])[{oldRow}]"));
                             }
                             catch (NoSuchElementException)
                             {
@@ -2328,9 +2385,13 @@ WHERE kh.SoHieu = ?";
                                 return null; // Trả về null nếu không tìm thấy
                             }
                         });
-                        var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
-                        var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
-
+                        var cellC25TYY = row[0].FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
+                        var cell22252 = row[0].FindElement(By.XPath("./td[4]")).Text; // 22252
+                        if (string.IsNullOrEmpty(cellC25TYY))
+                        {
+                            oldRow++; // Vẫn tiếp tục với dòng tiếp theo
+                            continue;
+                        }
                         string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
 
 
@@ -2342,19 +2403,19 @@ WHERE kh.SoHieu = ?";
                         };
 
                         // Click vào dòng
-                        row.Click();
+                        row[0].Click();
                         var button = wait.Until(d =>
                           d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[13]")));
                         button.Click();
                         // Xử lý sau khi click (đợi tải, đóng popup,...)
+                        wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(20));
                         waitLoading(wait);
-                        string fp = "";
-                        if (currentRow == 15)
+                        string fp = ""; 
+                        if (isfirst)
                         {
-                            int aas = 10;
-                        }
-                        if (currentRow == 1)
                             fp = savedPath + "\\HDRa\\" + "invoice.zip";
+                            isfirst = false;
+                        }
                         else
                             fp = savedPath + "\\HDRa\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
 
@@ -2363,6 +2424,7 @@ WHERE kh.SoHieu = ?";
                         lstHas.Add(fp);
                         Sohoadoncuathan += 1;
                         currentRow++; // Chuyển sang dòng tiếp theo
+                        oldRow += 1;
                     }
                     catch (NoSuchElementException)
                     {
@@ -2504,7 +2566,7 @@ WHERE kh.SoHieu = ?";
             {
                 try
                 {
-                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
                     // Tìm dòng hiện tại
                     var row = wait.Until(d =>
                     {
@@ -2563,6 +2625,7 @@ WHERE kh.SoHieu = ?";
                      d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[19]")));
                     button.Click();
                     // Xử lý sau khi click (đợi tải, đóng popup,...)
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(20));
                     waitLoading(wait);
                     string fp = "";
                     if (currentRow == 15)
@@ -2590,56 +2653,54 @@ WHERE kh.SoHieu = ?";
                 {
                     Console.WriteLine($"Lỗi khi xử lý dòng {currentRow}: {ex.Message}");
                     isnext = false;
-                    currentRow++; // Vẫn tiếp tục với dòng tiếp theo
-                    Driver.Quit(); // Đóng WebDriver  
+                    currentRow++; // Vẫn tiếp tục với dòng tiếp theo  
                 }
             }
             if (lstHas.Count == 0)
             {
-               
-                XulyxoaExcel();
+              
                 DoTask += 1;
                // Xulysaudangnhap(); 
             }
-            var getlastlist = lstHas.LastOrDefault();
-            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
-            wait.Until(d => File.Exists(getlastlist));
-            XulyxoaExcel();
+            if (lstHas.Count > 0)
+            {
+                var getlastlist = lstHas.LastOrDefault();
+                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                wait.Until(d => File.Exists(getlastlist));
+                // XulyxoaExcel();
 
 
-            // Di chuyển file
+                // Di chuyển file
 
 
-            GiaiNenhoadon(1);
-            //  LoadXmlFiles(savedPath);
+                GiaiNenhoadon(1);
+                //  LoadXmlFiles(savedPath);
 
-            //End Xử lý hóa đơn từ máy tính tiền
-            DoTask += 1;
+                //End Xử lý hóa đơn từ máy tính tiền
+                DoTask += 1;
+            }
+          
             //Xulysaudangnhap();
-            Driver.Quit(); // Đóng WebDriver  
         }
-        private void XulyxoaExcel()
+        private void XulyxoaExcel(DateTime fromdate,DateTime todate)
         {
             var pp = savedPath + "\\HDVao";
-            var pp2 = savedPath + "\\HDVao\\" + DoTask;
+            var pp2 = savedPath + "\\HDVao\\" + fromdate.Month;
             // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
             string[] excelFiles = Directory.GetFiles(pp, "*.xlsx");
             if (excelFiles.Length > 0)
             {
                 //string fileName = System.IO.Path.GetFileName(excelFiles[0]); // Lấy tên file
-                string fileName = "Ex_" + dtTungay.DateTime.Day + "_" + dtDenngay.DateTime.Day + ".xlsx";
+                string fileName = "Ex_" + fromdate.Day + "_" + todate.Day + ".xlsx";
                 string destFilePath = System.IO.Path.Combine(pp2, fileName); // Tạo đường dẫn đích
                 try
                 {
                     File.Move(excelFiles[0], destFilePath);
-                    if (dtDenngay.DateTime.Month != dtTungay.DateTime.Month)
-                    {
-                        var pp3 = savedPath + "\\HDVao\\" + (dtDenngay.DateTime.Month);
-                         string destFilePath2 = System.IO.Path.Combine(pp3, fileName); // Tạo đường dẫn đích
-                        File.Copy(destFilePath, destFilePath2);
-                        XulyfilEexcel(1, DoTask);
-                        XulyfilEexcel(1, (DoTask + 1));
-                    }
+                   // var pp3 = savedPath + "\\HDVao\\" + (todate.Month);
+                   // string destFilePath2 = System.IO.Path.Combine(pp3, fileName); // Tạo đường dẫn đích
+                   // File.Copy(destFilePath, destFilePath2);
+                    //XulyfilEexcel(1, DoTask);
+                    //XulyfilEexcel(1, (DoTask + 1));
                     //Đọc File excel
                 }
                 catch (Exception ex)
@@ -2649,7 +2710,7 @@ WHERE kh.SoHieu = ?";
             }
            
         }
-        private void Cucthuekhngnhanma(WebDriverWait wait)
+        private void Cucthuekhngnhanma(WebDriverWait wait,DateTime fromdate,DateTime todate)
         {
             var divElement = wait.Until(d => d.FindElements(By.Id("ttxly")));
             if (divElement[1] != null)
@@ -2709,7 +2770,9 @@ WHERE kh.SoHieu = ?";
                 .Click()
                 .Perform();
             Thread.Sleep(2000); // Hoặc sử dụng WebDriverWait để chờ điều kiện phù hợp
-            //Tải file excel
+                                //Tải file excel
+
+            XulyxoaExcel(fromdate,todate);
             Xulymaytinhtien(wait);
         }
        
@@ -3478,7 +3541,7 @@ WHERE kh.SoHieu = ?";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
-            
+            progressPanel1.Caption = "Đang xử lý";
             if (chkDauvao.Checked)
             {
                 foreach (var it in people)
@@ -3725,6 +3788,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void xtraTabControl2_Click(object sender, EventArgs e)
         {
+            
 
         }
 
@@ -3943,11 +4007,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void dtDenngay_EditValueChanged(object sender, EventArgs e)
         {
-            DateTime fromDate = (DateTime)dtTungay.EditValue;
+            //DateTime fromDate = (DateTime)dtTungay.EditValue;
 
-            DateTime toDate = fromDate.AddMonths(1).AddDays(-1); 
-            if (dtDenngay.DateTime > toDate)
-                dtDenngay.EditValue = toDate;
+            //DateTime toDate = fromDate.AddMonths(1).AddDays(-1); 
+            //if (dtDenngay.DateTime > toDate)
+            //    dtDenngay.EditValue = toDate;
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -3986,43 +4050,62 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             XtraMessageBox.Show("Đã xóa dữ liệu dư thứa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
+        int uutienselect = 0;
         private void chkDaura_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!chkDauvao.Checked)
+        { 
+         
+            if (chkDaura.Checked && (uutienselect == 2 || uutienselect == 0))
             {
+                uutienselect = 2;
+                chkDaura.Checked = true;
+                chkDauvao.Checked = false;
                 xtraTabControl2.SelectedTabPageIndex = 2;
             }
-            if (!chkDaura.Checked)
-                xtraTabControl2.SelectedTabPageIndex = 0;
+            int getthang = 0;
+            try
+            {
+                string path = savedPath + @"\HDRa";
+                var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories).FirstOrDefault();
+                var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
+                 getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
+                DateTime now = DateTime.Now; // Ngày hiện tại
+                int year = now.Year; // Năm hiện tại 
+
+                DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
+                dtTungay.DateTime = new DateTime(year, getthang, 1);
+                dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message + "   " + getthang.ToString());
+            }
         }
 
         private void chkDauvao_CheckedChanged(object sender, EventArgs e)
         {
-            if (!chkDauvao.Checked)
-            {
-                if (chkDaura.Checked)
-                {
-                    xtraTabControl2.SelectedTabPageIndex = 2;
-                }
-            }
-            if (chkDauvao.Checked)
-            {
-                xtraTabControl2.SelectedTabPageIndex =0;
-            }
+             
+            xtraTabControl2.SelectedTabPageIndex =0;
         }
 
         private void gridView1_RowCellStyle(object sender, RowCellStyleEventArgs e)
         {
-            // Lấy giá trị của cột 10 (chỉ số 9)
-            object cellValue = gridView1.GetRowCellValue(e.RowHandle, gridView1.Columns["isAcess"]);
-
-            // Nếu giá trị của cột 10 là false
-            if (cellValue is bool && !(bool)cellValue)
+            //// Lấy giá trị của cột 10 (chỉ số 9)
+            try
             {
-                // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
-              //  e.Appearance.BackColor = System.Drawing.Color.Red; 
+                object cellValue = gridView1.GetRowCellValue(e.RowHandle, gridView1.Columns["isAcess"]);
+
+                // Nếu giá trị của cột 10 là false
+                if (cellValue is bool && !(bool)cellValue)
+                {
+                    // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
+                    e.Appearance.BackColor = System.Drawing.Color.Red;
+                }
             }
+            catch( Exception ex)
+            {
+
+            }
+           
         }
 
         private void gridView4_RowCellStyle(object sender, RowCellStyleEventArgs e)
@@ -4032,20 +4115,80 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView3_RowCellStyle(object sender, RowCellStyleEventArgs e)
         {
-            object cellValue = gridView3.GetRowCellValue(e.RowHandle, gridView3.Columns["isAcess"]);
-
-            // Nếu giá trị của cột 10 là false
-            if (cellValue is bool && !(bool)cellValue)
+            try
             {
-                // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
-                e.Appearance.BackColor = System.Drawing.Color.Red;
-                //   e.Appearance.ForeColor = System.Drawing.Color.DarkGray;
+                object cellValue = gridView3.GetRowCellValue(e.RowHandle, gridView3.Columns["isAcess"]);
+
+                //// Nếu giá trị của cột 10 là false
+                if (cellValue is bool && !(bool)cellValue)
+                {
+                    // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
+                    e.Appearance.BackColor = System.Drawing.Color.Red; 
+                }
             }
+            catch(Exception ex)
+            {
+
+            }
+          
         }
 
         private void simpleButton2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void chkDaura_Click(object sender, EventArgs e)
+        {
+            uutienselect = 2;
+        }
+
+        private void chkDauvao_Click(object sender, EventArgs e)
+        {
+            uutienselect = 1;
+        }
+
+        private void chkDauvao_CheckedChanged_1(object sender, EventArgs e)
+        {
+            
+            if (chkDaura.Checked && (uutienselect == 1 || uutienselect == 0))
+            {
+                uutienselect = 1;
+                xtraTabControl2.SelectedTabPageIndex = 0;
+                if (chkDauvao.Checked)
+                {
+                    chkDaura.Checked = false;
+                    chkDauvao.Checked = true;
+                }
+            }
+            int getthang = 0;
+            try
+            {
+                string path = savedPath + @"\HDVao";
+                var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories).FirstOrDefault();
+                var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
+                 getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
+                DateTime now = DateTime.Now; // Ngày hiện tại
+                int year = now.Year; // Năm hiện tại 
+
+                DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
+                dtTungay.DateTime = new DateTime(year, getthang, 1);
+                dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message +"  "+ getthang.ToString());
+            }
+            
+        }
+
+        private void dtDenngay_EditValueChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkDauvao_MouseClick(object sender, MouseEventArgs e)
+        {
         }
 
         public static string NormalizeVietnameseString(string input)
