@@ -340,7 +340,7 @@
             // 
             this.colTongTien.DisplayFormat.FormatString = "N0";
             this.colTongTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colTongTien.FieldName = "TongTien";
+            this.colTongTien.FieldName = "TgTCThue";
             this.colTongTien.MinWidth = 30;
             this.colTongTien.Name = "colTongTien";
             this.colTongTien.OptionsColumn.AllowEdit = false;
@@ -556,7 +556,7 @@
             // 
             this.gridColumn8.DisplayFormat.FormatString = "N0";
             this.gridColumn8.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.gridColumn8.FieldName = "TongTien";
+            this.gridColumn8.FieldName = "TgTCThue";
             this.gridColumn8.MinWidth = 30;
             this.gridColumn8.Name = "gridColumn8";
             this.gridColumn8.OptionsColumn.AllowEdit = false;

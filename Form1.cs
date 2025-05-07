@@ -101,13 +101,16 @@ namespace SaovietTax
             public int TkThue { get; set; }
             public string Mst { get; set; }
             public double TongTien { get; set; }
+            public double TPhi { get; set; }
+            public double TgTCThue { get; set; }
+            public double TgTThue { get; set; }
             public int Vat { get; set; }
             public int Type { get; set; }
             public bool isAcess { get; set; }
 
             public string SoHieuTP { get; set; }
             public List<FileImportDetail> fileImportDetails;
-            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP,bool isacess)
+            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP,bool isacess, double tPhi, double tgTCThue, double tgTThue)
             {
                 ID = Id;
                 SHDon = shdon;
@@ -128,6 +131,9 @@ namespace SaovietTax
                 Path = path;
                 SoHieuTP = tenTP;
                 isAcess = isacess;
+                TPhi = tPhi;
+                TgTCThue = tgTCThue;
+                TgTThue = tgTThue;
             }
 
         }
@@ -368,7 +374,22 @@ namespace SaovietTax
                 }
                 else
                 {
-                    Console.WriteLine($"Bảng '{tableName}' đã tồn tại.");
+                    // Kiểm tra xem cột tkoco đã tồn tại hay chưa
+                    if (!ColumnExists(connection, "tbimport", "TPhi"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "TPhi", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "TgTCThue"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "TgTCThue", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "TgTThue"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "TgTThue", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                 }
                 if (!TableExists(connection, tableName))
                 {
@@ -842,7 +863,9 @@ namespace SaovietTax
                 XmlNode nTTThanToan = root.SelectSingleNode("//LTSuat");
                 var nThTien = root.SelectNodes("//LTSuat//ThTien");
                 var nTSuat = root.SelectNodes("//LTSuat//TSuat");
-
+                var nTPhi= root.SelectSingleNode("//TToan//TPhi");
+                var nTgTCThue = root.SelectSingleNode("//TToan//TgTCThue").InnerText.Replace('.', ',');
+                var nTgTThue = root.SelectSingleNode("//TToan//TgTThue").InnerText.Replace('.', ',');
                 bool isAcess = true;
                 if(type==1)
                 {
@@ -866,6 +889,9 @@ namespace SaovietTax
                 int TkThue = 0;
                 int Vat = 0;
                 double Thanhtien = 0;
+                double TPhi = 0;
+                double TgTCThue = 0;
+                double TgTThue = 0;
                 string diengiai = "";
                 DateTime NLap = new DateTime();
                 if (nTTChungNode != null)
@@ -983,7 +1009,23 @@ namespace SaovietTax
                     XmlNode TgTTTBSo = root.SelectSingleNode("//TToan//TgTTTBSo");
                     Thanhtien = double.Parse(TgTTTBSo.InnerText);
                 }
-
+                //Tìm tổng tiền
+                if (nTPhi!=null && !string.IsNullOrEmpty(nTPhi.InnerText))
+                {
+                    TPhi = double.Parse(nTPhi.InnerText);
+                }
+                if (!string.IsNullOrEmpty(nTgTCThue))
+                {
+                    TgTCThue = double.Parse(nTgTCThue);
+                    if (TPhi != 0)
+                    {
+                        TgTCThue += TPhi;
+                    }
+                }
+                if (!string.IsNullOrEmpty(nTgTThue))
+                {
+                    TgTThue = double.Parse(nTgTThue);
+                }
                 //Kiểm tra thêm mới khách hàng
                 if (mst == null)
                     mst = "";
@@ -1030,7 +1072,7 @@ WHERE kh.SoHieu = ?";
                         aa = CapitalizeFirstLetter(aa);
                         mst = ConvertToTenDigitNumber(aa).ToString();
                     }
-                        peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "",isAcess));
+                        peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "",isAcess, TPhi, TgTCThue, TgTThue));
                 }
 
                 lblThongbao.Text = "Thêm danh sách sản phẩm con";
@@ -1384,6 +1426,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     int Vat = 0;
                     string Mst = "";
                     double Thanhtien = 0;
+                    double TgTCThue = 0;
+                    double TgTThue = 0;
                     DateTime NLap = new DateTime();
                     string diengiai = "";
                     int total = rowCount + 7;
@@ -1444,6 +1488,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             if (worksheet.Cell(i, 9).Value.ToString() != "")
                         {
                             Thanhtien = double.Parse(worksheet.Cell(i, 9).Value.ToString().Replace(",", ""));
+                            TgTCThue = double.Parse(worksheet.Cell(i, 9).Value.ToString().Replace(",", ""));
                             if (Thanhtien < 0)
                             {
                                 diengiai = "(*) Hóa đơn điều chỉnh âm";
@@ -1460,10 +1505,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                             Vat = 0;
                         }
+                        if (worksheet.Cell(i,10).Value.ToString() != "")
+                        {
+                            TgTThue = double.Parse(worksheet.Cell(i,10).Value.ToString().Replace(",", ""));
+                        }
 
-
-                        //Kiểm tra thêm mới khách hàng
-                        query = @" SELECT TOP 1 *  FROM KhachHang As kh
+                            //Kiểm tra thêm mới khách hàng
+                            query = @" SELECT TOP 1 *  FROM KhachHang As kh
 WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
                         DataTable result = ExecuteQuery(query, new OleDbParameter("?", mst));
                         if (result.Rows.Count == 0)
@@ -1492,7 +1540,7 @@ WHERE kh.SoHieu = ?";
 
                         if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
                         {
-                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 2, "",true));
+                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 2, "",true,0, TgTCThue, TgTThue));
                         }
                         //Load nội dung theo định danh
                         //Kiểm tra lại lại mã với Định danh
@@ -3216,8 +3264,8 @@ WHERE kh.SoHieu = ?";
                 }
 
                 string query = @"
-            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
 
                 string newTen = Helpers.ConvertUnicodeToVni(item.Ten);
                 string newNoidung = Helpers.ConvertUnicodeToVni(item.Noidung);
@@ -3237,7 +3285,10 @@ WHERE kh.SoHieu = ?";
             new OleDbParameter("?", DateTime.Now.ToShortDateString()),
             new OleDbParameter("?", item.TongTien.ToString()),
             new OleDbParameter("?", item.Vat.ToString()),
-            new OleDbParameter("?", item.SoHieuTP.ToString())
+            new OleDbParameter("?", item.SoHieuTP.ToString()),
+            new OleDbParameter("?", item.TPhi.ToString()),
+            new OleDbParameter("?", item.TgTCThue.ToString()),
+            new OleDbParameter("?", item.TgTThue.ToString())
                 };
 
                 int a = ExecuteQueryResult(query, parameters);
@@ -3829,22 +3880,22 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView1_MasterRowEmpty(object sender, MasterRowEmptyEventArgs e)
         {
-            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            //if (dt != null)
-            //    e.IsEmpty = !people.Any(m => m.fileImportDetails.Any(j=>j.ParentId==dt.ID));
+            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            if (dt != null)
+                e.IsEmpty = !people.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
         }
 
         private void gridView1_MasterRowGetChildList(object sender, MasterRowGetChildListEventArgs e)
         {
-            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            //if (dt != null)
-            //{
-            //    var fileImportDetails = dt.fileImportDetails;
-            //    fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
-            //    e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
-            //}
+            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            if (dt != null)
+            {
+                var fileImportDetails = dt.fileImportDetails;
+                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+                e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
+            }
         }
 
         private void gridView1_MasterRowGetRelationCount(object sender, MasterRowGetRelationCountEventArgs e)
@@ -3927,23 +3978,23 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView3_MasterRowEmpty(object sender, MasterRowEmptyEventArgs e)
         {
-            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            //if (dt != null)
-            //    e.IsEmpty = !people2.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
+            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            if (dt != null)
+                e.IsEmpty = !people2.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
         }
 
         private void gridView3_MasterRowGetChildList(object sender, MasterRowGetChildListEventArgs e)
         {
 
-            //DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
-            //FileImport dt = view.GetRow(e.RowHandle) as FileImport;
-            //if (dt != null)
-            //{
-            //    var fileImportDetails = dt.fileImportDetails;
-            //    fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
-            //    e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
-            //}
+            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            FileImport dt = view.GetRow(e.RowHandle) as FileImport;
+            if (dt != null)
+            {
+                var fileImportDetails = dt.fileImportDetails;
+                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+                e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
+            }
         }
 
         private void gridView3_MasterRowGetRelationCount(object sender, MasterRowGetRelationCountEventArgs e)
