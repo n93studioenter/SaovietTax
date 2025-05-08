@@ -84,7 +84,7 @@
             this.colSoHieu.OptionsColumn.AllowEdit = false;
             this.colSoHieu.Visible = true;
             this.colSoHieu.VisibleIndex = 0;
-            this.colSoHieu.Width = 112;
+            this.colSoHieu.Width = 90;
             // 
             // colTenVattu
             // 
@@ -95,7 +95,7 @@
             this.colTenVattu.OptionsColumn.AllowEdit = false;
             this.colTenVattu.Visible = true;
             this.colTenVattu.VisibleIndex = 1;
-            this.colTenVattu.Width = 112;
+            this.colTenVattu.Width = 412;
             // 
             // panelControl1
             // 

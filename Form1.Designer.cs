@@ -71,6 +71,7 @@
             this.colAcess2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
+            this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.progressPanel1 = new DevExpress.XtraWaitForm.ProgressPanel();
             this.lblThongbao = new System.Windows.Forms.Label();
@@ -255,7 +256,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1282, 160);
+            this.gridControl1.Size = new System.Drawing.Size(1266, 119);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -437,7 +438,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1282, 160);
+            this.gridControl2.Size = new System.Drawing.Size(1272, 132);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -596,13 +597,14 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1315, 543);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1299, 502);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1});
             // 
             // xtraTabPage1
             // 
+            this.xtraTabPage1.Controls.Add(this.simpleButton2);
             this.xtraTabPage1.Controls.Add(this.panelControl2);
             this.xtraTabPage1.Controls.Add(this.lblThongbao);
             this.xtraTabPage1.Controls.Add(this.panelControl4);
@@ -614,9 +616,19 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1308, 508);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1292, 467);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
+            // 
+            // simpleButton2
+            // 
+            this.simpleButton2.Location = new System.Drawing.Point(450, 455);
+            this.simpleButton2.Name = "simpleButton2";
+            this.simpleButton2.Size = new System.Drawing.Size(112, 34);
+            this.simpleButton2.TabIndex = 12;
+            this.simpleButton2.Text = "simpleButton2";
+            this.simpleButton2.Visible = false;
+            this.simpleButton2.Click += new System.EventHandler(this.simpleButton2_Click_1);
             // 
             // panelControl2
             // 
@@ -627,7 +639,7 @@
             this.panelControl2.Controls.Add(this.progressPanel1);
             this.panelControl2.Location = new System.Drawing.Point(11, 192);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1297, 57);
+            this.panelControl2.Size = new System.Drawing.Size(1281, 57);
             this.panelControl2.TabIndex = 2;
             // 
             // progressPanel1
@@ -641,7 +653,7 @@
             this.progressPanel1.LineAnimationElementType = DevExpress.Utils.Animation.LineAnimationElementType.Rectangle;
             this.progressPanel1.Location = new System.Drawing.Point(5, 5);
             this.progressPanel1.Name = "progressPanel1";
-            this.progressPanel1.Size = new System.Drawing.Size(1287, 50);
+            this.progressPanel1.Size = new System.Drawing.Size(1271, 50);
             this.progressPanel1.TabIndex = 6;
             this.progressPanel1.Text = "progressPanel1";
             this.progressPanel1.Visible = false;
@@ -650,7 +662,7 @@
             // 
             this.lblThongbao.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblThongbao.AutoSize = true;
-            this.lblThongbao.Location = new System.Drawing.Point(1074, 475);
+            this.lblThongbao.Location = new System.Drawing.Point(1058, 434);
             this.lblThongbao.Name = "lblThongbao";
             this.lblThongbao.Size = new System.Drawing.Size(51, 19);
             this.lblThongbao.TabIndex = 11;
@@ -662,7 +674,7 @@
             this.panelControl4.Controls.Add(this.btnRefresh);
             this.panelControl4.Controls.Add(this.simpleButton1);
             this.panelControl4.Controls.Add(this.btnOpenFolder);
-            this.panelControl4.Location = new System.Drawing.Point(1241, 3);
+            this.panelControl4.Location = new System.Drawing.Point(1225, 3);
             this.panelControl4.Name = "panelControl4";
             this.panelControl4.Size = new System.Drawing.Size(65, 185);
             this.panelControl4.TabIndex = 10;
@@ -704,7 +716,7 @@
             this.xtraTabControl2.Location = new System.Drawing.Point(11, 253);
             this.xtraTabControl2.Name = "xtraTabControl2";
             this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1289, 195);
+            this.xtraTabControl2.Size = new System.Drawing.Size(1273, 154);
             this.xtraTabControl2.TabIndex = 8;
             this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage3,
@@ -718,7 +730,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1282, 160);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1266, 119);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -748,7 +760,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1282, 160);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1272, 132);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -776,7 +788,7 @@
             this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Purple;
             this.lblDpPath.Appearance.Options.UseFont = true;
             this.lblDpPath.Appearance.Options.UseForeColor = true;
-            this.lblDpPath.Location = new System.Drawing.Point(11, 475);
+            this.lblDpPath.Location = new System.Drawing.Point(11, 434);
             this.lblDpPath.Name = "lblDpPath";
             this.lblDpPath.Size = new System.Drawing.Size(170, 19);
             this.lblDpPath.TabIndex = 7;
@@ -913,7 +925,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarControl1.Location = new System.Drawing.Point(13, 194);
             this.progressBarControl1.Name = "progressBarControl1";
-            this.progressBarControl1.Size = new System.Drawing.Size(1289, 36);
+            this.progressBarControl1.Size = new System.Drawing.Size(1273, 36);
             this.progressBarControl1.TabIndex = 3;
             this.progressBarControl1.Visible = false;
             // 
@@ -925,7 +937,7 @@
             this.comboBoxEdit2.Name = "comboBoxEdit2";
             this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit2.Size = new System.Drawing.Size(87, 27);
+            this.comboBoxEdit2.Size = new System.Drawing.Size(71, 27);
             this.comboBoxEdit2.TabIndex = 6;
             this.comboBoxEdit2.Visible = false;
             // 
@@ -988,7 +1000,7 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(95, 27);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(79, 27);
             this.comboBoxEdit1.TabIndex = 1;
             this.comboBoxEdit1.Visible = false;
             // 
@@ -1004,7 +1016,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1315, 543);
+            this.ClientSize = new System.Drawing.Size(1299, 502);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
@@ -1131,5 +1143,6 @@
         private System.Windows.Forms.Label lblThongbao;
         private DevExpress.XtraEditors.PanelControl panelControl2;
         private DevExpress.XtraBars.Ribbon.RadialMenu radialMenu1;
+        private DevExpress.XtraEditors.SimpleButton simpleButton2;
     }
 }

@@ -44,6 +44,7 @@ using Windows.UI.Xaml.Controls;
 using DocumentFormat.OpenXml.Spreadsheet;
 using static DevExpress.Data.Helpers.ExpressiveSortInfo;
 using DocumentFormat.OpenXml.Bibliography;
+using DevExpress.Xpo.DB.Helpers;
 namespace SaovietTax
 {
     public partial class frmMain : DevExpress.XtraEditors.XtraForm
@@ -668,7 +669,7 @@ namespace SaovietTax
          
             InitDB();
 
-            InitData();
+            InitData(); 
             SetVietnameseCulture();
             GetMST();
             string fileName = Path.GetFileName(dbPath.Trim());
@@ -1173,12 +1174,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                     }
                     //Kiểm tra nếu ko có con thì tk cha sẽ là 6240
-                    if (peopleTemp.LastOrDefault().fileImportDetails.Count == 0)
-                    {
-                        peopleTemp.LastOrDefault().TKNo = "6422";
-                    }
+                   
                 }
-
+                if (peopleTemp.LastOrDefault().fileImportDetails.Count == 0)
+                {
+                    if (type == 1)
+                        peopleTemp.LastOrDefault().TKNo = "6422";
+                }
             }
             //Trường hợp không đủ info
             //Th1 có 1 sản phẩm và ko có đơn vị tính
@@ -1300,6 +1302,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 {
                     //item.Noidung = "Mã số thuế không hợp lệ";
                     item.Checked = false;
+                }
+                if (item.TPhi == null)
+                {
+                    
                 }
             }
              
@@ -2807,8 +2813,7 @@ WHERE kh.SoHieu = ?";
             waitLoading(wait);
             button = wait.Until(d =>
                 d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[18]")));
-
-
+             
             ((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].scrollIntoView({behavior: 'smooth'});", button);
 
             // Hover rồi mới click
@@ -3128,15 +3133,44 @@ WHERE kh.SoHieu = ?";
 
                 // Lấy giá trị ô hiện tại
                 var currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.FocusedColumn);
-                if (currentValue.ToString().Contains("154"))
+                if (currentValue.ToString().Contains("154") )
                 {
+                  
                     frmCongtrinh frmCongtrinh = new frmCongtrinh();
                     frmCongtrinh.frmMain = this;
                     frmCongtrinh.ShowDialog();
                     if (currentValue.ToString().Contains("|"))
                         currentValue = currentValue.ToString().Split('|')[0];
+                    if(currentValue.ToString().Contains("154"))
                     gridView.SetRowCellValue(currentRowHandle, "TKNo", currentValue + "|" + hiddenValue);
+                    if (currentValue.ToString().Contains("511"))
+                    {
+                        gridView.SetRowCellValue(currentRowHandle, "TKCo", currentValue + "|" + hiddenValue);
+
+                     
+                    }
                     return;
+                }
+                if (currentValue.ToString().Contains("511"))
+                {
+                    if (!Kiemtrataikhoancon(currentValue.ToString()))
+                    {
+                        frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                        frmCongtrinh.frmMain = this;
+                        frmCongtrinh.ShowDialog();
+                        if (currentValue.ToString().Contains("|"))
+                            currentValue = currentValue.ToString().Split('|')[0];
+                        if (currentValue.ToString().Contains("154"))
+                            gridView.SetRowCellValue(currentRowHandle, "TKNo", currentValue + "|" + hiddenValue);
+                        if (currentValue.ToString().Contains("511"))
+                        {
+                            gridView.SetRowCellValue(currentRowHandle, "TKCo", currentValue + "|" + hiddenValue);
+
+
+                        }
+                        return;
+                    }
+                   
                 }
                 // Di chuyển xuống hàng
                 int nextRowHandle = currentRowHandle + 1;
@@ -3402,6 +3436,19 @@ WHERE kh.SoHieu = ?";
                 this.Close();
             }
         }
+        private bool Kiemtrataikhoancon(string tk)
+        {
+            string query = @"
+                        select * from  HeThongTK where SoHieu =?";
+            var resultkm = ExecuteQuery(query, new OleDbParameter("?",tk));
+            if (resultkm.Rows.Count > 0)
+            {
+                var getTK_ID2 = resultkm.Rows[0]["TK_ID2"].ToString();
+                if(getTK_ID2=="0")
+                    return true;
+            }
+            return false;
+        }
         private void ImportHDRa()
         {
             if (string.IsNullOrEmpty(savedPath))
@@ -3473,7 +3520,8 @@ WHERE kh.SoHieu = ?";
                         item.TkThue = 1331;
                 }
 
-                string query = @" INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                string query = @" INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
 
                 string newTen = Helpers.ConvertUnicodeToVni(item.Ten);
                 string newNoidung = Helpers.ConvertUnicodeToVni(item.Noidung);
@@ -3493,8 +3541,12 @@ WHERE kh.SoHieu = ?";
             new OleDbParameter("?", DateTime.Now.ToShortDateString()),
             new OleDbParameter("?", item.TongTien.ToString()),
             new OleDbParameter("?", item.Vat.ToString()),
-            new OleDbParameter("?", item.SoHieuTP.ToString())
+            new OleDbParameter("?", item.SoHieuTP.ToString()),
+            new OleDbParameter("?", item.TPhi.ToString()),
+            new OleDbParameter("?", item.TgTCThue.ToString()),
+            new OleDbParameter("?", item.TgTThue.ToString())
                 };
+
 
                 int a = ExecuteQueryResult(query, parameters);
 
@@ -4117,14 +4169,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 string path = savedPath + @"\HDRa";
                 var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories).FirstOrDefault();
-                var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
-                 getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
-                DateTime now = DateTime.Now; // Ngày hiện tại
-                int year = now.Year; // Năm hiện tại 
+                if (files != null)
+                {
+                    var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
+                    getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
+                    DateTime now = DateTime.Now; // Ngày hiện tại
+                    int year = now.Year; // Năm hiện tại 
 
-                DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
-                dtTungay.DateTime = new DateTime(year, getthang, 1);
-                dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+                    DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
+                    dtTungay.DateTime = new DateTime(year, getthang, 1);
+                    dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+                }
+                else
+                {
+
+                }
             }
             catch(Exception ex)
             {
@@ -4217,14 +4276,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 string path = savedPath + @"\HDVao";
                 var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories).FirstOrDefault();
-                var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
-                 getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
-                DateTime now = DateTime.Now; // Ngày hiện tại
-                int year = now.Year; // Năm hiện tại 
+                if (files != null)
+                {
+                    var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
+                    getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
+                    DateTime now = DateTime.Now; // Ngày hiện tại
+                    int year = now.Year; // Năm hiện tại 
 
-                DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
-                dtTungay.DateTime = new DateTime(year, getthang, 1);
-                dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+                    DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
+                    dtTungay.DateTime = new DateTime(year, getthang, 1);
+                    dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+                }
+              
             }
             catch(Exception ex)
             {
@@ -4240,6 +4303,39 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void chkDauvao_MouseClick(object sender, MouseEventArgs e)
         {
+        }
+
+        private void simpleButton2_Click_1(object sender, EventArgs e)
+        {
+            var options = new ChromeOptions();
+            // Tắt các cảnh báo bảo mật (Safe Browsing)
+
+            // Tắt Safe Browsing và các tính năng bảo mật can thiệp
+            options.AddArgument("--disable-features=SafeBrowsing,DownloadBubble,DownloadNotification");
+            options.AddArgument("--safebrowsing-disable-extension-blacklist");
+            options.AddArgument("--safebrowsing-disable-download-protection");
+
+            options.AddUserProfilePreference("download.prompt_for_download", false);
+            options.AddUserProfilePreference("safebrowsing.enabled", false);
+            options.AddUserProfilePreference("safebrowsing.disable_download_protection", true);
+            // Tối ưu hóa trình duyệt
+
+            options.AddArguments(
+                "--disable-notifications",
+                "--start-maximized",
+                "--disable-extensions",
+                "--disable-infobars");
+            //
+            string downloadPath = "";
+            downloadPath = savedPath + "\\HDVao";
+            options.AddUserProfilePreference("download.default_directory", downloadPath);
+            options.AddUserProfilePreference("download.prompt_for_download", false);
+            options.AddUserProfilePreference("disable-popup-blocking", "true");
+            options.AddUserProfilePreference("safebrowsing.disable_download_protection", true);
+            options.AddUserProfilePreference("safebrowsing.enabled", false); // Tắt Safe Browsing hoàn toàn
+            var driverPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Driver = new ChromeDriver(driverPath, options);
+            Driver.Navigate().GoToUrl("https://hoadondientu.gdt.gov.vn");
         }
 
         public static string NormalizeVietnameseString(string input)

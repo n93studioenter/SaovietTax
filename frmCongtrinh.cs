@@ -28,6 +28,10 @@ namespace SaovietTax
         {
             string query = @" SELECT *  FROM TP154 ";
             var kq = ExecuteQuery(query, null);
+            for (int i = 0; i < kq.Rows.Count; i++)
+            {
+                kq.Rows[i]["TenVattu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["TenVattu"].ToString());
+            }
             gridControl1.DataSource = kq;
         }
         string dbPath = "";
