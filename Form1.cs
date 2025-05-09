@@ -865,8 +865,8 @@ namespace SaovietTax
                 var nThTien = root.SelectNodes("//LTSuat//ThTien");
                 var nTSuat = root.SelectNodes("//LTSuat//TSuat");
                 var nTPhi= root.SelectSingleNode("//TToan//TPhi");
-                var nTgTCThue = root.SelectSingleNode("//TToan//TgTCThue").InnerText.Replace('.', ',');
-                var nTgTThue = root.SelectSingleNode("//TToan//TgTThue").InnerText.Replace('.', ',');
+                var nTgTCThue = root.SelectSingleNode("//TToan//TgTCThue")!=null?  root.SelectSingleNode("//TToan//TgTCThue").InnerText.Replace('.', ','):"";
+                var nTgTThue = root.SelectSingleNode("//TToan//TgTThue")!=null? root.SelectSingleNode("//TToan//TgTThue").InnerText.Replace('.', ','):"";
                 bool isAcess = true;
                 if(type==1)
                 {
@@ -1000,7 +1000,7 @@ namespace SaovietTax
                     else
                     {
                         XmlNode TgTTTBSo = root.SelectSingleNode("//TToan//TgTTTBSo");
-                        Thanhtien = double.Parse(TgTTTBSo.InnerText);
+                        Thanhtien = double.Parse(TgTTTBSo.InnerText.Replace('.', ','));
                     }
 
                 }
@@ -1008,8 +1008,12 @@ namespace SaovietTax
                 {
                     //Kiểm tra tiếp
                     XmlNode TgTTTBSo = root.SelectSingleNode("//TToan//TgTTTBSo");
-                    Thanhtien = double.Parse(TgTTTBSo.InnerText);
+                    Thanhtien = double.Parse(TgTTTBSo.InnerText.Replace('.', ','));
                 }
+                if (string.IsNullOrEmpty(nTgTCThue))
+                {
+                    nTgTCThue = Thanhtien.ToString();
+                } 
                 //Tìm tổng tiền
                 if (nTPhi!=null && !string.IsNullOrEmpty(nTPhi.InnerText))
                 {
@@ -1026,6 +1030,10 @@ namespace SaovietTax
                 if (!string.IsNullOrEmpty(nTgTThue))
                 {
                     TgTThue = double.Parse(nTgTThue);
+                }
+                else
+                {
+                    TgTThue = 0;
                 }
                 //Kiểm tra thêm mới khách hàng
                 if (mst == null)
@@ -1745,6 +1753,7 @@ WHERE kh.SoHieu = ?";
                 catch (Exception ex)
                 {
                     Driver.Close();
+                    Environment.Exit(0);    
                     // MessageBox.Show($"Lỗi: {ex.Message}");
                 }
             }
@@ -3767,7 +3776,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     if (resultnt.Rows.Count == 0)
                     {
                         // Tạo nhóm tạm
-                        query = @"
+                      string  querypl = @"
                     INSERT INTO PhanLoaiVattu (SoHieu, TenPhanLoai, Cap, MaTK)
                     VALUES (?, ?, ?, ?)";
 
@@ -3779,7 +3788,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     new OleDbParameter("?", 39)
                         };
 
-                        int rr = ExecuteQueryResult(query, parameterss);
+                        int rr = ExecuteQueryResult(querypl, parameterss);
                         quryNhomtam = @"SELECT * FROM PhanLoaiVattu WHERE TenPhanLoai LIKE ?";
                         resultnt = ExecuteQuery(quryNhomtam, new OleDbParameter("?", searchTemp));
 
