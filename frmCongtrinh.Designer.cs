@@ -34,6 +34,9 @@
             this.colSoHieu = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTenVattu = new DevExpress.XtraGrid.Columns.GridColumn();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtTaikhoan = new DevExpress.XtraEditors.TextEdit();
+            this.txtId = new DevExpress.XtraEditors.TextEdit();
             this.simpleButton4 = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton3 = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
@@ -50,6 +53,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtTaikhoan.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtId.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtTenvattu.Properties)).BeginInit();
@@ -74,6 +79,7 @@
             this.colTenVattu});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
+            this.gridView1.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView1_RowClick);
             // 
             // colSoHieu
             // 
@@ -99,6 +105,9 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.label5);
+            this.panelControl1.Controls.Add(this.txtTaikhoan);
+            this.panelControl1.Controls.Add(this.txtId);
             this.panelControl1.Controls.Add(this.simpleButton4);
             this.panelControl1.Controls.Add(this.simpleButton3);
             this.panelControl1.Controls.Add(this.simpleButton2);
@@ -116,28 +125,54 @@
             this.panelControl1.Size = new System.Drawing.Size(597, 589);
             this.panelControl1.TabIndex = 1;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(24, 235);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(79, 19);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "Tài khoản";
+            // 
+            // txtTaikhoan
+            // 
+            this.txtTaikhoan.Location = new System.Drawing.Point(113, 232);
+            this.txtTaikhoan.Name = "txtTaikhoan";
+            this.txtTaikhoan.Size = new System.Drawing.Size(465, 27);
+            this.txtTaikhoan.TabIndex = 13;
+            // 
+            // txtId
+            // 
+            this.txtId.Location = new System.Drawing.Point(29, 328);
+            this.txtId.Name = "txtId";
+            this.txtId.Size = new System.Drawing.Size(549, 27);
+            this.txtId.TabIndex = 12;
+            this.txtId.Visible = false;
+            // 
             // simpleButton4
             // 
             this.simpleButton4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton4.ImageOptions.Image")));
-            this.simpleButton4.Location = new System.Drawing.Point(447, 237);
+            this.simpleButton4.Location = new System.Drawing.Point(447, 277);
             this.simpleButton4.Name = "simpleButton4";
             this.simpleButton4.Size = new System.Drawing.Size(131, 34);
             this.simpleButton4.TabIndex = 11;
             this.simpleButton4.Text = "Thoát";
+            this.simpleButton4.Click += new System.EventHandler(this.simpleButton4_Click);
             // 
             // simpleButton3
             // 
             this.simpleButton3.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton3.ImageOptions.Image")));
-            this.simpleButton3.Location = new System.Drawing.Point(305, 237);
+            this.simpleButton3.Location = new System.Drawing.Point(305, 277);
             this.simpleButton3.Name = "simpleButton3";
             this.simpleButton3.Size = new System.Drawing.Size(122, 34);
             this.simpleButton3.TabIndex = 10;
             this.simpleButton3.Text = "Xóa";
+            this.simpleButton3.Click += new System.EventHandler(this.simpleButton3_Click);
             // 
             // simpleButton2
             // 
             this.simpleButton2.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton2.ImageOptions.Image")));
-            this.simpleButton2.Location = new System.Drawing.Point(171, 237);
+            this.simpleButton2.Location = new System.Drawing.Point(171, 277);
             this.simpleButton2.Name = "simpleButton2";
             this.simpleButton2.Size = new System.Drawing.Size(119, 34);
             this.simpleButton2.TabIndex = 9;
@@ -147,11 +182,12 @@
             // simpleButton1
             // 
             this.simpleButton1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton1.ImageOptions.Image")));
-            this.simpleButton1.Location = new System.Drawing.Point(29, 237);
+            this.simpleButton1.Location = new System.Drawing.Point(29, 277);
             this.simpleButton1.Name = "simpleButton1";
             this.simpleButton1.Size = new System.Drawing.Size(121, 34);
             this.simpleButton1.TabIndex = 8;
             this.simpleButton1.Text = "Thêm";
+            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
             // 
             // txtGhichu
             // 
@@ -234,6 +270,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             this.panelControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtTaikhoan.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtId.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtTenvattu.Properties)).EndInit();
@@ -261,5 +299,8 @@
         private DevExpress.XtraEditors.SimpleButton simpleButton3;
         private DevExpress.XtraEditors.SimpleButton simpleButton2;
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
+        private DevExpress.XtraEditors.TextEdit txtId;
+        private System.Windows.Forms.Label label5;
+        private DevExpress.XtraEditors.TextEdit txtTaikhoan;
     }
 }

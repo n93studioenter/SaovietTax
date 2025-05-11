@@ -54,6 +54,14 @@
             "Microsoft.Windows.SDK.Contracts": {
               "target": "Package",
               "version": "[10.0.19041.1, )"
+            },
+            "Svg": {
+              "target": "Package",
+              "version": "[3.4.7, )"
+            },
+            "Tesseract": {
+              "target": "Package",
+              "version": "[5.2.0, )"
             }
           },
           "imports": [
