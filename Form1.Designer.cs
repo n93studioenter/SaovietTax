@@ -261,6 +261,7 @@
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
             this.gridView2});
+            this.gridControl1.DataSourceChanged += new System.EventHandler(this.gridControl1_DataSourceChanged);
             this.gridControl1.Click += new System.EventHandler(this.gridControl1_Click);
             this.gridControl1.DoubleClick += new System.EventHandler(this.gridControl1_DoubleClick);
             this.gridControl1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridControl1_KeyDown);
@@ -298,6 +299,7 @@
             this.gridView1.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridView1_CustomRowCellEdit);
             this.gridView1.ShownEditor += new System.EventHandler(this.gridView1_ShownEditor);
             this.gridView1.RowCellDefaultAlignment += new DevExpress.XtraGrid.Views.Base.RowCellAlignmentEventHandler(this.gridView1_RowCellDefaultAlignment);
+            this.gridView1.AsyncCompleted += new System.EventHandler(this.gridView1_AsyncCompleted);
             this.gridView1.DoubleClick += new System.EventHandler(this.gridView1_DoubleClick);
             // 
             // colID
