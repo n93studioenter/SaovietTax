@@ -155,39 +155,29 @@ namespace SaovietTax
         {
             if (type == 1)
             {
-                bindingSource.DataSource = people; // Gán dữ liệu cho bindingSource
-                gridControl1.DataSource = bindingSource; // Gán dữ liệu cho gridControl
-                Application.DoEvents();
-                bindingSource.ListChanged += (s, e) =>
-                {
-                    if (e.ListChangedType == ListChangedType.Reset)
-                    {
-                        progressPanel1.Visible = false;
-                    }
-                };
-
-                gridView1.OptionsDetail.EnableMasterViewMode = true; // Bật tính năng Master-Detail
-
-                // Chỉ khởi tạo DevExpress.XtraGrid.Views.Grid.GridView chi tiết nếu chưa được khởi tạo
-               
+                bindingSource.DataSource = people;
+                gridControl1.DataSource = bindingSource;
+                gridView1.OptionsDetail.EnableMasterViewMode = true;
+                progressPanel1.Visible = false; // Ẩn progressPanel
             }
             else if (type == 2)
             {
                 bindingSource2.DataSource = people2;
-                gridControl2.DataSource = bindingSource2; // Gán dữ liệu cho gridControl2
-                gridView3.OptionsDetail.EnableMasterViewMode = true; // Bật tính năng Master-Detail
+                gridControl2.DataSource = bindingSource2;
+                gridView3.OptionsDetail.EnableMasterViewMode = true;
             }
 
-            // Các thiết lập khác
-            GridStripRow(gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView);
-            GridStripRow(gridControl2.MainView as DevExpress.XtraGrid.Views.Grid.GridView);
-
-            gridView1.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
-            gridView1.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
-            gridView3.OptionsSelection.MultiSelect = true; // Cho phép chọn nhiều ô
-            gridView3.OptionsSelection.MultiSelectMode = DevExpress.XtraGrid.Views.Grid.GridMultiSelectMode.CellSelect; // Chọn ô
-           
+            SetGridViewOptions(gridView1);
+            SetGridViewOptions(gridView3);
         }
+
+        private void SetGridViewOptions(DevExpress.XtraGrid.Views.Grid.GridView view)
+        {
+            view.OptionsSelection.MultiSelect = true;
+            view.OptionsSelection.MultiSelectMode = GridMultiSelectMode.CellSelect;
+            GridStripRow(view);
+        }
+
 
         public void GridStripRow(DevExpress.XtraGrid.Views.Grid.GridView gridView)
         {
@@ -1910,76 +1900,76 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
 
             // Xử lý file Excel
-            foreach (string excelFile in excelFiles)
-            {
-                lblThongbao.Text = $"Đọc file Excel thứ {filesLoaded + 1}/{totalCount}";
-                progressPanel1.Caption = "Đang xử lý file Excel...";
-                progressPercentage = (filesLoaded * 100) / totalCount;
-                progressBarControl1.EditValue = progressPercentage;
-                Application.DoEvents();
-                filesLoaded++;
-                try
-                {
-                    using (var workbook = new XLWorkbook(excelFile))
-                    {
-                        var worksheet = workbook.Worksheet(1);
-                        var currentRow = worksheet.Cell("A7"); // Bắt đầu từ dòng 7
+            //foreach (string excelFile in excelFiles)
+            //{
+            //    lblThongbao.Text = $"Đọc file Excel thứ {filesLoaded + 1}/{totalCount}";
+            //    progressPanel1.Caption = "Đang xử lý file Excel...";
+            //    progressPercentage = (filesLoaded * 100) / totalCount;
+            //    progressBarControl1.EditValue = progressPercentage;
+            //    Application.DoEvents();
+            //    filesLoaded++;
+            //    try
+            //    {
+            //        using (var workbook = new XLWorkbook(excelFile))
+            //        {
+            //            var worksheet = workbook.Worksheet(1);
+            //            var currentRow = worksheet.Cell("A7"); // Bắt đầu từ dòng 7
 
-                        while (!currentRow.IsEmpty())
-                        {
-                            // Lấy giá trị ngày lập từ cột 5
-                            string getNgayLapStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 5).GetFormattedString().Trim();
-                            if (DateTime.TryParse(getNgayLapStr, out DateTime getNgayLap) && getNgayLap >= startDate && getNgayLap <= endDate)
-                            {
-                                // Tạo một đối tượng FileImport từ dữ liệu Excel
-                                string soHDE = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 2).GetFormattedString().Trim();
-                                string kHHDE = "";
-                                string tenKH = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 3).GetFormattedString().Trim();
-                                string mstKH = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 4).GetFormattedString().Trim();
-                                string diachiKH = "";
-                                double tongTienExcel = 0;
-                                double thueGTGTExcel = 0;
-                                double tongThanhToanExcel = 0;
+            //            while (!currentRow.IsEmpty())
+            //            {
+            //                // Lấy giá trị ngày lập từ cột 5
+            //                string getNgayLapStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 5).GetFormattedString().Trim();
+            //                if (DateTime.TryParse(getNgayLapStr, out DateTime getNgayLap) && getNgayLap >= startDate && getNgayLap <= endDate)
+            //                {
+            //                    // Tạo một đối tượng FileImport từ dữ liệu Excel
+            //                    string soHDE = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 2).GetFormattedString().Trim();
+            //                    string kHHDE = "";
+            //                    string tenKH = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 3).GetFormattedString().Trim();
+            //                    string mstKH = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 4).GetFormattedString().Trim();
+            //                    string diachiKH = "";
+            //                    double tongTienExcel = 0;
+            //                    double thueGTGTExcel = 0;
+            //                    double tongThanhToanExcel = 0;
 
-                                // Lấy giá trị từ các cột 6, 7, 8
-                                if (!currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 6).IsEmpty())
-                                {
-                                    string tongTienStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 6).GetFormattedString().Trim().Replace(",", "");
-                                    double.TryParse(tongTienStr, out tongTienExcel);
-                                }
-                                if (!currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 7).IsEmpty())
-                                {
-                                    string thueGTGTStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 7).GetFormattedString().Trim().Replace(",", "");
-                                    double.TryParse(thueGTGTStr, out thueGTGTExcel);
-                                }
-                                if (!currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 8).IsEmpty())
-                                {
-                                    string tongThanhToanStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 8).GetFormattedString().Trim().Replace(",", "");
-                                    double.TryParse(tongThanhToanStr, out tongThanhToanExcel);
-                                }
+            //                    // Lấy giá trị từ các cột 6, 7, 8
+            //                    if (!currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 6).IsEmpty())
+            //                    {
+            //                        string tongTienStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 6).GetFormattedString().Trim().Replace(",", "");
+            //                        double.TryParse(tongTienStr, out tongTienExcel);
+            //                    }
+            //                    if (!currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 7).IsEmpty())
+            //                    {
+            //                        string thueGTGTStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 7).GetFormattedString().Trim().Replace(",", "");
+            //                        double.TryParse(thueGTGTStr, out thueGTGTExcel);
+            //                    }
+            //                    if (!currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 8).IsEmpty())
+            //                    {
+            //                        string tongThanhToanStr = currentRow.Worksheet.Cell(currentRow.Address.RowNumber, 8).GetFormattedString().Trim().Replace(",", "");
+            //                        double.TryParse(tongThanhToanStr, out tongThanhToanExcel);
+            //                    }
 
-                                int vatExcel = 0;
-                                if (tongTienExcel > 0)
-                                    vatExcel = (int)Math.Round((thueGTGTExcel / tongTienExcel) * 100);
+            //                    int vatExcel = 0;
+            //                    if (tongTienExcel > 0)
+            //                        vatExcel = (int)Math.Round((thueGTGTExcel / tongTienExcel) * 100);
 
-                                bool isAcessExcel = (type == 1 && mstKH == mstcongty) || (type == 2 && mstKH == mstcongty);
+            //                    bool isAcessExcel = (type == 1 && mstKH == mstcongty) || (type == 2 && mstKH == mstcongty);
 
-                                // Kiểm tra trùng lặp
-                                if (!existingHoaDon.Rows.Cast<DataRow>().Any(row => row["SoHD"]?.ToString().Contains(soHDE) == true))
-                                {
-                                    FileImport excelImport = new FileImport(excelFile, soHDE, kHHDE, getNgayLap, tenKH, "", "", "", vatExcel, mstKH, tongTienExcel, 0, 2, "", isAcessExcel, 0, tongThanhToanExcel, thueGTGTExcel);
-                                    peopleTemp.Add(excelImport);
-                                }
-                            }
-                            currentRow = currentRow.Worksheet.Row(currentRow.Address.RowNumber + 1).Cell("A");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Lỗi khi đọc file Excel: {ex.Message}");
-                }
-            }
+            //                    // Kiểm tra trùng lặp
+            //                    if (!existingHoaDon.Rows.Cast<DataRow>().Any(row => row["SoHD"]?.ToString().Contains(soHDE) == true))
+            //                    {
+            //                        FileImport excelImport = new FileImport(excelFile, soHDE, kHHDE, getNgayLap, tenKH, "", "", "", vatExcel, mstKH, tongTienExcel, 0, 2, "", isAcessExcel, 0, tongThanhToanExcel, thueGTGTExcel);
+            //                        peopleTemp.Add(excelImport);
+            //                    }
+            //                }
+            //                currentRow = currentRow.Worksheet.Row(currentRow.Address.RowNumber + 1).Cell("A");
+            //            }
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine($"Lỗi khi đọc file Excel: {ex.Message}");
+            //    }
+            //}
 
             // Gán tài khoản mặc định và theo quy tắc
             foreach (var item in peopleTemp)
@@ -2002,7 +1992,6 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             progressBarControl1.EditValue = 100;
             lblThongbao.Text = "Hoàn thành";
-            progressPanel1.Visible = false;
 
             // Fill cho BindingList chính
             if (type == 1)
@@ -2053,6 +2042,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
+            Id = 1;
              filesLoaded = 0;
             totalCount = 0;
             progressPanel1.Visible = true;
@@ -2064,230 +2054,250 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             LoadDataGridview(1);
             if (chkDaura.Checked)
                 LoadXmlFilesOptimized(savedPath, 2);
-            LoadDataGridview(2);
-          
+            LoadDataGridview(2); 
 
         }
-        public void LoadExcel(string filePath,int type)
+        public void LoadExcel(string filePath, int type)
         {
-            //       var excelFiles = Directory.EnumerateFiles(filePath, "*.xlsx", SearchOption.AllDirectories)
-            //.Where(file => !file.Contains("HDVaoChonLoc")).ToList();  // Loại trừ đường dẫn chứa "HDVaoChonLoc"
-            filePath +=   (type == 1 ? "\\HDVao" : "\\HDRa");
-            int fromMonth = int.Parse(dtTungay.DateTime.Month.ToString()); // Thay đổi theo tháng bắt đầu (ví dụ: 3 cho tháng 3)
-            int toMonth = int.Parse(dtDenngay.DateTime.Month.ToString());   // Thay đổi theo tháng kết thúc (ví dụ: 7 cho tháng 7)
+            filePath += (type == 1 ? "\\HDVao" : "\\HDRa");
+            int fromMonth = dtTungay.DateTime.Month;
+            int toMonth = dtDenngay.DateTime.Month;
 
-            // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
             var excelFiles = Directory.EnumerateFiles(filePath, "*.xlsx", SearchOption.AllDirectories)
-                .Where(file => IsFileInMonthRange(file, filePath, fromMonth, toMonth)).ToList(); // Kiểm tra xem file có nằm trong khoảng tháng
+                .Where(file => IsFileInMonthRange(file, filePath, fromMonth, toMonth))
+                .ToList();
 
-
-            if (excelFiles.Count() == 0)
+            if (excelFiles.Count == 0)
                 return;
-            // Kiểm tra xem file có tồn tại không
-            for (int j = 0; j < excelFiles.Count; j++)
+
+            foreach (var excelFile in excelFiles)
             {
-                using (var workbook = new XLWorkbook(excelFiles[j]))
+                ProcessExcelFile(excelFile);
+            }
+        }
+        private int GetValidRowCount(IXLWorksheet worksheet)
+        {
+            int rowCount = 0;
+            var currentCell = worksheet.Cell("A6");
+
+            while (!currentCell.IsEmpty())
+            {
+                try
                 {
-                    // Lấy worksheet đầu tiên
-                    var worksheet = workbook.Worksheet(1); // Hoặc bạn có thể dùng tên worksheet như worksheet = workbook.Worksheet("Sheet1");
-                                                           // Lấy giá trị của ô A6
-                    int rowCount = 0;
-                    var currentCell = worksheet.Cell("A6"); // Bắt đầu từ ô A6
-                    int demdong = 0;
-                    // Kiểm tra các ô bắt đầu từ A6 cho đến khi gặp ô trống
-                    while (!currentCell.IsEmpty())
-                    {
-                        try
-                        {
-                            DateTime getNgayLap = DateTime.Parse(worksheet.Cell(demdong + 7, 5).Value.ToString().Trim());
-                            if (getNgayLap >= dtTungay.DateTime && getNgayLap <= dtDenngay.DateTime)
-                                rowCount++; // Tăng số dòng
-                            currentCell = currentCell.Worksheet.Row(currentCell.Address.RowNumber + 1).Cell("A"); // Chuyển xuống ô bên dưới
-                            demdong += 1;
-                        }
-                        catch(Exception ex)
-                        {
-                            break;
-                        }
-                     
-                    }
-                    string SHDon = "";
-                    string KHHDon = "";
-                    string ten = "";
-                    string mst = "";
-                    string ten2 = "";
-                    string mst2 = "";
-                    string SoHD = "";
-                    string diachi = "";
-                    int TkCo = 0;
-                    int TkNo = 0;
-                    int TkThue = 0;
-                    int Vat = 0;
-                    string Mst = "";
-                    double Thanhtien = 0;
-                    double TgTCThue = 0;
-                    double TgTThue = 0;
-                    DateTime NLap = new DateTime();
-                    string diengiai = "";
-                    int total = rowCount + 7;
-                    for (int i = 7; i <= (total - 1); i++)
-                    {
-                        if (totalCount > 0)
-                            progressPercentage = (filesLoaded * 100) / totalCount;
-                        else
-                            progressPercentage = 0;
-                            filesLoaded += 1;
-                        progressBarControl1.EditValue = progressPercentage;
-                        progressPanel1.Caption = "Đọc file thứ " + (filesLoaded - 1) + "/ " + totalCount;
-                        Application.DoEvents();
+                    DateTime invoiceDate = DateTime.Parse(worksheet.Cell(rowCount + 7, 5).Value.ToString().Trim());
+                    if (invoiceDate >= dtTungay.DateTime && invoiceDate <= dtDenngay.DateTime)
+                        rowCount++;
 
-                        diengiai = "";
-                        mst = worksheet.Cell(i, 6).Value.ToString().Trim();
-                        NLap = DateTime.Parse(worksheet.Cell(i, 5).Value.ToString().Trim());
-                        ten = worksheet.Cell(i, 7).Value.ToString();
-                        SHDon = worksheet.Cell(i, 4).Value.ToString().Trim();
-                        KHHDon = worksheet.Cell(i, 3).Value.ToString();
-                        string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-                        string trangthaihoadon = worksheet.Cell(i, 16).Value.ToString();
-                        if (trangthaihoadon.Contains("điều chỉnh"))
-                        {
-                            diengiai = "(*) Hóa đơn điều chỉnh";
-                        }
-                        // Tạo mảng tham số với giá trị cho câu lệnh SQL
-                        OleDbParameter[] parameters = new OleDbParameter[]
-                        {
-            new OleDbParameter("KyHieu", KHHDon),          // Sử dụng chỉ số mà không cần tên
-            new OleDbParameter("SoHD", "%" + SHDon + "%")  // Thêm ký tự % cho LIKE
-                        };
-                        var kq = ExecuteQuery(query, parameters);
-                        if (kq.Rows.Count > 0)
-                        {
-                            continue;
-                        }
-                        //Kiem tra trong tbimport
-                        query = "SELECT * FROM tbimport WHERE KHHDon = ? AND SHDon LIKE ?";
-                        parameters = new OleDbParameter[]
-                      {
-            new OleDbParameter("KHHDon", KHHDon),          // Sử dụng chỉ số mà không cần tên
-            new OleDbParameter("SHDon", "%" + SHDon + "%")  // Thêm ký tự % cho LIKE
-                      };
-                        kq = ExecuteQuery(query, parameters);
-                        if (kq.Rows.Count > 0)
-                        {
-                            continue;
-                        }
-
-                        double TienSauVAT = 0;
-                        //Kiểm tra xem có phải trường hợp ko có thuế
-                        //Lấy mst
-                        if (worksheet.Cell(i, 6).Value.ToString() != "")
-                        {
-                            mst = worksheet.Cell(i, 6).Value.ToString();
-                        }
-                            if (worksheet.Cell(i, 9).Value.ToString() != "")
-                        {
-                            Thanhtien = double.Parse(worksheet.Cell(i, 9).Value.ToString().Replace(",", ""));
-                            TgTCThue = double.Parse(worksheet.Cell(i, 9).Value.ToString().Replace(",", ""));
-                            if (Thanhtien < 0)
-                            {
-                                diengiai = "(*) Hóa đơn điều chỉnh âm";
-                            }
-                            TienSauVAT = double.Parse(worksheet.Cell(i, 10).Value.ToString().Replace(",", ""));
-                            if (TienSauVAT > 0)
-                                Vat = int.Parse(Math.Round((TienSauVAT / Thanhtien * 100)).ToString());
-                            else
-                                Vat = 0;
-                        }
-                        else
-                        {
-                            Thanhtien = double.Parse(worksheet.Cell(i, 13).Value.ToString().Replace(",", ""));
-
-                            Vat = 0;
-                        }
-                        if (worksheet.Cell(i,10).Value.ToString() != "")
-                        {
-                            TgTThue = double.Parse(worksheet.Cell(i,10).Value.ToString().Replace(",", ""));
-                        }
-
-                            //Kiểm tra thêm mới khách hàng
-                            query = @" SELECT TOP 1 *  FROM KhachHang As kh
-WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
-                        DataTable result = ExecuteQuery(query, new OleDbParameter("?", mst));
-                        if (result.Rows.Count == 0)
-                        {
-                            diachi = worksheet.Cell(i, 8).Value.ToString();
-                            var Sohieu = GetLastFourDigits(mst.Replace("-",""));
-                            ten = Helpers.ConvertUnicodeToVni(ten);
-                            diachi = Helpers.ConvertUnicodeToVni(diachi);
-                            //Kiểm tra sohieu có trùng nữa ko
-                            query = @" SELECT TOP 1 *  FROM KhachHang As kh
-WHERE kh.SoHieu = ?";
-                            DataTable result2 = ExecuteQuery(query, new OleDbParameter("?", Sohieu));
-                            if (result2.Rows.Count > 0)
-                                Sohieu = "0" + Sohieu;
-                            if (string.IsNullOrEmpty(diachi))
-                            {
-                                diachi = Helpers.ConvertUnicodeToVni("Bô sung địa chỉ");
-                            }
-                            InitCustomer(2, Sohieu, ten, diachi, mst);
-                        }
-
-                        //Kiểm tra đã có hóa đơn trước đó chưa 
-                        TkNo = 6422;
-                        TkCo = 1111;
-                        TkThue = 1331;
-
-                        if (!people.Any(m => m.SHDon.Contains(SHDon) && m.KHHDon == KHHDon))
-                        {
-                            people.Add(new FileImport(excelFiles[j], SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 2, "",true,0, TgTCThue, TgTThue));
-                        }
-                        //Load nội dung theo định danh
-                        //Kiểm tra lại lại mã với Định danh
-                        string querydinhdanh = @" SELECT *  FROM tbDinhdanhtaikhoan where KeyValue like '%MST%'"; // Sử dụng ? thay cho @mst trong OleDb
-
-                        result = ExecuteQuery(querydinhdanh, new OleDbParameter("?", ""));
-                        foreach (var item in people)
-                        {
-                            //Lấy danh sách định danh
-                          
-                            foreach (DataRow row in result.Rows)
-                            {
-                                string[] conditions = row["KeyValue"].ToString().Split('&');
-                                string name = Helpers.ConvertUnicodeToVni((string)row["KeyValue"]);
-                                int hasdata = 0;
-                                foreach (string condition in conditions)
-                                {
-                                    string[] parts = Regex.Split(condition, @"([><=%]+)"); // Vẫn giữ % để linh hoạt nếu cần
-                                    if (parts.Length == 3)
-                                    {
-                                        string key = parts[0];
-                                        string operatorStr = parts[1];
-                                        string valueStr = parts[2];
-                                       
-                                        if (key == "MST")
-                                        {
-                                            if (item.Mst == valueStr)
-                                                hasdata += 1;
-                                        }
-                                    }
-
-                                }
-                                if (hasdata == conditions.Count())
-                                {
-
-                                    if (string.IsNullOrEmpty(item.Noidung))
-                                        item.Noidung = row["Type"].ToString();;
-                                    item.TKCo = row[4].ToString();
-                                }
-                            }
-                        }
-                    }
-
+                    currentCell = currentCell.Worksheet.Row(currentCell.Address.RowNumber + 1).Cell("A");
+                }
+                catch
+                {
+                    break;
                 }
             }
 
+            return rowCount;
         }
-        
+
+        private void ProcessExcelFile(string filePath)
+        {
+            using (var workbook = new XLWorkbook(filePath))
+            {
+                var worksheet = workbook.Worksheet(1);
+                int rowCount = GetValidRowCount(worksheet);
+
+                if (rowCount == 0)
+                    return;
+
+                for (int i = 7; i <= (rowCount + 6); i++)
+                {
+                    UpdateProgressUI();
+
+                    try
+                    {
+                        var fileImport = ExtractFileImportData(worksheet, i, filePath);
+                        if (ShouldSkipInvoice(fileImport))
+                            continue;
+
+                        ProcessCustomerInformation(fileImport);
+                        AddInvoiceToCollection(fileImport);
+                        ApplyTaxCodeRules(fileImport);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error if needed
+                        continue;
+                    }
+                }
+            }
+        }
+        private bool ShouldSkipInvoice(FileImport fileImport)
+        {
+            // Check in HoaDon table
+            string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
+            var parameters = new OleDbParameter[]
+            {
+        new OleDbParameter("KyHieu", fileImport.KHHDon),
+        new OleDbParameter("SoHD", "%" + fileImport.SHDon + "%")
+            };
+
+            if (ExecuteQuery(query, parameters).Rows.Count > 0)
+                return true;
+
+            // Check in tbimport table
+            query = "SELECT * FROM tbimport WHERE KHHDon = ? AND SHDon LIKE ?";
+            parameters = new OleDbParameter[]
+            {
+        new OleDbParameter("KHHDon", fileImport.KHHDon),
+        new OleDbParameter("SHDon", "%" + fileImport.SHDon + "%")
+            };
+
+            return ExecuteQuery(query, parameters).Rows.Count > 0;
+        }
+
+        private void ProcessCustomerInformation(FileImport fileImport)
+        {
+            string query = "SELECT TOP 1 * FROM KhachHang WHERE MST = ?";
+            DataTable result = ExecuteQuery(query, new OleDbParameter("?", fileImport.Mst));
+
+            if (result.Rows.Count == 0)
+            {
+                string customerCode = GetLastFourDigits(fileImport.Mst.Replace("-", ""));
+                string convertedName = Helpers.ConvertUnicodeToVni(fileImport.Ten);
+                //string convertedAddress = Helpers.ConvertUnicodeToVni(fileImport.Address);
+                string convertedAddress = "";
+
+                if (string.IsNullOrEmpty(convertedAddress))
+                {
+                    convertedAddress = Helpers.ConvertUnicodeToVni("Bô sung địa chỉ");
+                }
+
+                // Check for duplicate customer code
+                query = "SELECT TOP 1 * FROM KhachHang WHERE SoHieu = ?";
+                if (ExecuteQuery(query, new OleDbParameter("?", customerCode)).Rows.Count > 0)
+                {
+                    customerCode = "0" + customerCode;
+                }
+
+                InitCustomer(2, customerCode, convertedName, convertedAddress, fileImport.Mst);
+            }
+        }
+
+        private void AddInvoiceToCollection(FileImport fileImport)
+        {
+            if (!people.Any(m => m.SHDon.Contains(fileImport.SHDon) && m.KHHDon == fileImport.KHHDon))
+            {
+                people.Add(fileImport);
+            }
+        }
+
+        private void ApplyTaxCodeRules(FileImport fileImport)
+        {
+            string query = "SELECT * FROM tbDinhdanhtaikhoan where KeyValue like '%MST%'";
+            DataTable taxRules = ExecuteQuery(query);
+
+            foreach (var item in people.Where(p => p.Mst == fileImport.Mst))
+            {
+                foreach (DataRow row in taxRules.Rows)
+                {
+                    string[] conditions = row["KeyValue"].ToString().Split('&');
+                    int matchedConditions = 0;
+
+                    foreach (string condition in conditions)
+                    {
+                        string[] parts = Regex.Split(condition, @"([><=%]+)");
+                        if (parts.Length == 3 && parts[0] == "MST" && item.Mst == parts[2])
+                        {
+                            matchedConditions++;
+                        }
+                    }
+
+                    if (matchedConditions == conditions.Length)
+                    {
+                        if (string.IsNullOrEmpty(item.Noidung))
+                            item.Noidung = row["Type"].ToString();
+
+                        item.TKCo = row[4].ToString();
+                    }
+                }
+            }
+        }
+
+        private void UpdateProgressUI()
+        {
+            if (totalCount > 0)
+                progressPercentage = (filesLoaded * 100) / totalCount;
+            else
+                progressPercentage = 0;
+
+            filesLoaded++;
+            progressBarControl1.EditValue = progressPercentage;
+            progressPanel1.Caption = $"Đọc file thứ {filesLoaded - 1}/{totalCount}";
+            Application.DoEvents();
+        }
+        private FileImport ExtractFileImportData(IXLWorksheet worksheet, int row, string filePath)
+        {
+            // Extract basic information
+            string invoiceNumber = worksheet.Cell(row, 4).Value.ToString().Trim();
+            string invoiceSeries = worksheet.Cell(row, 3).Value.ToString();
+            DateTime invoiceDate = DateTime.Parse(worksheet.Cell(row, 5).Value.ToString().Trim());
+            string customerName = worksheet.Cell(row, 7).Value.ToString();
+            string taxCode = worksheet.Cell(row, 6).Value.ToString().Trim();
+            string address = worksheet.Cell(row, 8).Value.ToString();
+            string status = worksheet.Cell(row, 16).Value.ToString();
+
+            // Initialize amounts
+            double amountBeforeTax = 0;
+            double amountAfterTax = 0;
+            int taxRate = 0;
+            string description = "";
+
+            // Parse financial data
+            if (!string.IsNullOrEmpty(worksheet.Cell(row, 9).Value.ToString()))
+            {
+                amountBeforeTax = double.Parse(worksheet.Cell(row, 9).Value.ToString().Replace(",", ""));
+                amountAfterTax = double.Parse(worksheet.Cell(row, 10).Value.ToString().Replace(",", ""));
+
+                if (amountBeforeTax < 0)
+                    description = "(*) Hóa đơn điều chỉnh âm";
+
+                taxRate = amountAfterTax > 0
+                    ? int.Parse(Math.Round((amountAfterTax / amountBeforeTax * 100)).ToString())
+                    : 0;
+            }
+            else
+            {
+                amountBeforeTax = double.Parse(worksheet.Cell(row, 13).Value.ToString().Replace(",", ""));
+            }
+
+            if (status.Contains("điều chỉnh"))
+            {
+                description = "(*) Hóa đơn điều chỉnh";
+            }
+
+            // Create and return FileImport object
+            return new FileImport(
+                path: filePath,
+                shdon: invoiceNumber,
+                khhdon: invoiceSeries,
+                nlap: invoiceDate,
+                ten: customerName,
+                noidung: description,
+                tkno: "6422",  // Default debit account
+                tkco: "1111",  // Default credit account
+                tkthue: 1331,  // Default tax account
+                mst: taxCode,
+                tongTien: amountBeforeTax,
+                vat: taxRate,
+                type: 2,       // Assuming type 2 for these invoices
+                tenTP: "",     // Empty for now
+                isacess: true,
+                tPhi: 0,
+                tgTCThue: amountBeforeTax,
+                tgTThue: amountAfterTax
+            );
+        }
+
         public static ChromeDriver Driver { get; private set; }
         #endregion
 
