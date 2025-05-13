@@ -154,9 +154,11 @@ namespace SaovietTax
         private void LoadDataGridview(int type)
         {
             if (type == 1)
-            {
+            {   
+                // For individual GridControl 
                 bindingSource.DataSource = people;
                 gridControl1.DataSource = bindingSource;
+                 
                 gridView1.OptionsDetail.EnableMasterViewMode = true;
                 progressPanel1.Visible = false; // Ẩn progressPanel
             }
@@ -224,6 +226,7 @@ namespace SaovietTax
                     DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
                     gridView.SetRowCellValue(rowHandle, e.Column, "");
                     XtraMessageBox.Show("Số tài khoản không tồn tại trong hệ thống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
             }
         }
@@ -1725,9 +1728,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 filesLoaded++;
 
                 XmlDocument xmlDoc = new XmlDocument();
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.XmlResolver = null;
+                settings.DtdProcessing = DtdProcessing.Ignore;
+                settings.CheckCharacters = false;
                 try
                 {
-                    xmlDoc.Load(xmlFile);
+                    using (StreamReader sr = new StreamReader(xmlFile, Encoding.UTF8, true))
+                    {
+                        xmlDoc.Load(sr);
+                    }
                 }
                 catch (XmlException ex)
                 {
@@ -1769,8 +1779,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     InitCustomer(type == 1 ? 2 : 3, "", ten, "", mst);
                 }
 
-                bool isAcess = (type == 1 && root.SelectSingleNode("//NMua//MST")?.InnerText == mstcongty) || (type == 2 && root.SelectSingleNode("//NBan//MST")?.InnerText == mstcongty);
-
+                // bool isAcess = (type == 1 && root.SelectSingleNode("//NMua//MST")?.InnerText == mstcongty) || (type == 2 && root.SelectSingleNode("//NBan//MST")?.InnerText == mstcongty);
+                bool isAcess = true;
                 XmlNodeList nTSuat = root.SelectNodes("//LTSuat//TSuat");
                 int vat = 0;
                 foreach (XmlNode item in nTSuat)
@@ -1850,7 +1860,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             if (!existingVatTu.ContainsKey($"{tenVattuVni}-{dvTinhVni}"))
                             {
                                 // Kiểm tra trong list tạm thời của file hiện tại
-                                var existingDetail = newFileImport.fileImportDetails.FirstOrDefault(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni);
+                                //var existingDetail = newFileImport.fileImportDetails.FirstOrDefault(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni);
+
+                                FileImportDetail existingDetail = null;
+                                foreach (var it in peopleTemp)
+                                {
+                                    existingDetail = it.fileImportDetails.Where(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni).FirstOrDefault();
+                                    if (existingDetail != null)
+                                        break;
+                                }
+
                                 soHieuVattu = existingDetail?.SoHieu ?? GenerateResultString(thhdVu.Trim());
                                 // Thêm mới vật tư (nếu cần và bạn muốn lưu vào DB ngay)
                                 // InitVatTu(soHieuVattu, Helpers.ConvertUnicodeToVni(thhdVu.Trim()), Helpers.ConvertUnicodeToVni(dvTinh));
@@ -1863,7 +1882,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 soHieuVattu = existingVatTu[$"{tenVattuVni}-{dvTinhVni}"]["SoHieu"]?.ToString();
                             }
 
-                            FileImportDetail fileImportDetail = new FileImportDetail(thhdVu, newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString());
+                            FileImportDetail fileImportDetail = new FileImportDetail(NormalizeVietnameseString(thhdVu), newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString());
                             newFileImport.fileImportDetails.Add(fileImportDetail);
                         }
                         else if (thhdVu?.ToLower().Contains("chiết khấu") == true)
@@ -2054,8 +2073,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             LoadDataGridview(1);
             if (chkDaura.Checked)
                 LoadXmlFilesOptimized(savedPath, 2);
-            LoadDataGridview(2); 
-
+            LoadDataGridview(2);
+            progressPanel1.Visible = false;
         }
         public void LoadExcel(string filePath, int type)
         {
@@ -4412,7 +4431,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 Application.DoEvents();
                 ImportHD(people2, "HDRa");
             }
-            progressPanel1.Visible = false;
+          
         }
         private void ImportHD(BindingList<FileImport> data, string type)
         {
@@ -4529,7 +4548,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             int parentID = (int)ExecuteQuery(query, new OleDbParameter("?", null)).Rows[0][0];
                             if (rowsAffected > 0)
                             {
-                                if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || item.TKNo.Contains("154") || item.TKNo.Contains("711") || item.TKNo.Contains("5111")) //them 5111
+                                if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || item.TKNo.Contains("154") || item.TKNo.Contains("711") || item.TKNo.Contains("511")) //them 5111
                                 {
                                     InsertImportDetails(connection, transaction, item, parentID, type);
                                 }
@@ -4618,35 +4637,35 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 string tkNo = detail.TKNo;
                 if (item.TKNo == "154")
                 {
-                    string sc = Helpers.ConvertUnicodeToVni("Sửa");
-                    if (detail.Ten.Contains(sc))
-                    {
-                        tkNo = "154";
-                        detail.MaCT = Kiemtracongtrinh(idconttrinh);
-                        idconttrinh++;
-                    }
-                    else
-                    {
-                        tkNo = "152";
-                    }
+                    //string sc = Helpers.ConvertUnicodeToVni("Sửa");
+                    //if (detail.Ten.Contains(sc))
+                    //{
+                    //    tkNo = "154";
+                    //    detail.MaCT = Kiemtracongtrinh(idconttrinh);
+                    //    idconttrinh++;
+                    //}
+                    //else
+                    //{
+                    //    tkNo = "152";
+                    //}
                 }
                 else if (item.TKNo == "711") // Thêm xử lý cho TK 711
                 {
                     tkNo = "711";
                     detail.TKCo = "331";
                 }
-                else if (item.TKNo == "5111")
+                if (type == "HDRad")
                 {
                     string temp = detail.TKCo;
                     detail.TKCo = detail.TKNo;
                     detail.TKNo = temp;
+
                 }
 
                 string query = @"
             INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                if (type == "HDVao")
-                    detail.Ten = Helpers.ConvertUnicodeToVni(detail.Ten);
+                detail.Ten = Helpers.ConvertUnicodeToVni(detail.Ten);
                 OleDbParameter[] parameters = new OleDbParameter[]
                 {
             new OleDbParameter("?", parentId),
@@ -4656,7 +4675,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", Helpers.ConvertUnicodeToVni(detail.DVT)),
             new OleDbParameter("?", detail.Ten),
             new OleDbParameter("?", detail.MaCT),
-            new OleDbParameter("?", tkNo),
+            new OleDbParameter("?", detail.TKNo),
             new OleDbParameter("?", detail.TKCo)
                 };
 
@@ -4703,7 +4722,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 using (OleDbCommand insertPhanLoaiCmd = new OleDbCommand(insertPhanLoaiQuery, connection, transaction))
                                 {
                                     insertPhanLoaiCmd.Parameters.AddWithValue("?", "HKM");
-                                    insertPhanLoaiCmd.Parameters.AddWithValue("?", "Hàng khuyến mãi");
+                                    insertPhanLoaiCmd.Parameters.AddWithValue("?", Helpers.ConvertUnicodeToVni("Hàng khuyến mãi"));
                                     insertPhanLoaiCmd.Parameters.AddWithValue("?", 1);
                                     insertPhanLoaiCmd.Parameters.AddWithValue("?", 39);
                                     insertPhanLoaiCmd.ExecuteNonQuery();
@@ -4921,7 +4940,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             if (dt != null)
             {
                 var fileImportDetails = dt.fileImportDetails;
-                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+               // fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
                 e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
             }
         }
@@ -5020,7 +5039,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             if (dt != null)
             {
                 var fileImportDetails = dt.fileImportDetails;
-                fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
+               // fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
                 e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
             }
         }
@@ -5334,12 +5353,17 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridControl1_DataSourceChanged(object sender, EventArgs e)
         {
-           
+            progressPanel1.Visible = false;
         }
 
         private void gridView1_AsyncCompleted(object sender, EventArgs e)
         {
             
+        }
+
+        private void gridControl2_DataSourceChanged(object sender, EventArgs e)
+        {
+            progressPanel1.Visible = false;
         }
 
         public static string NormalizeVietnameseString(string input)
