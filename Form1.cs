@@ -50,6 +50,8 @@ using Svg;
 using System.Drawing.Imaging;
 using DevExpress.XtraLayout.Customization;
 using System.Collections;
+using System.Web.UI.WebControls;
+using DevExpress.Data.Filtering;
 
 namespace SaovietTax
 {
@@ -201,6 +203,8 @@ namespace SaovietTax
 
             }
         }
+
+        bool getMessage = true;
         private void GridView_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             // Lấy thông tin về hàng và cột của ô đã thay đổi
@@ -221,12 +225,13 @@ namespace SaovietTax
             new OleDbParameter("?", newValue),
                 };
                 var kq = ExecuteQuery(query, parameters);
-                if (kq.Rows.Count == 0 && !newValue.ToString().Contains("|"))
+                if (kq.Rows.Count == 0 && !newValue.ToString().Contains("|") && getMessage)
                 {
+                    getMessage = false;
                     DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
-                    gridView.SetRowCellValue(rowHandle, e.Column, "");
-                    XtraMessageBox.Show("Số tài khoản không tồn tại trong hệ thống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    //gridView.SetRowCellValue(rowHandle, e.Column, "");
+                    XtraMessageBox.Show("Số tài khoản không tồn tại trong hệ thống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+
                 }
             }
         }
@@ -1856,6 +1861,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             string tenVattuVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(thhdVu.Trim())).ToLower();
                             string dvTinhVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(dvTinh)).ToLower();
                             string soHieuVattu = "";
+
 
                             if (!existingVatTu.ContainsKey($"{tenVattuVni}-{dvTinhVni}"))
                             {
@@ -3842,8 +3848,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         public string hiddenValue { get; set; }
         private void GridcontrolKeyup(KeyEventArgs e, DevExpress.XtraGrid.Views.Grid.GridView gridView)
         {
-            
-                if (e.KeyCode == System.Windows.Forms.Keys.Enter)
+           
+
+            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
                 var selectedCells = gridView1.GetSelectedCells();
 
@@ -3876,45 +3883,44 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 // Lấy giá trị ô hiện tại
                 var currentValue = gridView.GetRowCellValue(currentRowHandle, gridView.FocusedColumn);
-                if (currentValue.ToString().Contains("154") )
-                {
+                //if (currentValue.ToString().Contains("154") )
+                //{
                   
-                    frmCongtrinh frmCongtrinh = new frmCongtrinh();
-                    frmCongtrinh.frmMain = this;
-                    frmCongtrinh.ShowDialog();
-                    if (currentValue.ToString().Contains("|"))
-                        currentValue = currentValue.ToString().Split('|')[0];
-                    if(currentValue.ToString().Contains("154"))
-                    gridView.SetRowCellValue(currentRowHandle, "TKNo", currentValue + "|" + hiddenValue);
-                    if (currentValue.ToString().Contains("511"))
-                    {
-                        gridView.SetRowCellValue(currentRowHandle, "TKCo", currentValue + "|" + hiddenValue);
+                //    frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                //    frmCongtrinh.frmMain = this;
+                //    frmCongtrinh.ShowDialog();
+                //    if (currentValue.ToString().Contains("|"))
+                //        currentValue = currentValue.ToString().Split('|')[0];
+                //    if(currentValue.ToString().Contains("154"))
+                //    gridView.SetRowCellValue(currentRowHandle, "TKNo", currentValue + "|" + hiddenValue);
+                //    if (currentValue.ToString().Contains("511"))
+                //    {
+                //        gridView.SetRowCellValue(currentRowHandle, "TKCo", currentValue + "|" + hiddenValue);
 
                      
-                    }
-                    return;
-                }
-                if (currentValue.ToString().Contains("511"))
-                {
-                    if (!Kiemtrataikhoancon(currentValue.ToString()))
-                    {
-                        frmCongtrinh frmCongtrinh = new frmCongtrinh();
-                        frmCongtrinh.frmMain = this;
-                        frmCongtrinh.ShowDialog();
-                        if (currentValue.ToString().Contains("|"))
-                            currentValue = currentValue.ToString().Split('|')[0];
-                        if (currentValue.ToString().Contains("154"))
-                            gridView.SetRowCellValue(currentRowHandle, "TKNo", currentValue + "|" + hiddenValue);
-                        if (currentValue.ToString().Contains("511"))
-                        {
-                            gridView.SetRowCellValue(currentRowHandle, "TKCo", currentValue + "|" + hiddenValue);
+                //    }
+                //    return;
+                //}
+                //if (currentValue.ToString().Contains("511"))
+                //{
+                //    if (!Kiemtrataikhoancon(currentValue.ToString()))
+                //    {
+                //        frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                //        frmCongtrinh.frmMain = this;
+                //        frmCongtrinh.ShowDialog();
+                //        if (currentValue.ToString().Contains("|"))
+                //            currentValue = currentValue.ToString().Split('|')[0];
+                //        if (currentValue.ToString().Contains("154"))
+                //            gridView.SetRowCellValue(currentRowHandle, "TKNo", currentValue + "|" + hiddenValue);
+                //        if (currentValue.ToString().Contains("511"))
+                //        {
+                //            gridView.SetRowCellValue(currentRowHandle, "TKCo", currentValue + "|" + hiddenValue);
 
-
-                        }
-                        return;
-                    }
+                //        }
+                //        return;
+                //    }
                    
-                }
+                //}
                 // Di chuyển xuống hàng
                 int nextRowHandle = currentRowHandle + 1;
 
@@ -3949,9 +3955,45 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void gridControl1_KeyUp(object sender, KeyEventArgs e)
         {
-
             DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+
+            // Kiểm tra nếu có hàng con nào đang mở
+            if (gridView != null && IsAnyRowExpanded(gridView))
+            {
+                // Nếu có hàng con mở, xử lý cho GridView con
+                HandleChildGridViewKeyUp(e, gridView);
+                return; // Không xử lý cho GridView cha
+            }
+
+            // Xử lý sự kiện cho GridView cha
             GridcontrolKeyup(e, gridView);
+        }
+
+        private bool IsAnyRowExpanded(DevExpress.XtraGrid.Views.Grid.GridView gridView)
+        {
+            for (int rowHandle = 0; rowHandle < gridView.RowCount; rowHandle++)
+            {
+                // Kiểm tra xem hàng có detail view đang mở
+                if (gridView.GetDetailView(rowHandle, 0) != null)
+                {
+                    return true; // Có hàng con đang mở
+                }
+            }
+            return false; // Không có hàng con nào mở
+        }
+
+        private void HandleChildGridViewKeyUp(KeyEventArgs e, DevExpress.XtraGrid.Views.Grid.GridView gridView)
+        {
+            // Duyệt qua từng hàng để xử lý sự kiện cho GridView con
+            for (int rowHandle = 0; rowHandle < gridView.RowCount; rowHandle++)
+            {
+                var childView = gridView.GetDetailView(rowHandle, 0) as DevExpress.XtraGrid.Views.Grid.GridView;
+                if (childView != null)
+                {
+                    // Xử lý sự kiện KeyUp cho GridView con
+                    GridcontrolKeyup(e, childView);
+                }
+            }
         }
         public string Kiemtracongtrinh(int id)
         {
@@ -4491,10 +4533,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 transaction.Rollback(); // Rollback giao dịch nếu có lỗi
                                 return;
                             }
-
+                            bool parenthasCT = false;
                             // Xử lý 154 cho notk
                             if (item.TKNo.Contains('|'))
                             {
+                                parenthasCT = true;
                                 var getsplits = item.TKNo.Split('|');
                                 item.TKNo = getsplits[0].Trim();
                                 item.SoHieuTP = getsplits[1].Trim();
@@ -4548,7 +4591,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             int parentID = (int)ExecuteQuery(query, new OleDbParameter("?", null)).Rows[0][0];
                             if (rowsAffected > 0)
                             {
-                                if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || item.TKNo.Contains("154") || item.TKNo.Contains("711") || item.TKNo.Contains("511")) //them 5111
+                                if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || (item.TKNo.Contains("154") && !parenthasCT) || item.TKNo.Contains("711") || (item.TKNo.Contains("511") && !parenthasCT)) //them 5111
                                 {
                                     InsertImportDetails(connection, transaction, item, parentID, type);
                                 }
@@ -4635,8 +4678,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             foreach (var detail in item.fileImportDetails)
             {
                 string tkNo = detail.TKNo;
-                if (item.TKNo == "154")
+                if (detail.TKNo.Contains("154"))
                 {
+                    if (detail.TKNo.Contains("|"))
+                    {
+                        var getsplit = detail.TKNo.Split('|');
+                        detail.TKNo = getsplit[0];
+                        detail.MaCT = getsplit[1];
+                    }
+                    else
+                    {
+                        return;
+                    }
                     //string sc = Helpers.ConvertUnicodeToVni("Sửa");
                     //if (detail.Ten.Contains(sc))
                     //{
@@ -4654,7 +4707,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     tkNo = "711";
                     detail.TKCo = "331";
                 }
-                if (type == "HDRad")
+                if (type == "HDRa")
                 {
                     string temp = detail.TKCo;
                     detail.TKCo = detail.TKNo;
@@ -4898,6 +4951,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void gridControl2_KeyUp(object sender, KeyEventArgs e)
         {
             DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl2.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+
+            // Kiểm tra nếu có hàng con nào đang mở
+            if (gridView != null && IsAnyRowExpanded(gridView))
+            {
+                // Nếu có hàng con mở, xử lý cho GridView con
+                HandleChildGridViewKeyUp(e, gridView);
+                return; // Không xử lý cho GridView cha
+            }
+
+            // Xử lý sự kiện cho GridView cha
             GridcontrolKeyup(e, gridView);
         }
 
@@ -5051,7 +5114,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView3_MasterRowGetRelationName(object sender, MasterRowGetRelationNameEventArgs e)
         {
-            e.RelationName = "Details";
+            e.RelationName = "Detail";
         }
 
         private void gridView1_RowClick(object sender, RowClickEventArgs e)
@@ -5364,6 +5427,266 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void gridControl2_DataSourceChanged(object sender, EventArgs e)
         {
             progressPanel1.Visible = false;
+        }
+
+        private void gridView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            {
+                getMessage = true;
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+
+                if (cellValue != null)
+                {
+                    if (cellValue.ToString().Contains("154"))
+                    {
+                        // Thực hiện hành động mong muốn khi nhấn phím Tab
+                        frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                        frmCongtrinh.frmMain = this;
+                        frmCongtrinh.ShowDialog();
+                        if (cellValue.ToString().Contains("|"))
+                            cellValue = cellValue.ToString().Split('|')[0];
+                        if (cellValue.ToString().Contains("154"))
+                            gridView.SetRowCellValue(currentRowHandle, "TKNo", cellValue + "|" + hiddenValue);
+                        if (cellValue.ToString().Contains("511"))
+                        {
+                            gridView.SetRowCellValue(currentRowHandle, "TKCo", cellValue + "|" + hiddenValue);
+
+                        }
+                        // Nếu bạn muốn ngăn chặn hành động mặc định của phím Tab
+
+                        e.SuppressKeyPress = true;
+                    }
+                  
+                }
+              
+            }
+           
+        }
+
+        private void gridView1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        private void gridView1_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+            // Kiểm tra nếu hàng có detail view đang mở
+            if (gridView.GetDetailView(e.RowHandle, 0) != null)
+            {
+                return; // Nếu có hàng con mở, không thực hiện hành động
+            }
+
+            // Chỉ thực hiện khi không có hàng con mở
+            foreach (var item in people)
+            {
+                foreach (var it2 in item.fileImportDetails)
+                {
+                    it2.TKCo = item.TKCo;
+                    it2.TKNo = item.TKNo;
+                }
+            }
+
+            gridControl1.Refresh();
+        }
+
+        private void gridView1_KeyUp(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void gridView2_KeyUp(object sender, KeyEventArgs e)
+        {
+           
+        }
+
+        private void frmMain_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void gridView2_RowCellClick(object sender, RowCellClickEventArgs e)
+        {
+
+        }
+        private int clickCount = 0;
+        private System.Windows.Forms.Timer clickTimer;
+        private void gridView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void gridView2_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            {
+                getMessage = true;
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+
+                if (cellValue != null)
+                {
+                    if (cellValue.ToString().Contains("154"))
+                    {
+                        // Thực hiện hành động mong muốn khi nhấn phím Tab
+                        frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                        frmCongtrinh.frmMain = this;
+                        frmCongtrinh.ShowDialog();
+                        if (cellValue.ToString().Contains("|"))
+                            cellValue = cellValue.ToString().Split('|')[0];
+                        if (cellValue.ToString().Contains("154"))
+                            gridView.SetRowCellValue(currentRowHandle, "TKNo", cellValue + "|" + hiddenValue);
+                        if (cellValue.ToString().Contains("511"))
+                        {
+                            gridView.SetRowCellValue(currentRowHandle, "TKCo", cellValue + "|" + hiddenValue);
+
+                        }
+                        // Nếu bạn muốn ngăn chặn hành động mặc định của phím Tab
+
+                        e.SuppressKeyPress = true;
+                    }
+
+                }
+
+            }
+        }
+
+        private void gridView3_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+            // Kiểm tra nếu hàng có detail view đang mở
+            if (gridView.GetDetailView(e.RowHandle, 0) != null)
+            {
+                return; // Nếu có hàng con mở, không thực hiện hành động
+            }
+
+            // Chỉ thực hiện khi không có hàng con mở
+            foreach (var item in people2)
+            {
+                foreach (var it2 in item.fileImportDetails)
+                {
+                    it2.TKCo = item.TKCo;
+                    it2.TKNo = item.TKNo;
+                }
+            }
+
+            gridControl2.Refresh();
+        }
+
+        private void gridView4_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            {
+                getMessage = true;
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+
+                if (cellValue != null)
+                {
+                    if (cellValue.ToString().Contains("511"))
+                    {
+                        // Thực hiện hành động mong muốn khi nhấn phím Tab
+                        frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                        frmCongtrinh.frmMain = this;
+                        frmCongtrinh.ShowDialog();
+                        if (cellValue.ToString().Contains("|"))
+                            cellValue = cellValue.ToString().Split('|')[0];
+                        if (cellValue.ToString().Contains("154"))
+                            gridView.SetRowCellValue(currentRowHandle, "TKNo", cellValue + "|" + hiddenValue);
+                        if (cellValue.ToString().Contains("511"))
+                        {
+                            gridView.SetRowCellValue(currentRowHandle, "TKCo", cellValue + "|" + hiddenValue);
+
+                        }
+                        // Nếu bạn muốn ngăn chặn hành động mặc định của phím Tab
+
+                        e.SuppressKeyPress = true;
+                    }
+
+                }
+
+            }
+        }
+
+        private void gridView3_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            {
+                getMessage = true;
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+
+                if (cellValue != null)
+                {
+                    if (cellValue.ToString().Contains("511"))
+                    {
+                        if (!Kiemtrataikhoancon(cellValue.ToString()))
+                        {
+                            // Thực hiện hành động mong muốn khi nhấn phím Tab
+                            frmCongtrinh frmCongtrinh = new frmCongtrinh();
+                            frmCongtrinh.frmMain = this;
+                            frmCongtrinh.ShowDialog();
+                            if (cellValue.ToString().Contains("|"))
+                                cellValue = cellValue.ToString().Split('|')[0];
+                            if (cellValue.ToString().Contains("511"))
+                            {
+                                gridView.SetRowCellValue(currentRowHandle, "TKCo", cellValue + "|" + hiddenValue);
+
+                            }
+                        }
+                        // Nếu bạn muốn ngăn chặn hành động mặc định của phím Tab
+
+                        e.SuppressKeyPress = true;
+                    }
+
+                }
+
+            }
+        }
+
+        private void gridControl1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void gridView2_RowClick(object sender, RowClickEventArgs e)
+        {
+            if (e.Clicks == 1) // Nếu là single click
+            {
+                gridView2.ShowEditor(); // Hiển thị chế độ chỉnh sửa
+            }
+        }
+
+        private void gridView4_RowClick(object sender, RowClickEventArgs e)
+        {
+            if (e.Clicks == 1) // Nếu là single click
+            {
+                gridView4.ShowEditor(); // Hiển thị chế độ chỉnh sửa
+            }
         }
 
         public static string NormalizeVietnameseString(string input)

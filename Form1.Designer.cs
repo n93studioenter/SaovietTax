@@ -33,8 +33,8 @@
             DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSohieu2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoluong2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDongia2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDVT = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -56,9 +56,10 @@
             this.colPath = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colAcess = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.colTen3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colSoHieu3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridControl2 = new DevExpress.XtraGrid.GridControl();
             this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn4 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -67,6 +68,7 @@
             this.gridColumn7 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn8 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn9 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn10 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colAcess2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
@@ -108,6 +110,11 @@
             this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.fileImportDetailBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
+            this.colSoluong3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colDongia3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colDVT3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTKNo3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTKCo3 = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -146,8 +153,8 @@
             // gridView2
             // 
             this.gridView2.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.colTen2,
             this.colSohieu2,
+            this.colTen2,
             this.colSoluong2,
             this.colDongia2,
             this.colDVT,
@@ -157,6 +164,20 @@
             this.gridView2.GridControl = this.gridControl1;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsView.ShowGroupPanel = false;
+            this.gridView2.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView2_RowClick);
+            this.gridView2.RowCellClick += new DevExpress.XtraGrid.Views.Grid.RowCellClickEventHandler(this.gridView2_RowCellClick);
+            this.gridView2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyDown);
+            this.gridView2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyUp);
+            // 
+            // colSohieu2
+            // 
+            this.colSohieu2.Caption = "Số hiệu";
+            this.colSohieu2.FieldName = "SoHieu";
+            this.colSohieu2.MinWidth = 30;
+            this.colSohieu2.Name = "colSohieu2";
+            this.colSohieu2.Visible = true;
+            this.colSohieu2.VisibleIndex = 1;
+            this.colSohieu2.Width = 112;
             // 
             // colTen2
             // 
@@ -168,17 +189,6 @@
             this.colTen2.Visible = true;
             this.colTen2.VisibleIndex = 0;
             this.colTen2.Width = 112;
-            // 
-            // colSohieu2
-            // 
-            this.colSohieu2.Caption = "Số hiệu";
-            this.colSohieu2.FieldName = "SoHieu";
-            this.colSohieu2.MinWidth = 30;
-            this.colSohieu2.Name = "colSohieu2";
-            this.colSohieu2.OptionsColumn.AllowEdit = false;
-            this.colSohieu2.Visible = true;
-            this.colSohieu2.VisibleIndex = 1;
-            this.colSohieu2.Width = 112;
             // 
             // colSoluong2
             // 
@@ -267,6 +277,7 @@
             this.gridControl1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridControl1_KeyDown);
             this.gridControl1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridControl1_KeyUp);
             this.gridControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.gridControl1_MouseClick);
+            this.gridControl1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.gridControl1_MouseDoubleClick);
             // 
             // fileImportBindingSource
             // 
@@ -298,8 +309,13 @@
             this.gridView1.MasterRowGetRelationCount += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationCountEventHandler(this.gridView1_MasterRowGetRelationCount);
             this.gridView1.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridView1_CustomRowCellEdit);
             this.gridView1.ShownEditor += new System.EventHandler(this.gridView1_ShownEditor);
+            this.gridView1.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView1_CellValueChanged);
             this.gridView1.RowCellDefaultAlignment += new DevExpress.XtraGrid.Views.Base.RowCellAlignmentEventHandler(this.gridView1_RowCellDefaultAlignment);
             this.gridView1.AsyncCompleted += new System.EventHandler(this.gridView1_AsyncCompleted);
+            this.gridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView1_KeyDown);
+            this.gridView1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView1_KeyUp);
+            this.gridView1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gridView1_KeyPress);
+            this.gridView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView1_MouseDown);
             this.gridView1.DoubleClick += new System.EventHandler(this.gridView1_DoubleClick);
             // 
             // colID
@@ -425,16 +441,47 @@
             // 
             // gridView4
             // 
+            this.gridView4.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.colTen3,
+            this.colSoHieu3,
+            this.colSoluong3,
+            this.colDongia3,
+            this.colDVT3,
+            this.colTKNo3,
+            this.colTKCo3});
             this.gridView4.GridControl = this.gridControl2;
             this.gridView4.Name = "gridView4";
+            this.gridView4.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView4_RowClick);
             this.gridView4.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView4_RowCellStyle);
+            this.gridView4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView4_KeyDown);
+            // 
+            // colTen3
+            // 
+            this.colTen3.Caption = "Tên";
+            this.colTen3.FieldName = "Ten";
+            this.colTen3.MinWidth = 30;
+            this.colTen3.Name = "colTen3";
+            this.colTen3.OptionsColumn.AllowEdit = false;
+            this.colTen3.Visible = true;
+            this.colTen3.VisibleIndex = 0;
+            this.colTen3.Width = 112;
+            // 
+            // colSoHieu3
+            // 
+            this.colSoHieu3.Caption = "Số hiệu";
+            this.colSoHieu3.FieldName = "SoHieu";
+            this.colSoHieu3.MinWidth = 30;
+            this.colSoHieu3.Name = "colSoHieu3";
+            this.colSoHieu3.Visible = true;
+            this.colSoHieu3.VisibleIndex = 1;
+            this.colSoHieu3.Width = 112;
             // 
             // gridControl2
             // 
             this.gridControl2.DataSource = this.fileImportBindingSource;
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             gridLevelNode2.LevelTemplate = this.gridView4;
-            gridLevelNode2.RelationName = "Level1";
+            gridLevelNode2.RelationName = "Detail";
             this.gridControl2.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
             gridLevelNode2});
             this.gridControl2.Location = new System.Drawing.Point(0, 0);
@@ -455,7 +502,6 @@
             // gridView3
             // 
             this.gridView3.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.gridColumn1,
             this.gridColumn2,
             this.gridColumn3,
             this.gridColumn4,
@@ -464,6 +510,7 @@
             this.gridColumn7,
             this.gridColumn8,
             this.gridColumn9,
+            this.gridColumn1,
             this.gridColumn10,
             this.colAcess2});
             this.gridView3.GridControl = this.gridControl2;
@@ -475,15 +522,8 @@
             this.gridView3.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView3_MasterRowGetChildList);
             this.gridView3.MasterRowGetRelationName += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationNameEventHandler(this.gridView3_MasterRowGetRelationName);
             this.gridView3.MasterRowGetRelationCount += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationCountEventHandler(this.gridView3_MasterRowGetRelationCount);
-            // 
-            // gridColumn1
-            // 
-            this.gridColumn1.FieldName = "ID";
-            this.gridColumn1.Name = "gridColumn1";
-            this.gridColumn1.OptionsColumn.AllowEdit = false;
-            this.gridColumn1.Visible = true;
-            this.gridColumn1.VisibleIndex = 0;
-            this.gridColumn1.Width = 53;
+            this.gridView3.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView3_CellValueChanged);
+            this.gridView3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView3_KeyDown);
             // 
             // gridColumn2
             // 
@@ -579,6 +619,15 @@
             this.gridColumn9.Visible = true;
             this.gridColumn9.VisibleIndex = 8;
             this.gridColumn9.Width = 68;
+            // 
+            // gridColumn1
+            // 
+            this.gridColumn1.FieldName = "ID";
+            this.gridColumn1.Name = "gridColumn1";
+            this.gridColumn1.OptionsColumn.AllowEdit = false;
+            this.gridColumn1.Visible = true;
+            this.gridColumn1.VisibleIndex = 0;
+            this.gridColumn1.Width = 53;
             // 
             // gridColumn10
             // 
@@ -1017,6 +1066,61 @@
             // 
             this.radialMenu1.Name = "radialMenu1";
             // 
+            // colSoluong3
+            // 
+            this.colSoluong3.Caption = "Số lượng";
+            this.colSoluong3.FieldName = "Soluong";
+            this.colSoluong3.MinWidth = 30;
+            this.colSoluong3.Name = "colSoluong3";
+            this.colSoluong3.OptionsColumn.AllowEdit = false;
+            this.colSoluong3.Visible = true;
+            this.colSoluong3.VisibleIndex = 2;
+            this.colSoluong3.Width = 112;
+            // 
+            // colDongia3
+            // 
+            this.colDongia3.Caption = "Đơn giá";
+            this.colDongia3.DisplayFormat.FormatString = "N0";
+            this.colDongia3.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colDongia3.FieldName = "Dongia";
+            this.colDongia3.MinWidth = 30;
+            this.colDongia3.Name = "colDongia3";
+            this.colDongia3.OptionsColumn.AllowEdit = false;
+            this.colDongia3.Visible = true;
+            this.colDongia3.VisibleIndex = 3;
+            this.colDongia3.Width = 112;
+            // 
+            // colDVT3
+            // 
+            this.colDVT3.Caption = "Đơn vị tính";
+            this.colDVT3.FieldName = "DVT";
+            this.colDVT3.MinWidth = 30;
+            this.colDVT3.Name = "colDVT3";
+            this.colDVT3.OptionsColumn.AllowEdit = false;
+            this.colDVT3.Visible = true;
+            this.colDVT3.VisibleIndex = 4;
+            this.colDVT3.Width = 112;
+            // 
+            // colTKNo3
+            // 
+            this.colTKNo3.Caption = "TKNo";
+            this.colTKNo3.FieldName = "TKNo";
+            this.colTKNo3.MinWidth = 30;
+            this.colTKNo3.Name = "colTKNo3";
+            this.colTKNo3.Visible = true;
+            this.colTKNo3.VisibleIndex = 5;
+            this.colTKNo3.Width = 112;
+            // 
+            // colTKCo3
+            // 
+            this.colTKCo3.Caption = "TKCo";
+            this.colTKCo3.FieldName = "TKCo";
+            this.colTKCo3.MinWidth = 30;
+            this.colTKCo3.Name = "colTKCo3";
+            this.colTKCo3.Visible = true;
+            this.colTKCo3.VisibleIndex = 6;
+            this.colTKCo3.Width = 112;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
@@ -1030,6 +1134,7 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
+            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.frmMain_MouseDoubleClick);
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).EndInit();
@@ -1149,5 +1254,12 @@
         private DevExpress.XtraEditors.PanelControl panelControl2;
         private DevExpress.XtraBars.Ribbon.RadialMenu radialMenu1;
         private DevExpress.XtraEditors.SimpleButton simpleButton2;
+        private DevExpress.XtraGrid.Columns.GridColumn colTen3;
+        private DevExpress.XtraGrid.Columns.GridColumn colSoHieu3;
+        private DevExpress.XtraGrid.Columns.GridColumn colSoluong3;
+        private DevExpress.XtraGrid.Columns.GridColumn colDongia3;
+        private DevExpress.XtraGrid.Columns.GridColumn colDVT3;
+        private DevExpress.XtraGrid.Columns.GridColumn colTKNo3;
+        private DevExpress.XtraGrid.Columns.GridColumn colTKCo3;
     }
 }
