@@ -807,7 +807,7 @@ namespace SaovietTax
             }
         }
         private void frmMain_Load(object sender, EventArgs e)
-        {
+        { 
             InitDB();
 
             InitData(); 
@@ -1807,17 +1807,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 {
                     thanhtien = tt2;
                 }
-
+                thanhtien= Math.Round(thanhtien, MidpointRounding.ToEven);
                 XmlNode nTPhi = root.SelectSingleNode("//TToan//TPhi");
                 double tPhi = double.TryParse(nTPhi?.InnerText, out var phi) ? phi : 0;
 
                 string nTgTCThueStr = root.SelectSingleNode("//TToan//TgTCThue")?.InnerText?.Replace('.', ',');
                 double tgTCThue = double.TryParse(nTgTCThueStr, out var ttc) ? ttc : thanhtien;
+                tgTCThue= Math.Round(tgTCThue, MidpointRounding.ToEven);
                 if (tPhi != 0) tgTCThue += tPhi;
 
                 string nTgTThueStr = root.SelectSingleNode("//TToan//TgTThue")?.InnerText?.Replace('.', ',');
                 double tgTThue = double.TryParse(nTgTThueStr, out var tth) ? tth : 0;
-
+                tgTThue = Math.Round(tgTThue, MidpointRounding.ToEven);
                 string diengiai = "";
                 int tkCo = 0;
                 int tkNo = 0;

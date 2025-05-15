@@ -58,6 +58,11 @@
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoHieu3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colSoluong3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colDongia3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colDVT3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTKNo3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colTKCo3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridControl2 = new DevExpress.XtraGrid.GridControl();
             this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -110,11 +115,6 @@
             this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.fileImportDetailBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
-            this.colSoluong3 = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colDongia3 = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colDVT3 = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colTKNo3 = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colTKCo3 = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -204,7 +204,7 @@
             // colDongia2
             // 
             this.colDongia2.Caption = "Đơn giá";
-            this.colDongia2.DisplayFormat.FormatString = "N0";
+            this.colDongia2.DisplayFormat.FormatString = "N2";
             this.colDongia2.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colDongia2.FieldName = "Dongia";
             this.colDongia2.MinWidth = 30;
@@ -359,7 +359,7 @@
             // 
             // colTongTien
             // 
-            this.colTongTien.DisplayFormat.FormatString = "N0";
+            this.colTongTien.DisplayFormat.FormatString = "N2";
             this.colTongTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colTongTien.FieldName = "TgTCThue";
             this.colTongTien.MinWidth = 30;
@@ -475,6 +475,61 @@
             this.colSoHieu3.Visible = true;
             this.colSoHieu3.VisibleIndex = 1;
             this.colSoHieu3.Width = 112;
+            // 
+            // colSoluong3
+            // 
+            this.colSoluong3.Caption = "Số lượng";
+            this.colSoluong3.FieldName = "Soluong";
+            this.colSoluong3.MinWidth = 30;
+            this.colSoluong3.Name = "colSoluong3";
+            this.colSoluong3.OptionsColumn.AllowEdit = false;
+            this.colSoluong3.Visible = true;
+            this.colSoluong3.VisibleIndex = 2;
+            this.colSoluong3.Width = 112;
+            // 
+            // colDongia3
+            // 
+            this.colDongia3.Caption = "Đơn giá";
+            this.colDongia3.DisplayFormat.FormatString = "N2";
+            this.colDongia3.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colDongia3.FieldName = "Dongia";
+            this.colDongia3.MinWidth = 30;
+            this.colDongia3.Name = "colDongia3";
+            this.colDongia3.OptionsColumn.AllowEdit = false;
+            this.colDongia3.Visible = true;
+            this.colDongia3.VisibleIndex = 3;
+            this.colDongia3.Width = 112;
+            // 
+            // colDVT3
+            // 
+            this.colDVT3.Caption = "Đơn vị tính";
+            this.colDVT3.FieldName = "DVT";
+            this.colDVT3.MinWidth = 30;
+            this.colDVT3.Name = "colDVT3";
+            this.colDVT3.OptionsColumn.AllowEdit = false;
+            this.colDVT3.Visible = true;
+            this.colDVT3.VisibleIndex = 4;
+            this.colDVT3.Width = 112;
+            // 
+            // colTKNo3
+            // 
+            this.colTKNo3.Caption = "TKNo";
+            this.colTKNo3.FieldName = "TKNo";
+            this.colTKNo3.MinWidth = 30;
+            this.colTKNo3.Name = "colTKNo3";
+            this.colTKNo3.Visible = true;
+            this.colTKNo3.VisibleIndex = 5;
+            this.colTKNo3.Width = 112;
+            // 
+            // colTKCo3
+            // 
+            this.colTKCo3.Caption = "TKCo";
+            this.colTKCo3.FieldName = "TKCo";
+            this.colTKCo3.MinWidth = 30;
+            this.colTKCo3.Name = "colTKCo3";
+            this.colTKCo3.Visible = true;
+            this.colTKCo3.VisibleIndex = 6;
+            this.colTKCo3.Width = 112;
             // 
             // gridControl2
             // 
@@ -600,7 +655,7 @@
             // 
             // gridColumn8
             // 
-            this.gridColumn8.DisplayFormat.FormatString = "N0";
+            this.gridColumn8.DisplayFormat.FormatString = "N2";
             this.gridColumn8.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.gridColumn8.FieldName = "TgTCThue";
             this.gridColumn8.MinWidth = 30;
@@ -1065,61 +1120,6 @@
             // radialMenu1
             // 
             this.radialMenu1.Name = "radialMenu1";
-            // 
-            // colSoluong3
-            // 
-            this.colSoluong3.Caption = "Số lượng";
-            this.colSoluong3.FieldName = "Soluong";
-            this.colSoluong3.MinWidth = 30;
-            this.colSoluong3.Name = "colSoluong3";
-            this.colSoluong3.OptionsColumn.AllowEdit = false;
-            this.colSoluong3.Visible = true;
-            this.colSoluong3.VisibleIndex = 2;
-            this.colSoluong3.Width = 112;
-            // 
-            // colDongia3
-            // 
-            this.colDongia3.Caption = "Đơn giá";
-            this.colDongia3.DisplayFormat.FormatString = "N0";
-            this.colDongia3.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colDongia3.FieldName = "Dongia";
-            this.colDongia3.MinWidth = 30;
-            this.colDongia3.Name = "colDongia3";
-            this.colDongia3.OptionsColumn.AllowEdit = false;
-            this.colDongia3.Visible = true;
-            this.colDongia3.VisibleIndex = 3;
-            this.colDongia3.Width = 112;
-            // 
-            // colDVT3
-            // 
-            this.colDVT3.Caption = "Đơn vị tính";
-            this.colDVT3.FieldName = "DVT";
-            this.colDVT3.MinWidth = 30;
-            this.colDVT3.Name = "colDVT3";
-            this.colDVT3.OptionsColumn.AllowEdit = false;
-            this.colDVT3.Visible = true;
-            this.colDVT3.VisibleIndex = 4;
-            this.colDVT3.Width = 112;
-            // 
-            // colTKNo3
-            // 
-            this.colTKNo3.Caption = "TKNo";
-            this.colTKNo3.FieldName = "TKNo";
-            this.colTKNo3.MinWidth = 30;
-            this.colTKNo3.Name = "colTKNo3";
-            this.colTKNo3.Visible = true;
-            this.colTKNo3.VisibleIndex = 5;
-            this.colTKNo3.Width = 112;
-            // 
-            // colTKCo3
-            // 
-            this.colTKCo3.Caption = "TKCo";
-            this.colTKCo3.FieldName = "TKCo";
-            this.colTKCo3.MinWidth = 30;
-            this.colTKCo3.Name = "colTKCo3";
-            this.colTKCo3.Visible = true;
-            this.colTKCo3.VisibleIndex = 6;
-            this.colTKCo3.Width = 112;
             // 
             // frmMain
             // 
