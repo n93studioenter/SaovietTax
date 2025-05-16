@@ -184,11 +184,38 @@ namespace SaovietTax
         string password, connectionString;
         private void btnLuudinhdanh_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtTukhoa.Text) || string.IsNullOrEmpty(txtTKNo.Text) || string.IsNullOrEmpty(txtTKCo.Text) || string.IsNullOrEmpty(txtTKThue.Text))
+            //Kiểm tra tài khoản con
+            if (txtTukhoa.Text.Contains("Ưu tiên vào"))
             {
-                XtraMessageBox.Show("Vui lòng nhập thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", txtTKNo.Text + "%"));
+                if (resultkm.Rows.Count > 1)
+                {
+                    XtraMessageBox.Show("Tài khoản " + txtTKNo.Text + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (string.IsNullOrEmpty(txtTukhoa.Text) || string.IsNullOrEmpty(txtTKNo.Text) || string.IsNullOrEmpty(txtTKCo.Text) || string.IsNullOrEmpty(txtTKThue.Text))
+                {
+                    XtraMessageBox.Show("Vui lòng nhập thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
+            if (txtTukhoa.Text.Contains("Ưu tiên ra"))
+            {
+                string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", txtTKCo.Text + "%"));
+                if (resultkm.Rows.Count > 1)
+                {
+                    XtraMessageBox.Show("Tài khoản " + txtTKCo.Text + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (string.IsNullOrEmpty(txtTukhoa.Text) || string.IsNullOrEmpty(txtTKNo.Text) || string.IsNullOrEmpty(txtTKCo.Text) || string.IsNullOrEmpty(txtTKThue.Text))
+                {
+                    XtraMessageBox.Show("Vui lòng nhập thông tin!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+          
             string query = @"
         INSERT INTO tbDinhdanhtaikhoan (KeyValue,TKNo,TKCo,TKThue,Type)
         VALUES (?,?,?,?,?)";
@@ -205,6 +232,12 @@ namespace SaovietTax
             int a = ExecuteQueryResult(query, parameters);
             LoadDataDinhDanh();
         }
+
+        private void txtTKNo_EditValueChanging(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e)
+        {
+
+        }
+
         private int ExecuteQueryResult(string query, params OleDbParameter[] parameters)
         {
             DataTable dataTable = new DataTable();

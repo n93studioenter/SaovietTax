@@ -55,6 +55,7 @@
             this.colChecked = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colPath = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colAcess = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colisHaschild = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoHieu3 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -76,6 +77,7 @@
             this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn10 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colAcess2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colisHaschild2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
             this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
@@ -108,6 +110,7 @@
             this.progressBarControl1 = new DevExpress.XtraEditors.ProgressBarControl();
             this.comboBoxEdit2 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.popupControlContainer1 = new DevExpress.XtraBars.PopupControlContainer(this.components);
             this.btnimport = new DevExpress.XtraEditors.SimpleButton();
             this.btnMdtk = new DevExpress.XtraEditors.SimpleButton();
             this.btnChonthang = new DevExpress.XtraEditors.SimpleButton();
@@ -115,6 +118,7 @@
             this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.fileImportDetailBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
+            this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -145,6 +149,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.popupControlContainer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radialMenu1)).BeginInit();
@@ -296,7 +301,8 @@
             this.colNoidung,
             this.colChecked,
             this.colPath,
-            this.colAcess});
+            this.colAcess,
+            this.colisHaschild});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsDetail.ShowDetailTabs = false;
@@ -310,6 +316,7 @@
             this.gridView1.CustomRowCellEdit += new DevExpress.XtraGrid.Views.Grid.CustomRowCellEditEventHandler(this.gridView1_CustomRowCellEdit);
             this.gridView1.ShownEditor += new System.EventHandler(this.gridView1_ShownEditor);
             this.gridView1.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView1_CellValueChanged);
+            this.gridView1.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView1_CellValueChanging);
             this.gridView1.RowCellDefaultAlignment += new DevExpress.XtraGrid.Views.Base.RowCellAlignmentEventHandler(this.gridView1_RowCellDefaultAlignment);
             this.gridView1.AsyncCompleted += new System.EventHandler(this.gridView1_AsyncCompleted);
             this.gridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView1_KeyDown);
@@ -439,6 +446,16 @@
             this.colAcess.Name = "colAcess";
             this.colAcess.Width = 112;
             // 
+            // colisHaschild
+            // 
+            this.colisHaschild.Caption = "Có con";
+            this.colisHaschild.FieldName = "isHaschild";
+            this.colisHaschild.MinWidth = 30;
+            this.colisHaschild.Name = "colisHaschild";
+            this.colisHaschild.Visible = true;
+            this.colisHaschild.VisibleIndex = 9;
+            this.colisHaschild.Width = 112;
+            // 
             // gridView4
             // 
             this.gridView4.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
@@ -567,7 +584,8 @@
             this.gridColumn9,
             this.gridColumn1,
             this.gridColumn10,
-            this.colAcess2});
+            this.colAcess2,
+            this.colisHaschild2});
             this.gridView3.GridControl = this.gridControl2;
             this.gridView3.Name = "gridView3";
             this.gridView3.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView3_RowClick);
@@ -577,8 +595,11 @@
             this.gridView3.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView3_MasterRowGetChildList);
             this.gridView3.MasterRowGetRelationName += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationNameEventHandler(this.gridView3_MasterRowGetRelationName);
             this.gridView3.MasterRowGetRelationCount += new DevExpress.XtraGrid.Views.Grid.MasterRowGetRelationCountEventHandler(this.gridView3_MasterRowGetRelationCount);
+            this.gridView3.ShownEditor += new System.EventHandler(this.gridView3_ShownEditor);
             this.gridView3.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView3_CellValueChanged);
+            this.gridView3.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView3_CellValueChanging);
             this.gridView3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView3_KeyDown);
+            this.gridView3.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView3_KeyUp);
             // 
             // gridColumn2
             // 
@@ -699,6 +720,17 @@
             this.colAcess2.MinWidth = 30;
             this.colAcess2.Name = "colAcess2";
             this.colAcess2.Width = 112;
+            // 
+            // colisHaschild2
+            // 
+            this.colisHaschild2.Caption = "Có chi tiết";
+            this.colisHaschild2.FieldName = "isHaschild";
+            this.colisHaschild2.MinWidth = 30;
+            this.colisHaschild2.Name = "colisHaschild2";
+            this.colisHaschild2.OptionsColumn.AllowEdit = false;
+            this.colisHaschild2.Visible = true;
+            this.colisHaschild2.VisibleIndex = 9;
+            this.colisHaschild2.Width = 112;
             // 
             // xtraTabControl1
             // 
@@ -1052,6 +1084,7 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.popupControlContainer1);
             this.panelControl1.Controls.Add(this.btnimport);
             this.panelControl1.Controls.Add(this.btnMdtk);
             this.panelControl1.Controls.Add(this.btnChonthang);
@@ -1060,6 +1093,15 @@
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(361, 185);
             this.panelControl1.TabIndex = 1;
+            // 
+            // popupControlContainer1
+            // 
+            this.popupControlContainer1.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.popupControlContainer1.Location = new System.Drawing.Point(191, 49);
+            this.popupControlContainer1.Name = "popupControlContainer1";
+            this.popupControlContainer1.Size = new System.Drawing.Size(359, 106);
+            this.popupControlContainer1.TabIndex = 8;
+            this.popupControlContainer1.Visible = false;
             // 
             // btnimport
             // 
@@ -1169,6 +1211,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.popupControlContainer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.radialMenu1)).EndInit();
@@ -1261,5 +1304,9 @@
         private DevExpress.XtraGrid.Columns.GridColumn colDVT3;
         private DevExpress.XtraGrid.Columns.GridColumn colTKNo3;
         private DevExpress.XtraGrid.Columns.GridColumn colTKCo3;
+        private DevExpress.XtraBars.PopupControlContainer popupControlContainer1;
+        private DevExpress.Utils.ToolTipController toolTipController1;
+        private DevExpress.XtraGrid.Columns.GridColumn colisHaschild;
+        private DevExpress.XtraGrid.Columns.GridColumn colisHaschild2;
     }
 }

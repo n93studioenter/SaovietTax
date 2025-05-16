@@ -213,6 +213,7 @@
             this.txtTKNo.Name = "txtTKNo";
             this.txtTKNo.Size = new System.Drawing.Size(231, 27);
             this.txtTKNo.TabIndex = 15;
+            this.txtTKNo.EditValueChanging += new DevExpress.XtraEditors.Controls.ChangingEventHandler(this.txtTKNo_EditValueChanging);
             // 
             // labelControl9
             // 

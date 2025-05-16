@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lYW/cHbWO1o=",
+  "dgSpecHash": "v4/FjSUHoeU=",
   "success": true,
-  "projectFilePath": "C:\\TCP\\Saoviet\\SourcePmTrungGiang\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
+  "projectFilePath": "C:\\TCP\\Saoviet\\DAP3\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\excss\\4.2.3\\excss.4.2.3.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.0\\microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512",
