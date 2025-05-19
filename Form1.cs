@@ -1902,6 +1902,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                         if (!string.IsNullOrEmpty(dvTinh) && !string.IsNullOrEmpty(thhdVu) && double.TryParse(sLuongStr, out var sLuong) && double.TryParse(dGiaStr, out var dGia))
                         {
+                            thhdVu = Regex.Replace(thhdVu, @"\s+", " ");
                             string tenVattuVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(thhdVu.Trim())).ToLower();
                             string dvTinhVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(dvTinh)).ToLower();
                             string soHieuVattu = "";
@@ -2494,13 +2495,20 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     var imgElement = Driver.FindElements(By.XPath("//img[contains(@src, 'data:image')]"));
 
                     // In ra src của thẻ img
-                    string src = imgElement[1].GetAttribute("src");
+                    try
+                    {
+                        string src = imgElement[1].GetAttribute("src");
 
-                    Testimg2(src);
-                    Thread.Sleep(2000);
-                    string recap = Readcapcha();
-                    cvalue[1].SendKeys(recap);
-                    Thread.Sleep(2000);
+                        Testimg2(src);
+                        Thread.Sleep(500);
+                        string recap = Readcapcha();
+                        cvalue[1].SendKeys(recap);
+                        Thread.Sleep(500);
+                    }
+                    catch(Exception ex)
+                    {
+
+                    }
                     loginButton = Driver.FindElement(By.XPath("//button[contains(span/text(), 'Đăng nhập')]"));
                     loginButton.Click(); 
                     wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(200));
@@ -3883,6 +3891,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
 
         public string hiddenValue { get; set; }
+        public string hiddenValue2 { get; set; }
         private void GridcontrolKeyup(KeyEventArgs e, DevExpress.XtraGrid.Views.Grid.GridView gridView)
         {
            
@@ -4632,7 +4641,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 {
                                     if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || (item.TKNo.Contains("154") && !parenthasCT) || item.TKNo.Contains("711") || (item.TKNo.Contains("511") && !parenthasCT)) //them 5111
                                     {
-                                        InsertImportDetails(connection, transaction, item, parentID, type);
+                                        if (!item.TKNo.Contains("5113"))
+                                        {
+                                            InsertImportDetails(connection, transaction, item, parentID, type);
+                                        }
                                     }
                                 }
                             }
@@ -4716,7 +4728,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             int idconttrinh = 1;
             foreach (var detail in item.fileImportDetails)
-            {
+            { 
                 string tkNo = detail.TKNo;
                 if (detail.TKNo.Contains("154"))
                 {
@@ -4781,8 +4793,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", detail.TKCo)
                 };
 
-                ExecuteQueryResult(query, parameters); 
-                InsertHangHoa(Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(detail.DVT)), detail.SoHieu, detail.Ten);
+                ExecuteQueryResult(query, parameters);
+                if (!detail.TKCo.Contains("5113"))
+                    InsertHangHoa(Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(detail.DVT)), detail.SoHieu, detail.Ten);
             }
         }
         bool isClick = false;
@@ -4838,10 +4851,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
 
                         // Kiểm tra và thêm mới vật tư
-                        string queryCheckVatTu = @"SELECT MaSo FROM Vattu WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
+                        string queryCheckVatTu = @"SELECT MaSo FROM Vattu WHERE LCase(SoHieu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         using (OleDbCommand checkVatTuCmd = new OleDbCommand(queryCheckVatTu, connection, transaction))
                         {
-                            checkVatTuCmd.Parameters.AddWithValue("?", newName.ToLower());
+                            checkVatTuCmd.Parameters.AddWithValue("?", sohieu.ToLower());
                             checkVatTuCmd.Parameters.AddWithValue("?", DVTinh.ToLower());
                             object resultVatTu = checkVatTuCmd.ExecuteScalar();
                             if (resultVatTu == null)
@@ -5170,7 +5183,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             if (e.Clicks == 1) // Nếu là single click
             {
-               gridView1.ShowEditor(); // Hiển thị chế độ chỉnh sửa
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                // Lấy tên cột đã nhấp
+                string columnName = gridView.FocusedColumn.FieldName;
+                if(columnName != "isHaschild")
+                gridView1.ShowEditor(); // Hiển thị chế độ chỉnh sửa
             }
 
         }
@@ -5179,7 +5197,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             if (e.Clicks == 1) // Nếu là single click
             {
-                gridView3.ShowEditor(); // Hiển thị chế độ chỉnh sửa
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                string columnName = gridView.FocusedColumn.FieldName;
+                if (columnName != "isHaschild")
+                    if (columnName != "isHaschild")
+                    gridView3.ShowEditor(); // Hiển thị chế độ chỉnh sửa
             }
         }
 
@@ -5212,11 +5235,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             if (e.Column.FieldName == "isHaschild")
             {
                 bool currentValue = (bool)gridView1.GetRowCellValue(e.RowHandle, e.Column);
+                gridView1.SetRowCellValue(e.RowHandle, e.Column, !currentValue);
                 var gettkCo = gridView1.GetRowCellValue(e.RowHandle, "TKNo").ToString();
-                foreach (var item in people2)
+                foreach (var item in people)
                 {
-                    if (item.TKCo == gettkCo)
+                    if (item.TKNo == gettkCo)
+                    {
                         item.isHaschild = !currentValue;
+                        var index = people.IndexOf(item);
+                        gridView1.SetRowCellValue(index, e.Column, !currentValue);
+                    }
                 }
                 gridControl1.RefreshDataSource();
             }
@@ -5502,7 +5530,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
                 getMessage = true;
                 DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
@@ -5627,7 +5655,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView2_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
                 getMessage = true;
                 DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
@@ -5659,8 +5687,34 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                         e.SuppressKeyPress = true;
                     }
+                    else
+                    {
+                        if (currentColumnName.ToString() == "SoHieu")
+                        {
+                            frmHangHoa frmHangHoa = new frmHangHoa();
+                            frmHangHoa.frmMain = this;
 
+                            frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                            vatTu.SoHieu = cellValue.ToString();
+                            var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
+                            vatTu.TenVattu = tenvattu;
+                            var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
+                            vatTu.DonVi = dvt;
+                            frmHangHoa.dtoVatTu = vatTu;
+
+                            frmHangHoa.ShowDialog();
+
+
+                            if (!string.IsNullOrEmpty(hiddenValue) && frmHangHoa.isChange)
+                            {
+                                gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
+                                gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
+                            }
+                          
+                        }
+                    }
                 }
+                
 
             }
         }
@@ -5715,7 +5769,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView4_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
                 getMessage = true;
                 DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
@@ -5747,7 +5801,32 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                         e.SuppressKeyPress = true;
                     }
+                    else
+                    {
+                        if (currentColumnName.ToString() == "SoHieu")
+                        {
+                            frmHangHoa frmHangHoa = new frmHangHoa();
+                            frmHangHoa.frmMain = this;
 
+                            frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                            vatTu.SoHieu = cellValue.ToString();
+                            var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
+                            vatTu.TenVattu = tenvattu;
+                            var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
+                            vatTu.DonVi = dvt;
+                            frmHangHoa.dtoVatTu = vatTu;
+
+                            frmHangHoa.ShowDialog();
+
+
+                            if (!string.IsNullOrEmpty(hiddenValue) && frmHangHoa.isChange)
+                            {
+                                gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
+                                gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
+                            }
+
+                        }
+                    }
                 }
 
             }
@@ -5755,7 +5834,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView3_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
                 getMessage = true;
                 DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
@@ -5913,6 +5992,57 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
 
             }
+        }
+
+        private void gridView1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gridView2_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+            
+        }
+
+        private void gridView2_RowStyle(object sender, RowStyleEventArgs e)
+        {
+           
+        }
+        private void LoadCustomDrawcell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            if (e.Column.FieldName == "SoHieu")
+            {
+                var getvalue = e.CellValue.ToString();
+                // 1. Vẽ nền mặc định (giữ nguyên background)
+                //e.DefaultDraw();
+                string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu LIKE ?";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", getvalue));
+                // 2. Vẽ chữ màu đè lên (màu đỏ)
+                if (resultkm.Rows.Count == 0)
+                {
+                    System.Drawing.Font boldFont = new System.Drawing.Font(e.Appearance.Font, FontStyle.Bold);
+
+                    e.Cache.DrawString(
+                    e.DisplayText,
+                    boldFont,
+                    Brushes.DarkBlue,  // Chữ màu đỏ
+                    e.Bounds,
+                    e.Appearance.GetStringFormat()
+                );
+
+                    e.Handled = true; // Ngăn vẽ mặc định
+                }
+
+            }
+        }
+        private void gridView2_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            LoadCustomDrawcell(sender, e);
+        }
+
+        private void gridView4_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            LoadCustomDrawcell(sender, e);
         }
 
         public static string NormalizeVietnameseString(string input)
