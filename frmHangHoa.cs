@@ -19,6 +19,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DevExpress.Xpo.DB.Helpers;
+using System.Web.UI.WebControls;
 
 namespace SaovietTax
 {
@@ -55,9 +56,21 @@ namespace SaovietTax
             gridControl1.DataSource = kq;
            
         }
-        private void frmHangHoa_Load(object sender, EventArgs e)
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-                string query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai"; 
+            // Kiểm tra phím tắt (ví dụ: Ctrl + N)
+            if (keyData == (Keys.Control | Keys.G))
+            {
+                btnGhi.PerformClick(); // Gọi sự kiện nhấn nút
+                return true; // Đã xử lý phím
+            }
+            return base.ProcessCmdKey(ref msg, keyData); // Chuyển tiếp cho xử lý tiếp
+        }
+        private void frmHangHoa_Load(object sender, EventArgs e)
+        { 
+
+            string query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai"; 
             var dt = ExecuteQuery(query, null);
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -77,8 +90,8 @@ namespace SaovietTax
                 comboBoxEdit1.Properties.TextEditStyle = TextEditStyles.DisableTextEditor; // Ngăn người dùng nhập trực tiếp
                 if (comboBoxEdit1.Properties.Items.Count > 0)
                 {
-                    comboBoxEdit1.SelectedIndex = 0; // Chọn phần tử đầu tiên
-                  var selectedItem = comboBoxEdit1.SelectedItem as Item;
+                    comboBoxEdit1.SelectedIndex = frmMain.currentselectId; // Chọn phần tử đầu tiên
+                    var selectedItem = comboBoxEdit1.SelectedItem as Item;
 
                     LoadData(selectedItem.Id);
                 }
@@ -110,6 +123,8 @@ namespace SaovietTax
                 txtMaSo.Text = kq.Rows[0]["MaSo"].ToString();
                 txtGhichu.Text = kq.Rows[0]["GhiChu"].ToString();
                 int mapl = int.Parse(kq.Rows[0]["MaPhanLoai"].ToString());
+               
+
                 //comboBoxEdit1.SelectedItem=
                 foreach (Item item in comboBoxEdit1.Properties.Items)
                 {
@@ -118,6 +133,18 @@ namespace SaovietTax
                         comboBoxEdit1.EditValue = item; // Chọn mục theo ID
                         break; // Thoát khỏi vòng lặp
                     }
+                }
+            }
+
+            DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+            for (int i = 0; i < view.RowCount; i++)
+            {
+                // Lấy giá trị của cột STT
+                if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
+                {
+                    view.FocusedRowHandle = i; // Chọn dòng
+                    view.SelectRow(i); // Chọn dòng
+                    return; // Thoát sau khi tìm thấy
                 }
             }
         }
@@ -226,6 +253,7 @@ namespace SaovietTax
                 if (selectedItem != null)
                 {
                     int selectedId = selectedItem.Id; // Lấy giá trị Id 
+                    frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
                     LoadData(selectedId);
                 }
             }
@@ -234,7 +262,7 @@ namespace SaovietTax
         public bool isChange = false;
         private void gridControl1_DoubleClick(object sender, EventArgs e)
         {
-            GridView gridView = gridControl1.MainView as GridView;
+            DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
             var hitInfo = gridView.CalcHitInfo(gridView.GridControl.PointToClient(MousePosition));
 
 
@@ -246,8 +274,10 @@ namespace SaovietTax
                 // Lấy giá trị trong ô đã nhấp
                 var hiddenValue = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["SoHieu"]);
                 var hiddenValue2= gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["DonVi"]);
+                var hiddenValue3 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["TenVattu"]);
                 frmMain.hiddenValue = hiddenValue.ToString();
                 frmMain.hiddenValue2= hiddenValue2.ToString();
+                frmMain.hiddenValue3 = hiddenValue3.ToString();
                 isChange = true;
                 this.Close();
             }
@@ -301,7 +331,19 @@ namespace SaovietTax
             if (rowsAffected > 0)
             {
                 LoadData(selectedItem.Id);
-                RefreshData();
+                // RefreshData();
+                DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView; // Lấy GridView
+                for (int i = 0; i < view.RowCount; i++)
+                {
+                    // Lấy giá trị của cột STT
+                    if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
+                    {
+                        view.FocusedRowHandle = i; // Chọn dòng
+                        view.SelectRow(i); // Chọn dòng
+                        view.MakeRowVisible(i); // Cuộn tới dòng đã chọn
+                        return; // Thoát sau khi tìm thấy
+                    }
+                }
             }
             else
             {
@@ -322,12 +364,19 @@ namespace SaovietTax
             txtTenvattu.Text = "";
             txtDonvi.Text = "";
             txtGhichu.Text = "";
+            gridControl2.DataSource = null;
         }
         private void btnThem_Click(object sender, EventArgs e)
         {
             RefreshData();
         }
-
+        private class TonKho
+        {
+            public int MaSo { get; set; }
+            public double SoLuong { get; set; }
+            public double DonGia { get; set; }
+            public double ThanhTien { get; set; }
+        }
         private void gridView1_RowClick(object sender, RowClickEventArgs e)
         {
             // Lấy chỉ số hàng đã click
@@ -339,7 +388,29 @@ namespace SaovietTax
             txtTenvattu.Text = gridView1.GetRowCellValue(rowHandle, "TenVattu").ToString();
             txtDonvi.Text = gridView1.GetRowCellValue(rowHandle, "DonVi").ToString();
             txtGhichu.Text = gridView1.GetRowCellValue(rowHandle, "GhiChu").ToString();
-            txtMaSo.Text = gridView1.GetRowCellValue(rowHandle, "MaSo").ToString(); 
+            txtMaSo.Text = gridView1.GetRowCellValue(rowHandle, "MaSo").ToString();
+
+            string query = @" SELECT *  FROM TonKho where MaVatTu= ? ";
+            var parameterss = new OleDbParameter[]
+            {
+                new OleDbParameter("?",txtMaSo.Text)
+               };
+            var kq = ExecuteQuery(query, parameterss);
+            List<TonKho> lstTonkho = new List<TonKho>();
+            if (kq.Rows.Count > 0)
+            {
+                TonKho tk = new TonKho();
+                int cnt = 0;
+                while (kq.Rows[0]["Luong_" + cnt].ToString() == "0")
+                {
+                    cnt += 1;
+                }
+                tk.SoLuong = kq.Rows[0]["Luong_" + cnt] != null ? double.Parse(kq.Rows[0]["Luong_" + cnt].ToString()) : 0;
+                tk.ThanhTien = kq.Rows[0]["Tien_" + cnt] != null ? double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) : 0;
+                tk.DonGia = Math.Round(double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) / tk.SoLuong,2);
+                lstTonkho.Add(tk);
+            }
+            gridControl2.DataSource = lstTonkho;
         }
 
         private void btnXoa_Click(object sender, EventArgs e)

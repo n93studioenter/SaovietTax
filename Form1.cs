@@ -57,6 +57,9 @@ using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid.Views.Printing;
 using DevExpress.Utils.VisualEffects;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
 
 namespace SaovietTax
 {
@@ -86,8 +89,9 @@ namespace SaovietTax
             public string MaCT { get; set; }
             public string TKNo { get; set; }
             public string TKCo { get; set; }
-
-            public FileImportDetail(string ten, int parentId, string soHieu, double soluong, double dongia, string dVT, string maCT, string tkNo, string tkCo)
+            public double TTien { get; set; }
+            public double TgTThue { get; set; }
+            public FileImportDetail(string ten, int parentId, string soHieu, double soluong, double dongia, string dVT, string maCT, string tkNo, string tkCo,double ttien)
             {
                 Ten = ten;
                 ParentId = parentId;
@@ -98,6 +102,7 @@ namespace SaovietTax
                 MaCT = maCT;
                 TKNo = tkNo;
                 TKCo = tkCo;
+                TTien = ttien;
             }
         }
         public class FileImport
@@ -443,6 +448,18 @@ namespace SaovietTax
                     {
                         Console.WriteLine("Cột 'tkoco' đã tồn tại trong bảng 'tbimportdetail'.");
                     }
+                    //
+                    if (!ColumnExists(connection, "tbimportdetail", "TTien"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimportdetail", "TTien", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần
+                        Console.WriteLine("Cột 'TTien' đã được thêm vào bảng 'tbimportdetail'.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Cột 'TTien' đã tồn tại trong bảng 'tbimportdetail'.");
+                    }
+
                     Console.WriteLine($"Bảng '{tableNamedetail}' đã tồn tại.");
                 }
             }
@@ -1290,7 +1307,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 DGia = !string.IsNullOrEmpty(DGia) ? DGia : "0";
                                 SLuong = !string.IsNullOrEmpty(SLuong) ? SLuong : "0";
                                 //Thiết lập MÃ ctrinh2 và tkno cho detail 
-                                FileImportDetail fileImportDetail = new FileImportDetail(newName, peopleTemp.LastOrDefault().ID, sohieu.ToUpper(), double.Parse(SLuong), double.Parse(DGia), DVTinh, mct, tkno, tkco);
+                                FileImportDetail fileImportDetail = new FileImportDetail(newName, peopleTemp.LastOrDefault().ID, sohieu.ToUpper(), double.Parse(SLuong), double.Parse(DGia), DVTinh, mct, tkno, tkco,0);
                                 peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                             }
                            
@@ -1305,7 +1322,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     ThTien = hhdVuList[i].SelectSingleNode("THTien")?.InnerText;
                                 if (hhdVuList.Count == 1)
                                 {
-                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception", "", "","");
+                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception", "", "","",0);
                                     peopleTemp.LastOrDefault().TKNo = "331";
                                     peopleTemp.LastOrDefault().TKCo = "711";
                                     peopleTemp.LastOrDefault().TkThue = 1331;
@@ -1314,7 +1331,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 }
                                 else
                                 {
-                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 0, double.Parse(ThTien), "Exception", "", "","");
+                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 0, double.Parse(ThTien), "Exception", "", "","",0);
                                     peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                                 }
 
@@ -1326,7 +1343,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     ThTien = hhdVuList[i].SelectSingleNode("THTien")?.InnerText;
                                 if (ThTien != null && double.Parse(ThTien) > 0)
                                 {
-                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "6422", 0, double.Parse(ThTien), "Exception", "", "","");
+                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "6422", 0, double.Parse(ThTien), "Exception", "", "","", 0);
                                     peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                                 }
 
@@ -1532,7 +1549,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             Dictionary<string, DataRow> khachHangDictionary = new Dictionary<string, DataRow>();
             foreach (DataRow row in dt.Rows)
             {
-                string key = row[keyColumn]?.ToString();
+                string key = row[keyColumn]?.ToString().ToLower();
                 if (!string.IsNullOrEmpty(key) && !khachHangDictionary.ContainsKey(key))
                 {
                     khachHangDictionary.Add(key, row);
@@ -1696,6 +1713,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
         }
+        static string RemoveSpecialCharacters(string input)
+        {
+            // Biểu thức chính quy để xóa ký tự đặc biệt
+            return Regex.Replace(input, @"[^\w\s]", string.Empty);
+        }
+
+        public int currentselectId = 0;
         private void LoadXmlFilesOptimized(string path, int type)
         {
             progressPanel1.Visible = true;
@@ -1785,7 +1809,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 if (existingTbImport.Rows.Cast<DataRow>().Any(row => row["KHHDon"]?.ToString() == kHHDon && row["SHDon"]?.ToString().Contains(sHDon) == true)) continue;
 
                 XmlNode nBanNode = (type == 1) ? ndhDonNode.SelectSingleNode("NBan") : ndhDonNode.SelectSingleNode("NMua");
-                string ten = nBanNode?.SelectSingleNode("Ten")?.InnerText ?? nBanNode?.SelectSingleNode("HVTNMHang")?.InnerText;
+                string ten = nBanNode?.SelectSingleNode("Ten").InnerText;
+                if (string.IsNullOrEmpty(ten))
+                {
+                    ten = nBanNode?.SelectSingleNode("HVTNMHang").InnerText;
+                }
+                ten = RemoveSpecialCharacters(ten).Trim();
                 string mst = nBanNode?.SelectSingleNode("MST")?.InnerText;
                 string diachiBan = nBanNode?.SelectSingleNode("DChi")?.InnerText;
                 //Thêm khách hàng
@@ -1866,7 +1895,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
                 else
                 {
-                    if (!existingKhachHang2.ContainsKey(Helpers.ConvertUnicodeToVni(ten)))
+                    if (!existingKhachHang2.ContainsKey(Helpers.ConvertUnicodeToVni(ten.ToLower())))
                     {
                          sohieuKH = RemoveVietnameseDiacritics(ten.Split(' ').LastOrDefault());
                         //Sohieu = CapitalizeFirstLetter(Sohieu);
@@ -1882,7 +1911,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     else
                     {
                         mst = "00";
-                        sohieuKH = existingKhachHang2.Where(m => m.Key == Helpers.ConvertUnicodeToVni(ten)).FirstOrDefault().Value[2].ToString();
+                        sohieuKH = existingKhachHang2.Where(m => m.Key == Helpers.ConvertUnicodeToVni(ten.ToLower())).FirstOrDefault().Value[2].ToString();
                     }
                 }
 
@@ -1896,12 +1925,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     try
                     {
                         string thhdVu = hhdVu.SelectSingleNode("THHDVu")?.InnerText;
+                        thhdVu = RemoveSpecialCharacters(thhdVu);
                         string dvTinh = hhdVu.SelectSingleNode("DVTinh")?.InnerText;
                         string sLuongStr = hhdVu.SelectSingleNode("SLuong")?.InnerText?.Replace('.', ',');
                         string dGiaStr = hhdVu.SelectSingleNode("DGia")?.InnerText?.Replace('.', ',');
-
-                        if (!string.IsNullOrEmpty(dvTinh) && !string.IsNullOrEmpty(thhdVu) && double.TryParse(sLuongStr, out var sLuong) && double.TryParse(dGiaStr, out var dGia))
+                        string chietkhau = hhdVu.SelectSingleNode("STCKhau")?.InnerText?.Replace('.', ',');
+                        string ttien = hhdVu.SelectSingleNode("ThTien")?.InnerText?.Replace('.', ',');
+                        double.TryParse(chietkhau, out var dChietkhau);
+                       
+                        if (!string.IsNullOrEmpty(dvTinh) && !string.IsNullOrEmpty(thhdVu) && double.TryParse(sLuongStr, out var sLuong) && double.TryParse(dGiaStr, out var dGia) && double.TryParse(ttien, out var dttien))
                         {
+                            //if (dChietkhau != 0)
+                            //{
+                            //    dGia -= dChietkhau;
+                            //}
+                            //dGia= Math.Round(dGia, MidpointRounding.ToEven);
                             thhdVu = Regex.Replace(thhdVu, @"\s+", " ");
                             string tenVattuVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(thhdVu.Trim())).ToLower();
                             string dvTinhVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(dvTinh)).ToLower();
@@ -1933,7 +1971,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 soHieuVattu = existingVatTu[$"{tenVattuVni}-{dvTinhVni}"]["SoHieu"]?.ToString();
                             }
 
-                            FileImportDetail fileImportDetail = new FileImportDetail(NormalizeVietnameseString(thhdVu), newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString());
+                            FileImportDetail fileImportDetail = new FileImportDetail(NormalizeVietnameseString(thhdVu), newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString(), dttien);
                             newFileImport.fileImportDetails.Add(fileImportDetail);
                         }
                         else if (thhdVu?.ToLower().Contains("chiết khấu") == true)
@@ -1949,12 +1987,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     newFileImport.TkThue = 1331;
                                     newFileImport.Noidung = "Chiết khấu thương mại";
                                 }
-                                newFileImport.fileImportDetails.Add(new FileImportDetail(thhdVu, newFileImport.ID, soHieuCK, 0, thTien, "Exception", "", "", ""));
+                                newFileImport.fileImportDetails.Add(new FileImportDetail(thhdVu, newFileImport.ID, soHieuCK, 0, thTien, "Exception", "", "", "",0));
                             }
                         }
                         else if (double.TryParse(hhdVu.SelectSingleNode("ThTien")?.InnerText ?? hhdVu.SelectSingleNode("THTien")?.InnerText, out var thTienNN) && thTienNN > 0)
                         {
-                            newFileImport.fileImportDetails.Add(new FileImportDetail(thhdVu, newFileImport.ID, "6422", 0, thTienNN, "Exception", "", "", ""));
+                            newFileImport.fileImportDetails.Add(new FileImportDetail(thhdVu, newFileImport.ID, "6422", 0, thTienNN, "Exception", "", "", "",0));
                         }
                     }
                     catch (Exception ex)
@@ -2047,7 +2085,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 ApplyDefaultAndRuleBasedAccounts(item, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien);
                 if (item.fileImportDetails.Count > 0 && string.IsNullOrEmpty(item.Noidung))
                 {
-                    item.Noidung = Helpers.ConvertVniToUnicode(item.fileImportDetails.FirstOrDefault().Ten);
+                    item.Noidung = item.fileImportDetails.FirstOrDefault().Ten;
                 }
                 foreach (var detail in item.fileImportDetails)
                 {
@@ -2510,7 +2548,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                     }
                     loginButton = Driver.FindElement(By.XPath("//button[contains(span/text(), 'Đăng nhập')]"));
-                    loginButton.Click(); 
+                    loginButton.Click();
                     wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(200));
                     //chờ khi nao dang nhap xong
                     //                var button = wait.Until(d =>
@@ -3892,6 +3930,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         public string hiddenValue { get; set; }
         public string hiddenValue2 { get; set; }
+        public string hiddenValue3 { get; set; }
         private void GridcontrolKeyup(KeyEventArgs e, DevExpress.XtraGrid.Views.Grid.GridView gridView)
         {
            
@@ -4777,8 +4816,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
 
                 string query = @"
-            INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo,TTien)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
                 detail.Ten = Helpers.ConvertUnicodeToVni(detail.Ten);
                 OleDbParameter[] parameters = new OleDbParameter[]
                 {
@@ -4790,7 +4829,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", detail.Ten),
             new OleDbParameter("?", detail.MaCT),
             new OleDbParameter("?", detail.TKNo),
-            new OleDbParameter("?", detail.TKCo)
+            new OleDbParameter("?", detail.TKCo),
+            new OleDbParameter("?", detail.TTien)
                 };
 
                 ExecuteQueryResult(query, parameters);
@@ -5709,12 +5749,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             {
                                 gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
                                 gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
+                                gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
                             }
                           
                         }
                     }
                 }
-                
 
             }
         }
@@ -5823,6 +5863,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             {
                                 gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
                                 gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
+                                gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
                             }
 
                         }
@@ -6043,6 +6084,71 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void gridView4_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
         {
             LoadCustomDrawcell(sender, e);
+        }
+
+        private void btnReadPDF_Click(object sender, EventArgs e)
+        {
+            string filePath = @"C:\Users\Admin\Desktop\file-sample_150kB.pdf"; // Đường dẫn đến file PDF
+
+
+            // Sử dụng lớp PdfReader để đọc file PDF
+            try
+            {
+                // Đảm bảo rằng tệp tồn tại trước khi tiếp tục
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine($"Lỗi: Không tìm thấy tệp PDF tại đường dẫn: {filePath}");
+                    return; // Kết thúc chương trình nếu tệp không tồn tại
+                }
+
+                // Mở tệp PDF để đọc
+                using (PdfReader reader = new PdfReader(filePath))
+                {
+                    // Tạo một PdfDocument từ PdfReader
+                    using (PdfDocument pdfDoc = new PdfDocument(reader))
+                    {
+                        // Sử dụng StringBuilder để lưu trữ текст
+                        StringBuilder text = new StringBuilder();
+                        // Lặp qua từng trang trong PDF
+                        for (int pageNum = 1; pageNum <= pdfDoc.GetNumberOfPages(); pageNum++)
+                        {
+                            // Tạo một chiến lược trích xuất текст đơn giản
+                            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                            // Lấy đối tượng trang PDF
+                                                   PdfPage page = pdfDoc.GetPage(pageNum);
+
+                            if (page != null)
+                            {
+                                // Trích xuất текст từ trang sử dụng PdfTextExtractor
+                                string pageText = PdfTextExtractor.GetTextFromPage(page, strategy);
+                                // Thêm текст của trang vào kết quả
+                                text.Append(pageText);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Trang {pageNum} là null.");
+                            }
+                        }
+                        // In toàn bộ текст từ PDF
+                        Console.WriteLine(text.ToString());
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                // Xử lý исключение nếu có lỗi đọc tệp
+                Console.WriteLine($"Lỗi khi đọc tệp PDF: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý các исключение khác
+                Console.WriteLine($"Một lỗi đã xảy ra: {ex.Message}");
+            }
+            finally
+            {
+                // Mã dọn dẹp (nếu cần)
+                Console.WriteLine("Đã hoàn thành việc đọc PDF.");
+            }
         }
 
         public static string NormalizeVietnameseString(string input)

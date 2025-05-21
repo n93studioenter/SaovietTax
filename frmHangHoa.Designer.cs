@@ -45,6 +45,11 @@
             this.txtSohieu = new DevExpress.XtraEditors.TextEdit();
             this.label1 = new System.Windows.Forms.Label();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.gridControl2 = new DevExpress.XtraGrid.GridControl();
+            this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.colSoLuong = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colDongia = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colThanhTien = new DevExpress.XtraGrid.Columns.GridColumn();
             this.txtMaSo = new DevExpress.XtraEditors.TextEdit();
             this.btnThoat = new DevExpress.XtraEditors.SimpleButton();
             this.btnXoa = new DevExpress.XtraEditors.SimpleButton();
@@ -57,6 +62,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtSohieu.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             this.SuspendLayout();
@@ -117,17 +124,17 @@
             // btnGhi
             // 
             this.btnGhi.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnGhi.ImageOptions.Image")));
-            this.btnGhi.Location = new System.Drawing.Point(171, 227);
+            this.btnGhi.Location = new System.Drawing.Point(171, 215);
             this.btnGhi.Name = "btnGhi";
             this.btnGhi.Size = new System.Drawing.Size(119, 34);
             this.btnGhi.TabIndex = 9;
-            this.btnGhi.Text = "Ghi";
+            this.btnGhi.Text = "&Ghi";
             this.btnGhi.Click += new System.EventHandler(this.btnGhi_Click);
             // 
             // btnThem
             // 
             this.btnThem.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnThem.ImageOptions.Image")));
-            this.btnThem.Location = new System.Drawing.Point(29, 227);
+            this.btnThem.Location = new System.Drawing.Point(29, 215);
             this.btnThem.Name = "btnThem";
             this.btnThem.Size = new System.Drawing.Size(121, 34);
             this.btnThem.TabIndex = 8;
@@ -200,6 +207,7 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.gridControl2);
             this.panelControl1.Controls.Add(this.txtMaSo);
             this.panelControl1.Controls.Add(this.btnThoat);
             this.panelControl1.Controls.Add(this.btnXoa);
@@ -218,17 +226,76 @@
             this.panelControl1.Size = new System.Drawing.Size(597, 572);
             this.panelControl1.TabIndex = 3;
             // 
+            // gridControl2
+            // 
+            this.gridControl2.Location = new System.Drawing.Point(29, 267);
+            this.gridControl2.MainView = this.gridView2;
+            this.gridControl2.Name = "gridControl2";
+            this.gridControl2.Size = new System.Drawing.Size(549, 187);
+            this.gridControl2.TabIndex = 16;
+            this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridView2});
+            // 
+            // gridView2
+            // 
+            this.gridView2.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.colSoLuong,
+            this.colDongia,
+            this.colThanhTien});
+            this.gridView2.GridControl = this.gridControl2;
+            this.gridView2.Name = "gridView2";
+            // 
+            // colSoLuong
+            // 
+            this.colSoLuong.Caption = "Số lượng";
+            this.colSoLuong.DisplayFormat.FormatString = "N2";
+            this.colSoLuong.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colSoLuong.FieldName = "SoLuong";
+            this.colSoLuong.MinWidth = 30;
+            this.colSoLuong.Name = "colSoLuong";
+            this.colSoLuong.OptionsColumn.AllowEdit = false;
+            this.colSoLuong.Visible = true;
+            this.colSoLuong.VisibleIndex = 0;
+            this.colSoLuong.Width = 112;
+            // 
+            // colDongia
+            // 
+            this.colDongia.Caption = "Đơn giá";
+            this.colDongia.DisplayFormat.FormatString = "N2";
+            this.colDongia.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colDongia.FieldName = "DonGia";
+            this.colDongia.MinWidth = 30;
+            this.colDongia.Name = "colDongia";
+            this.colDongia.OptionsColumn.AllowEdit = false;
+            this.colDongia.Visible = true;
+            this.colDongia.VisibleIndex = 1;
+            this.colDongia.Width = 112;
+            // 
+            // colThanhTien
+            // 
+            this.colThanhTien.Caption = "Thành tiền";
+            this.colThanhTien.DisplayFormat.FormatString = "N2";
+            this.colThanhTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colThanhTien.FieldName = "ThanhTien";
+            this.colThanhTien.MinWidth = 30;
+            this.colThanhTien.Name = "colThanhTien";
+            this.colThanhTien.OptionsColumn.AllowEdit = false;
+            this.colThanhTien.Visible = true;
+            this.colThanhTien.VisibleIndex = 2;
+            this.colThanhTien.Width = 112;
+            // 
             // txtMaSo
             // 
-            this.txtMaSo.Location = new System.Drawing.Point(29, 267);
+            this.txtMaSo.Location = new System.Drawing.Point(29, 540);
             this.txtMaSo.Name = "txtMaSo";
             this.txtMaSo.Size = new System.Drawing.Size(549, 27);
             this.txtMaSo.TabIndex = 15;
+            this.txtMaSo.Visible = false;
             // 
             // btnThoat
             // 
             this.btnThoat.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnThoat.ImageOptions.Image")));
-            this.btnThoat.Location = new System.Drawing.Point(447, 227);
+            this.btnThoat.Location = new System.Drawing.Point(447, 215);
             this.btnThoat.Name = "btnThoat";
             this.btnThoat.Size = new System.Drawing.Size(131, 34);
             this.btnThoat.TabIndex = 11;
@@ -238,7 +305,7 @@
             // btnXoa
             // 
             this.btnXoa.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnXoa.ImageOptions.Image")));
-            this.btnXoa.Location = new System.Drawing.Point(305, 227);
+            this.btnXoa.Location = new System.Drawing.Point(305, 215);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(122, 34);
             this.btnXoa.TabIndex = 10;
@@ -277,6 +344,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             this.panelControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             this.ResumeLayout(false);
@@ -305,5 +374,10 @@
         private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
         private DevExpress.XtraGrid.Columns.GridColumn colDonvitinh;
         private DevExpress.XtraEditors.TextEdit txtMaSo;
+        private DevExpress.XtraGrid.GridControl gridControl2;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView2;
+        private DevExpress.XtraGrid.Columns.GridColumn colSoLuong;
+        private DevExpress.XtraGrid.Columns.GridColumn colDongia;
+        private DevExpress.XtraGrid.Columns.GridColumn colThanhTien;
     }
 }

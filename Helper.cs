@@ -177,6 +177,7 @@ namespace SaovietTax
 
         public static string ConvertVniToUnicode(string input)
         {
+            input = NormalizeVietnameseString(input);
             StringBuilder output = new StringBuilder();
             int i = 0;
 

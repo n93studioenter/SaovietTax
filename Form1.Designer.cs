@@ -37,6 +37,7 @@
             this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoluong2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDongia2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colThanhTien = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDVT = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colMaCT2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo2 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -61,6 +62,7 @@
             this.colSoHieu3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoluong3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDongia3 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colThanhtien2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDVT3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKCo3 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -110,7 +112,7 @@
             this.progressBarControl1 = new DevExpress.XtraEditors.ProgressBarControl();
             this.comboBoxEdit2 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
-            this.popupControlContainer1 = new DevExpress.XtraBars.PopupControlContainer(this.components);
+            this.btnReadPDF = new DevExpress.XtraEditors.SimpleButton();
             this.btnimport = new DevExpress.XtraEditors.SimpleButton();
             this.btnMdtk = new DevExpress.XtraEditors.SimpleButton();
             this.btnChonthang = new DevExpress.XtraEditors.SimpleButton();
@@ -149,7 +151,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.popupControlContainer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radialMenu1)).BeginInit();
@@ -162,6 +163,7 @@
             this.colTen2,
             this.colSoluong2,
             this.colDongia2,
+            this.colThanhTien,
             this.colDVT,
             this.colMaCT2,
             this.colTKNo2,
@@ -184,7 +186,7 @@
             this.colSohieu2.MinWidth = 30;
             this.colSohieu2.Name = "colSohieu2";
             this.colSohieu2.Visible = true;
-            this.colSohieu2.VisibleIndex = 1;
+            this.colSohieu2.VisibleIndex = 0;
             this.colSohieu2.Width = 112;
             // 
             // colTen2
@@ -195,7 +197,7 @@
             this.colTen2.Name = "colTen2";
             this.colTen2.OptionsColumn.AllowEdit = false;
             this.colTen2.Visible = true;
-            this.colTen2.VisibleIndex = 0;
+            this.colTen2.VisibleIndex = 1;
             this.colTen2.Width = 112;
             // 
             // colSoluong2
@@ -204,7 +206,6 @@
             this.colSoluong2.FieldName = "Soluong";
             this.colSoluong2.MinWidth = 30;
             this.colSoluong2.Name = "colSoluong2";
-            this.colSoluong2.OptionsColumn.AllowEdit = false;
             this.colSoluong2.Visible = true;
             this.colSoluong2.VisibleIndex = 2;
             this.colSoluong2.Width = 112;
@@ -212,7 +213,7 @@
             // colDongia2
             // 
             this.colDongia2.Caption = "Đơn giá";
-            this.colDongia2.DisplayFormat.FormatString = "N2";
+            this.colDongia2.DisplayFormat.FormatString = "N0";
             this.colDongia2.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colDongia2.FieldName = "Dongia";
             this.colDongia2.MinWidth = 30;
@@ -222,6 +223,18 @@
             this.colDongia2.VisibleIndex = 3;
             this.colDongia2.Width = 112;
             // 
+            // colThanhTien
+            // 
+            this.colThanhTien.Caption = "Thành tiền";
+            this.colThanhTien.DisplayFormat.FormatString = "N0";
+            this.colThanhTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colThanhTien.FieldName = "TTien";
+            this.colThanhTien.MinWidth = 30;
+            this.colThanhTien.Name = "colThanhTien";
+            this.colThanhTien.Visible = true;
+            this.colThanhTien.VisibleIndex = 4;
+            this.colThanhTien.Width = 112;
+            // 
             // colDVT
             // 
             this.colDVT.Caption = "Đơn vị tính";
@@ -230,7 +243,7 @@
             this.colDVT.Name = "colDVT";
             this.colDVT.OptionsColumn.AllowEdit = false;
             this.colDVT.Visible = true;
-            this.colDVT.VisibleIndex = 4;
+            this.colDVT.VisibleIndex = 5;
             this.colDVT.Width = 112;
             // 
             // colMaCT2
@@ -248,7 +261,7 @@
             this.colTKNo2.MinWidth = 30;
             this.colTKNo2.Name = "colTKNo2";
             this.colTKNo2.Visible = true;
-            this.colTKNo2.VisibleIndex = 5;
+            this.colTKNo2.VisibleIndex = 6;
             this.colTKNo2.Width = 112;
             // 
             // coltkco2
@@ -258,7 +271,7 @@
             this.coltkco2.MinWidth = 30;
             this.coltkco2.Name = "coltkco2";
             this.coltkco2.Visible = true;
-            this.coltkco2.VisibleIndex = 6;
+            this.coltkco2.VisibleIndex = 7;
             this.coltkco2.Width = 112;
             // 
             // gridControl1
@@ -274,7 +287,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1330, 225);
+            this.gridControl1.Size = new System.Drawing.Size(1632, 195);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -370,7 +383,7 @@
             // 
             // colTongTien
             // 
-            this.colTongTien.DisplayFormat.FormatString = "N2";
+            this.colTongTien.DisplayFormat.FormatString = "N0";
             this.colTongTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colTongTien.FieldName = "TgTCThue";
             this.colTongTien.MinWidth = 30;
@@ -467,6 +480,7 @@
             this.colSoHieu3,
             this.colSoluong3,
             this.colDongia3,
+            this.colThanhtien2,
             this.colDVT3,
             this.colTKNo3,
             this.colTKCo3});
@@ -505,7 +519,6 @@
             this.colSoluong3.FieldName = "Soluong";
             this.colSoluong3.MinWidth = 30;
             this.colSoluong3.Name = "colSoluong3";
-            this.colSoluong3.OptionsColumn.AllowEdit = false;
             this.colSoluong3.Visible = true;
             this.colSoluong3.VisibleIndex = 2;
             this.colSoluong3.Width = 112;
@@ -513,7 +526,7 @@
             // colDongia3
             // 
             this.colDongia3.Caption = "Đơn giá";
-            this.colDongia3.DisplayFormat.FormatString = "N2";
+            this.colDongia3.DisplayFormat.FormatString = "N0";
             this.colDongia3.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colDongia3.FieldName = "Dongia";
             this.colDongia3.MinWidth = 30;
@@ -523,6 +536,18 @@
             this.colDongia3.VisibleIndex = 3;
             this.colDongia3.Width = 112;
             // 
+            // colThanhtien2
+            // 
+            this.colThanhtien2.Caption = "Thành tiền";
+            this.colThanhtien2.DisplayFormat.FormatString = "N0";
+            this.colThanhtien2.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colThanhtien2.FieldName = "TTien";
+            this.colThanhtien2.MinWidth = 30;
+            this.colThanhtien2.Name = "colThanhtien2";
+            this.colThanhtien2.Visible = true;
+            this.colThanhtien2.VisibleIndex = 4;
+            this.colThanhtien2.Width = 112;
+            // 
             // colDVT3
             // 
             this.colDVT3.Caption = "Đơn vị tính";
@@ -531,7 +556,7 @@
             this.colDVT3.Name = "colDVT3";
             this.colDVT3.OptionsColumn.AllowEdit = false;
             this.colDVT3.Visible = true;
-            this.colDVT3.VisibleIndex = 4;
+            this.colDVT3.VisibleIndex = 5;
             this.colDVT3.Width = 112;
             // 
             // colTKNo3
@@ -541,7 +566,7 @@
             this.colTKNo3.MinWidth = 30;
             this.colTKNo3.Name = "colTKNo3";
             this.colTKNo3.Visible = true;
-            this.colTKNo3.VisibleIndex = 5;
+            this.colTKNo3.VisibleIndex = 6;
             this.colTKNo3.Width = 112;
             // 
             // colTKCo3
@@ -551,7 +576,7 @@
             this.colTKCo3.MinWidth = 30;
             this.colTKCo3.Name = "colTKCo3";
             this.colTKCo3.Visible = true;
-            this.colTKCo3.VisibleIndex = 6;
+            this.colTKCo3.VisibleIndex = 7;
             this.colTKCo3.Width = 112;
             // 
             // gridControl2
@@ -567,7 +592,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1330, 225);
+            this.gridControl2.Size = new System.Drawing.Size(1632, 195);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -744,7 +769,7 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1363, 608);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1665, 578);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1});
@@ -763,7 +788,7 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1356, 573);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1658, 543);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
@@ -786,7 +811,7 @@
             this.panelControl2.Controls.Add(this.progressPanel1);
             this.panelControl2.Location = new System.Drawing.Point(11, 192);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1345, 57);
+            this.panelControl2.Size = new System.Drawing.Size(1647, 57);
             this.panelControl2.TabIndex = 2;
             // 
             // progressPanel1
@@ -800,7 +825,7 @@
             this.progressPanel1.LineAnimationElementType = DevExpress.Utils.Animation.LineAnimationElementType.Rectangle;
             this.progressPanel1.Location = new System.Drawing.Point(5, 5);
             this.progressPanel1.Name = "progressPanel1";
-            this.progressPanel1.Size = new System.Drawing.Size(1335, 50);
+            this.progressPanel1.Size = new System.Drawing.Size(1637, 50);
             this.progressPanel1.TabIndex = 6;
             this.progressPanel1.Text = "progressPanel1";
             this.progressPanel1.Visible = false;
@@ -809,7 +834,7 @@
             // 
             this.lblThongbao.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblThongbao.AutoSize = true;
-            this.lblThongbao.Location = new System.Drawing.Point(1122, 540);
+            this.lblThongbao.Location = new System.Drawing.Point(1424, 510);
             this.lblThongbao.Name = "lblThongbao";
             this.lblThongbao.Size = new System.Drawing.Size(51, 19);
             this.lblThongbao.TabIndex = 11;
@@ -821,7 +846,7 @@
             this.panelControl4.Controls.Add(this.btnRefresh);
             this.panelControl4.Controls.Add(this.simpleButton1);
             this.panelControl4.Controls.Add(this.btnOpenFolder);
-            this.panelControl4.Location = new System.Drawing.Point(1289, 3);
+            this.panelControl4.Location = new System.Drawing.Point(1591, 3);
             this.panelControl4.Name = "panelControl4";
             this.panelControl4.Size = new System.Drawing.Size(65, 185);
             this.panelControl4.TabIndex = 10;
@@ -863,7 +888,7 @@
             this.xtraTabControl2.Location = new System.Drawing.Point(11, 253);
             this.xtraTabControl2.Name = "xtraTabControl2";
             this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1337, 260);
+            this.xtraTabControl2.Size = new System.Drawing.Size(1639, 230);
             this.xtraTabControl2.TabIndex = 8;
             this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage3,
@@ -877,7 +902,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1330, 225);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1632, 195);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -907,7 +932,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1330, 225);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1632, 195);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -935,7 +960,7 @@
             this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Purple;
             this.lblDpPath.Appearance.Options.UseFont = true;
             this.lblDpPath.Appearance.Options.UseForeColor = true;
-            this.lblDpPath.Location = new System.Drawing.Point(11, 540);
+            this.lblDpPath.Location = new System.Drawing.Point(11, 510);
             this.lblDpPath.Name = "lblDpPath";
             this.lblDpPath.Size = new System.Drawing.Size(170, 19);
             this.lblDpPath.TabIndex = 7;
@@ -1072,7 +1097,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarControl1.Location = new System.Drawing.Point(13, 194);
             this.progressBarControl1.Name = "progressBarControl1";
-            this.progressBarControl1.Size = new System.Drawing.Size(1337, 36);
+            this.progressBarControl1.Size = new System.Drawing.Size(1639, 36);
             this.progressBarControl1.TabIndex = 3;
             this.progressBarControl1.Visible = false;
             // 
@@ -1084,30 +1109,31 @@
             this.comboBoxEdit2.Name = "comboBoxEdit2";
             this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit2.Size = new System.Drawing.Size(135, 27);
+            this.comboBoxEdit2.Size = new System.Drawing.Size(437, 27);
             this.comboBoxEdit2.TabIndex = 6;
             this.comboBoxEdit2.Visible = false;
             // 
             // panelControl1
             // 
-            this.panelControl1.Controls.Add(this.popupControlContainer1);
+            this.panelControl1.Controls.Add(this.btnReadPDF);
             this.panelControl1.Controls.Add(this.btnimport);
             this.panelControl1.Controls.Add(this.btnMdtk);
             this.panelControl1.Controls.Add(this.btnChonthang);
             this.panelControl1.Controls.Add(this.btnTaicoquanthue);
             this.panelControl1.Location = new System.Drawing.Point(850, 3);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(361, 185);
+            this.panelControl1.Size = new System.Drawing.Size(654, 185);
             this.panelControl1.TabIndex = 1;
             // 
-            // popupControlContainer1
+            // btnReadPDF
             // 
-            this.popupControlContainer1.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
-            this.popupControlContainer1.Location = new System.Drawing.Point(191, 49);
-            this.popupControlContainer1.Name = "popupControlContainer1";
-            this.popupControlContainer1.Size = new System.Drawing.Size(359, 106);
-            this.popupControlContainer1.TabIndex = 8;
-            this.popupControlContainer1.Visible = false;
+            this.btnReadPDF.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnReadPDF.ImageOptions.Image")));
+            this.btnReadPDF.Location = new System.Drawing.Point(373, 11);
+            this.btnReadPDF.Name = "btnReadPDF";
+            this.btnReadPDF.Size = new System.Drawing.Size(276, 34);
+            this.btnReadPDF.TabIndex = 10;
+            this.btnReadPDF.Text = "Đọc file PDF";
+            this.btnReadPDF.Click += new System.EventHandler(this.btnReadPDF_Click);
             // 
             // btnimport
             // 
@@ -1157,7 +1183,7 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(143, 27);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(445, 27);
             this.comboBoxEdit1.TabIndex = 1;
             this.comboBoxEdit1.Visible = false;
             // 
@@ -1173,7 +1199,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1363, 608);
+            this.ClientSize = new System.Drawing.Size(1665, 578);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
@@ -1217,7 +1243,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit2.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.popupControlContainer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.radialMenu1)).EndInit();
@@ -1310,9 +1335,11 @@
         private DevExpress.XtraGrid.Columns.GridColumn colDVT3;
         private DevExpress.XtraGrid.Columns.GridColumn colTKNo3;
         private DevExpress.XtraGrid.Columns.GridColumn colTKCo3;
-        private DevExpress.XtraBars.PopupControlContainer popupControlContainer1;
         private DevExpress.Utils.ToolTipController toolTipController1;
         private DevExpress.XtraGrid.Columns.GridColumn colisHaschild;
         private DevExpress.XtraGrid.Columns.GridColumn colisHaschild2;
+        private DevExpress.XtraEditors.SimpleButton btnReadPDF;
+        private DevExpress.XtraGrid.Columns.GridColumn colThanhTien;
+        private DevExpress.XtraGrid.Columns.GridColumn colThanhtien2;
     }
 }
