@@ -2724,7 +2724,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                     catch(Exception ex)
                     {
-
+                        MessageBox.Show(ex.Message);
                     }
                     loginButton = Driver.FindElement(By.XPath("//button[contains(span/text(), 'Đăng nhập')]"));
                     loginButton.Click();
@@ -4712,7 +4712,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
                 progressPanel1.Visible = true;
                 Application.DoEvents();
-                ImportHD(people,"HDVao");
+                try
+                {
+                    ImportHD(people, "HDVao");
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+              
             }
             if (chkDaura.Checked)
             {
@@ -5935,6 +5943,28 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
 
             }
+
+            if (e.KeyCode == System.Windows.Forms.Keys.Delete)
+            {
+                // Lấy hàng hiện tại
+                int rowHandle = gridView1.FocusedRowHandle;
+               
+                GridView parentView = gridControl1.MainView as GridView;
+                GridView childView = parentView.GetDetailView(rowHandle, 0) as GridView;
+                var ID = (int)parentView.GetRowCellValue(rowHandle, "ID");
+                if (childView != null)
+                {
+                    // Lấy chỉ số dòng đang được chọn trong GridView con
+                    int focusedChildRowHandle = childView.FocusedRowHandle;
+                    var parentId = childView.GetRowCellValue(focusedChildRowHandle, "ParentId");
+                    string sohieu = (string)childView.GetRowCellValue(focusedChildRowHandle, "SoHieu");
+                    FileImportDetail itemToRemove = (FileImportDetail)childView.GetRow(rowHandle);
+                    var pp = people.Where(m => m.ID == ID).FirstOrDefault();
+                    pp.fileImportDetails.Remove(itemToRemove);
+                }
+                gridControl1.DataSource = people;
+                gridControl1.RefreshDataSource();
+            }
         }
 
         private void gridView3_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
@@ -6231,6 +6261,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             if (e.Column.FieldName == "SoHieu")
             {
+                if (e.CellValue == null)
+                    return;
                 var getvalue = e.CellValue.ToString();
                 // 1. Vẽ nền mặc định (giữ nguyên background)
                 //e.DefaultDraw();
