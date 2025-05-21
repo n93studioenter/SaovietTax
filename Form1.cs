@@ -60,6 +60,8 @@ using DevExpress.Utils.VisualEffects;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using GridView = DevExpress.XtraGrid.Views.Grid.GridView;
+using static iText.IO.Image.Jpeg2000ImageData;
 
 namespace SaovietTax
 {
@@ -204,7 +206,7 @@ namespace SaovietTax
                 gridView.OptionsView.EnableAppearanceOddRow = true;
 
                 // Thiết lập màu sắc cho hàng chẵn
-                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.LightCyan; // Màu nền cho hàng chẵn
+                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.LightYellow; // Màu nền cho hàng chẵn
                 gridView.Appearance.EvenRow.ForeColor = System.Drawing.Color.Black; // Màu chữ cho hàng chẵn
 
                 // Thiết lập màu sắc cho hàng lẻ
@@ -1720,6 +1722,142 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
 
         public int currentselectId = 0;
+        protected override bool ProcessCmdKey(ref Message msg, System.Windows.Forms.Keys keyData)
+        {
+            // Kiểm tra phím tắt (ví dụ: Ctrl + N)
+            if (keyData == (System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N))
+            {
+                AddNewChildRow();
+                return true; // Đã xử lý phím
+            }
+            if (keyData == (System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D))
+            {
+                GridView parentView = gridControl1.MainView as GridView;
+
+                // Lấy chỉ số dòng đang được chọn trong GridView cha
+                int focusedRowHandle = parentView.FocusedRowHandle;
+
+                 string noidung=  parentView.GetRowCellValue(focusedRowHandle, "Noidung").ToString();
+                string tenkh= Helpers.ConvertUnicodeToVni(parentView.GetRowCellValue(focusedRowHandle, "Ten").ToString());
+                string query = @"select * FROM KhachHang 
+                                    WHERE LCase(Ten) LIKE ? ";
+                var parameterss = new OleDbParameter[]
+                {
+                new OleDbParameter("?",tenkh.ToLower())
+                   };
+                var kq = ExecuteQuery(query, parameterss);
+                if (kq.Rows.Count > 0)
+                {
+                    if (xtraTabControl2.SelectedTabPageIndex == 0)
+                    {
+                        foreach (var item in people)
+                        {
+                            if (Helpers.ConvertUnicodeToVni(item.Ten.ToLower()) == tenkh.ToLower())
+                            {
+                                item.Noidung = noidung;
+                            }
+                        }
+                        gridControl1.DataSource = people;
+                        gridControl1.RefreshDataSource();
+                    }
+                    //Mật định tài khoản
+                    string getMST = kq.Rows[0]["MST"].ToString();
+                      query = @"select * FROM tbDinhdanhtaikhoan 
+                                    WHERE KeyValue LIKE ? ";
+                     parameterss = new OleDbParameter[]
+               {
+                new OleDbParameter("?","MST="+getMST)
+                  };
+                    kq = ExecuteQuery(query, parameterss);
+                    if (kq.Rows.Count == 0)
+                    {
+                        query = @"INSERT INTO tbDinhdanhtaikhoan (Type,KeyValue,TKNo,TKCo, TKThue) VALUES (?, ?, ?, ?, ?)";
+                       var parameters = new OleDbParameter[]
+                        {
+            new OleDbParameter("?", noidung),
+             new OleDbParameter("?","MST="+getMST),
+              new OleDbParameter("?", 6422),
+               new OleDbParameter("?", 1111),
+                 new OleDbParameter("?", 1331),
+                        };
+                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                    }
+                    else
+                    {
+                        query = @"UPDATE tbDinhdanhtaikhoan SET Type=?  WHERE ID=?";
+                        var parameters = new OleDbParameter[]
+                         {
+            new OleDbParameter("?", noidung),
+             new OleDbParameter("?",kq.Rows[0]["ID"].ToString()), 
+                         };
+                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                    }
+                }
+
+                return true; // Đã xử lý phím
+            }
+            return base.ProcessCmdKey(ref msg, keyData); // Chuyển tiếp cho xử lý tiếp
+        }
+        private void AddNewChildRow()
+        {
+            if (xtraTabControl2.SelectedTabPageIndex == 0)
+            {
+                GridView parentView = gridControl1.MainView as GridView;
+
+                // Lấy chỉ số dòng đang được chọn trong GridView cha
+                int focusedRowHandle = parentView.FocusedRowHandle;
+
+                // Lấy GridView con
+                GridView childView = parentView.GetDetailView(focusedRowHandle, 0) as GridView;
+                if (childView != null)
+                {
+                    // Lấy chỉ số dòng đang được chọn trong GridView con
+                    int focusedChildRowHandle = childView.FocusedRowHandle;
+                    var parentId = childView.GetRowCellValue(focusedChildRowHandle, "ParentId");
+                    string sohieu = childView.GetRowCellValue(focusedChildRowHandle, "SoHieu").ToString();
+                    var getparent = people.Where(m => m.ID == (int)parentId).FirstOrDefault();
+                    if (getparent != null)
+                    {
+                        var getcurrent = getparent.fileImportDetails.Where(m => m.SoHieu == sohieu).FirstOrDefault();
+                        if (getcurrent != null)
+                        {
+                            getparent.fileImportDetails.Add(new FileImportDetail(getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
+                            gridControl1.DataSource = people;
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                GridView parentView = gridControl2.MainView as GridView;
+
+                // Lấy chỉ số dòng đang được chọn trong GridView cha
+                int focusedRowHandle = parentView.FocusedRowHandle;
+
+                // Lấy GridView con
+                GridView childView = parentView.GetDetailView(focusedRowHandle, 0) as GridView;
+                if (childView != null)
+                {
+                    // Lấy chỉ số dòng đang được chọn trong GridView con
+                    int focusedChildRowHandle = childView.FocusedRowHandle;
+                    var parentId = childView.GetRowCellValue(focusedChildRowHandle, "ParentId");
+                    string sohieu = childView.GetRowCellValue(focusedChildRowHandle, "SoHieu").ToString();
+                    var getparent = people2.Where(m => m.ID == (int)parentId).FirstOrDefault();
+                    if (getparent != null)
+                    {
+                        var getcurrent = getparent.fileImportDetails.Where(m => m.SoHieu == sohieu).FirstOrDefault();
+                        if (getcurrent != null)
+                        {
+                            getparent.fileImportDetails.Add(new FileImportDetail(getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
+                            gridControl2.DataSource = people2;
+                        }
+
+                    }
+                }
+            }
+           
+        }
         private void LoadXmlFilesOptimized(string path, int type)
         {
             progressPanel1.Visible = true;
@@ -1745,7 +1883,36 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             var xmlFiles = allFiles.Where(f => f.ToLower().EndsWith(".xml")).ToList();
             var excelFiles = allFiles.Where(f => f.ToLower().EndsWith(".xlsx")).ToList();
+            List<string> lstdelete = new List<string>();
+            foreach (var item in xmlFiles)
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                string fullPath = item;
+                using (StreamReader reader = new StreamReader(fullPath, Encoding.UTF8))
+                {
+                    try
+                    {
+                        xmlDoc.Load(reader); // Tải file XML
+                    }
+                    catch (XmlException ex)
+                    {
+                        Console.WriteLine($"Lỗi khi tải file XML: {ex.Message}");
+                        return;
+                    }
+                    XmlNode root = xmlDoc.DocumentElement;
+                    XmlNode nTTChungNode = root.SelectSingleNode("//TTChung");
+                    DateTime NLap = DateTime.Parse(nTTChungNode.SelectSingleNode("NLap")?.InnerText);
+                    if (NLap >= dtTungay.DateTime && NLap <= dtDenngay.DateTime)
+                        continue;
+                    else
+                        lstdelete.Add(item);
 
+                }
+            }
+            foreach (var item in lstdelete)
+            {
+                xmlFiles.Remove(item);
+            }
             int totalCount = xmlFiles.Count + CountExcelRows(excelFiles, startDate, endDate);
             lblSofiles.Text = totalCount.ToString();
             Application.DoEvents();
@@ -1814,7 +1981,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 {
                     ten = nBanNode?.SelectSingleNode("HVTNMHang").InnerText;
                 }
-                ten = RemoveSpecialCharacters(ten).Trim();
+                //ten = RemoveSpecialCharacters(ten).Trim();
                 string mst = nBanNode?.SelectSingleNode("MST")?.InnerText;
                 string diachiBan = nBanNode?.SelectSingleNode("DChi")?.InnerText;
                 //Thêm khách hàng
@@ -1925,7 +2092,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     try
                     {
                         string thhdVu = hhdVu.SelectSingleNode("THHDVu")?.InnerText;
-                        thhdVu = RemoveSpecialCharacters(thhdVu);
+                        //thhdVu = RemoveSpecialCharacters(thhdVu);
                         string dvTinh = hhdVu.SelectSingleNode("DVTinh")?.InnerText;
                         string sLuongStr = hhdVu.SelectSingleNode("SLuong")?.InnerText?.Replace('.', ',');
                         string dGiaStr = hhdVu.SelectSingleNode("DGia")?.InnerText?.Replace('.', ',');
@@ -2350,8 +2517,20 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             string invoiceNumber = worksheet.Cell(row, 4).Value.ToString().Trim();
             string invoiceSeries = worksheet.Cell(row, 3).Value.ToString();
             DateTime invoiceDate = DateTime.Parse(worksheet.Cell(row, 5).Value.ToString().Trim());
-            string customerName = worksheet.Cell(row, 7).Value.ToString();
             string taxCode = worksheet.Cell(row, 6).Value.ToString().Trim();
+
+            string query = @"select * FROM KhachHang 
+                                    WHERE MST LIKE ? ";
+            var parameterss = new OleDbParameter[]
+            {
+                new OleDbParameter("?",taxCode)
+               };
+            var kq = ExecuteQuery(query, parameterss);
+            string customerName ="";
+            if (kq.Rows.Count > 0)
+                customerName = Helpers.ConvertVniToUnicode(kq.Rows[0]["Ten"].ToString());
+            else
+                customerName = worksheet.Cell(row, 7).Value.ToString();
             string address = worksheet.Cell(row, 8).Value.ToString();
             string status = worksheet.Cell(row, 16).Value.ToString();
 
@@ -2538,10 +2717,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         string src = imgElement[1].GetAttribute("src");
 
                         Testimg2(src);
-                        Thread.Sleep(500);
+                        Thread.Sleep(200);
                         string recap = Readcapcha();
                         cvalue[1].SendKeys(recap);
-                        Thread.Sleep(500);
+                        Thread.Sleep(200);
                     }
                     catch(Exception ex)
                     {
@@ -2855,7 +3034,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             //    return;
 
             //}
-            Thread.Sleep(1000);
+            Thread.Sleep(200);
             if (Driver == null)
             {
                 MessageBox.Show("Vui lòng mở trình duyệt trước!");
@@ -2877,9 +3056,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 tab.Click();
                  
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-                Thread.Sleep(1000);
+                Thread.Sleep(200);
                 Xulychonngay(wait,1, fromdate, todate);
-                Thread.Sleep(1000);
+                Thread.Sleep(200);
                 new Actions(Driver)
 .SendKeys(Keys.Enter) // Tab lần 2
 .Perform();
@@ -2939,7 +3118,6 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 // Cách 1: Target vào thẻ <i> có aria-label
                 //   d.FindElement(By.CssSelector("button.ant-btn-icon-only i[aria-label='icon: user']")
-                Thread.Sleep(1000);
                 bool isPhantrang = false;
                 
                 try
@@ -2967,7 +3145,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         {
                             try
                             {
-                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
+                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(1));
                                 // Tìm dòng hiện tại
                                 var row = wait.Until(d =>
                                 {
@@ -3457,7 +3635,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 try
                 {
-                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(1));
                     // Tìm dòng hiện tại
                     var row = wait.Until(d =>
                     {
@@ -3649,7 +3827,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             button.Click();
             // 
             waitLoading(wait);
-            Thread.Sleep(2000);
+            //Thread.Sleep(2000);
             button = wait.Until(d =>
                 d.FindElement(By.XPath("(//button[contains(@class, 'ant-btn-icon-only')])[18]")));
              

@@ -33,8 +33,8 @@
             DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.colSohieu2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colSohieu2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoluong2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDongia2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colThanhTien = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -159,8 +159,8 @@
             // gridView2
             // 
             this.gridView2.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.colSohieu2,
             this.colTen2,
+            this.colSohieu2,
             this.colSoluong2,
             this.colDongia2,
             this.colThanhTien,
@@ -179,6 +179,16 @@
             this.gridView2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyDown);
             this.gridView2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyUp);
             // 
+            // colTen2
+            // 
+            this.colTen2.Caption = "Tên";
+            this.colTen2.FieldName = "Ten";
+            this.colTen2.MinWidth = 30;
+            this.colTen2.Name = "colTen2";
+            this.colTen2.Visible = true;
+            this.colTen2.VisibleIndex = 0;
+            this.colTen2.Width = 287;
+            // 
             // colSohieu2
             // 
             this.colSohieu2.Caption = "Số hiệu";
@@ -186,19 +196,8 @@
             this.colSohieu2.MinWidth = 30;
             this.colSohieu2.Name = "colSohieu2";
             this.colSohieu2.Visible = true;
-            this.colSohieu2.VisibleIndex = 0;
-            this.colSohieu2.Width = 112;
-            // 
-            // colTen2
-            // 
-            this.colTen2.Caption = "Tên";
-            this.colTen2.FieldName = "Ten";
-            this.colTen2.MinWidth = 30;
-            this.colTen2.Name = "colTen2";
-            this.colTen2.OptionsColumn.AllowEdit = false;
-            this.colTen2.Visible = true;
-            this.colTen2.VisibleIndex = 1;
-            this.colTen2.Width = 112;
+            this.colSohieu2.VisibleIndex = 1;
+            this.colSohieu2.Width = 122;
             // 
             // colSoluong2
             // 
@@ -208,7 +207,7 @@
             this.colSoluong2.Name = "colSoluong2";
             this.colSoluong2.Visible = true;
             this.colSoluong2.VisibleIndex = 2;
-            this.colSoluong2.Width = 112;
+            this.colSoluong2.Width = 158;
             // 
             // colDongia2
             // 
@@ -218,10 +217,9 @@
             this.colDongia2.FieldName = "Dongia";
             this.colDongia2.MinWidth = 30;
             this.colDongia2.Name = "colDongia2";
-            this.colDongia2.OptionsColumn.AllowEdit = false;
             this.colDongia2.Visible = true;
             this.colDongia2.VisibleIndex = 3;
-            this.colDongia2.Width = 112;
+            this.colDongia2.Width = 203;
             // 
             // colThanhTien
             // 
@@ -233,7 +231,7 @@
             this.colThanhTien.Name = "colThanhTien";
             this.colThanhTien.Visible = true;
             this.colThanhTien.VisibleIndex = 4;
-            this.colThanhTien.Width = 112;
+            this.colThanhTien.Width = 203;
             // 
             // colDVT
             // 
@@ -241,10 +239,9 @@
             this.colDVT.FieldName = "DVT";
             this.colDVT.MinWidth = 30;
             this.colDVT.Name = "colDVT";
-            this.colDVT.OptionsColumn.AllowEdit = false;
             this.colDVT.Visible = true;
             this.colDVT.VisibleIndex = 5;
-            this.colDVT.Width = 112;
+            this.colDVT.Width = 203;
             // 
             // colMaCT2
             // 
@@ -256,23 +253,23 @@
             // 
             // colTKNo2
             // 
-            this.colTKNo2.Caption = "TKNo";
+            this.colTKNo2.Caption = "Tài khoản nợ";
             this.colTKNo2.FieldName = "TKNo";
             this.colTKNo2.MinWidth = 30;
             this.colTKNo2.Name = "colTKNo2";
             this.colTKNo2.Visible = true;
             this.colTKNo2.VisibleIndex = 6;
-            this.colTKNo2.Width = 112;
+            this.colTKNo2.Width = 203;
             // 
             // coltkco2
             // 
-            this.coltkco2.Caption = "TKCo";
+            this.coltkco2.Caption = "Tài khoản có";
             this.coltkco2.FieldName = "TKCo";
             this.coltkco2.MinWidth = 30;
             this.coltkco2.Name = "coltkco2";
             this.coltkco2.Visible = true;
             this.coltkco2.VisibleIndex = 7;
-            this.coltkco2.Width = 112;
+            this.coltkco2.Width = 226;
             // 
             // gridControl1
             // 
@@ -283,11 +280,11 @@
             this.gridControl1.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
             gridLevelNode1});
             this.gridControl1.Location = new System.Drawing.Point(0, 0);
-            this.gridControl1.LookAndFeel.SkinName = "Office 2016 Colorful";
+            this.gridControl1.LookAndFeel.SkinName = "Office 2019 Colorful";
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1632, 195);
+            this.gridControl1.Size = new System.Drawing.Size(1637, 199);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -363,6 +360,7 @@
             // 
             // colNLap
             // 
+            this.colNLap.Caption = "Ngày lập";
             this.colNLap.FieldName = "NLap";
             this.colNLap.MinWidth = 30;
             this.colNLap.Name = "colNLap";
@@ -373,16 +371,17 @@
             // 
             // colTen
             // 
+            this.colTen.Caption = "Tên";
             this.colTen.FieldName = "Ten";
             this.colTen.MinWidth = 30;
             this.colTen.Name = "colTen";
-            this.colTen.OptionsColumn.AllowEdit = false;
             this.colTen.Visible = true;
             this.colTen.VisibleIndex = 3;
             this.colTen.Width = 369;
             // 
             // colTongTien
             // 
+            this.colTongTien.Caption = "Thành tiền";
             this.colTongTien.DisplayFormat.FormatString = "N0";
             this.colTongTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colTongTien.FieldName = "TgTCThue";
@@ -429,6 +428,7 @@
             // 
             // colNoidung
             // 
+            this.colNoidung.Caption = "Nội dung";
             this.colNoidung.FieldName = "Noidung";
             this.colNoidung.MinWidth = 30;
             this.colNoidung.Name = "colNoidung";
@@ -440,6 +440,7 @@
             // 
             this.colChecked.AppearanceCell.Font = new System.Drawing.Font("Tahoma", 12F);
             this.colChecked.AppearanceCell.Options.UseFont = true;
+            this.colChecked.Caption = "Chọn";
             this.colChecked.FieldName = "Checked";
             this.colChecked.MinWidth = 50;
             this.colChecked.Name = "colChecked";
@@ -469,8 +470,6 @@
             this.colisHaschild.FieldName = "isHaschild";
             this.colisHaschild.MinWidth = 30;
             this.colisHaschild.Name = "colisHaschild";
-            this.colisHaschild.Visible = true;
-            this.colisHaschild.VisibleIndex = 9;
             this.colisHaschild.Width = 112;
             // 
             // gridView4
@@ -501,7 +500,7 @@
             this.colTen3.OptionsColumn.AllowEdit = false;
             this.colTen3.Visible = true;
             this.colTen3.VisibleIndex = 0;
-            this.colTen3.Width = 112;
+            this.colTen3.Width = 311;
             // 
             // colSoHieu3
             // 
@@ -511,7 +510,7 @@
             this.colSoHieu3.Name = "colSoHieu3";
             this.colSoHieu3.Visible = true;
             this.colSoHieu3.VisibleIndex = 1;
-            this.colSoHieu3.Width = 112;
+            this.colSoHieu3.Width = 121;
             // 
             // colSoluong3
             // 
@@ -521,7 +520,7 @@
             this.colSoluong3.Name = "colSoluong3";
             this.colSoluong3.Visible = true;
             this.colSoluong3.VisibleIndex = 2;
-            this.colSoluong3.Width = 112;
+            this.colSoluong3.Width = 194;
             // 
             // colDongia3
             // 
@@ -531,10 +530,9 @@
             this.colDongia3.FieldName = "Dongia";
             this.colDongia3.MinWidth = 30;
             this.colDongia3.Name = "colDongia3";
-            this.colDongia3.OptionsColumn.AllowEdit = false;
             this.colDongia3.Visible = true;
             this.colDongia3.VisibleIndex = 3;
-            this.colDongia3.Width = 112;
+            this.colDongia3.Width = 194;
             // 
             // colThanhtien2
             // 
@@ -546,7 +544,7 @@
             this.colThanhtien2.Name = "colThanhtien2";
             this.colThanhtien2.Visible = true;
             this.colThanhtien2.VisibleIndex = 4;
-            this.colThanhtien2.Width = 112;
+            this.colThanhtien2.Width = 194;
             // 
             // colDVT3
             // 
@@ -554,10 +552,9 @@
             this.colDVT3.FieldName = "DVT";
             this.colDVT3.MinWidth = 30;
             this.colDVT3.Name = "colDVT3";
-            this.colDVT3.OptionsColumn.AllowEdit = false;
             this.colDVT3.Visible = true;
             this.colDVT3.VisibleIndex = 5;
-            this.colDVT3.Width = 112;
+            this.colDVT3.Width = 194;
             // 
             // colTKNo3
             // 
@@ -567,7 +564,7 @@
             this.colTKNo3.Name = "colTKNo3";
             this.colTKNo3.Visible = true;
             this.colTKNo3.VisibleIndex = 6;
-            this.colTKNo3.Width = 112;
+            this.colTKNo3.Width = 194;
             // 
             // colTKCo3
             // 
@@ -577,7 +574,7 @@
             this.colTKCo3.Name = "colTKCo3";
             this.colTKCo3.Visible = true;
             this.colTKCo3.VisibleIndex = 7;
-            this.colTKCo3.Width = 112;
+            this.colTKCo3.Width = 203;
             // 
             // gridControl2
             // 
@@ -592,7 +589,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1632, 195);
+            this.gridControl2.Size = new System.Drawing.Size(1637, 199);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -644,6 +641,7 @@
             // 
             // gridColumn3
             // 
+            this.gridColumn3.Caption = "Ngày lập";
             this.gridColumn3.FieldName = "NLap";
             this.gridColumn3.MinWidth = 30;
             this.gridColumn3.Name = "gridColumn3";
@@ -654,6 +652,7 @@
             // 
             // gridColumn4
             // 
+            this.gridColumn4.Caption = "Tên";
             this.gridColumn4.FieldName = "Ten";
             this.gridColumn4.MinWidth = 30;
             this.gridColumn4.Name = "gridColumn4";
@@ -664,6 +663,7 @@
             // 
             // gridColumn5
             // 
+            this.gridColumn5.Caption = "Nội dung";
             this.gridColumn5.FieldName = "Noidung";
             this.gridColumn5.MinWidth = 30;
             this.gridColumn5.Name = "gridColumn5";
@@ -707,7 +707,8 @@
             // 
             // gridColumn8
             // 
-            this.gridColumn8.DisplayFormat.FormatString = "N2";
+            this.gridColumn8.Caption = "Thành tiền";
+            this.gridColumn8.DisplayFormat.FormatString = "N0";
             this.gridColumn8.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.gridColumn8.FieldName = "TgTCThue";
             this.gridColumn8.MinWidth = 30;
@@ -719,6 +720,7 @@
             // 
             // gridColumn9
             // 
+            this.gridColumn9.Caption = "Chọn";
             this.gridColumn9.FieldName = "Checked";
             this.gridColumn9.MinWidth = 30;
             this.gridColumn9.Name = "gridColumn9";
@@ -759,8 +761,6 @@
             this.colisHaschild2.MinWidth = 30;
             this.colisHaschild2.Name = "colisHaschild2";
             this.colisHaschild2.OptionsColumn.AllowEdit = false;
-            this.colisHaschild2.Visible = true;
-            this.colisHaschild2.VisibleIndex = 9;
             this.colisHaschild2.Width = 112;
             // 
             // xtraTabControl1
@@ -788,13 +788,13 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1658, 543);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1663, 547);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
             // simpleButton2
             // 
-            this.simpleButton2.Location = new System.Drawing.Point(449, 478);
+            this.simpleButton2.Location = new System.Drawing.Point(454, 502);
             this.simpleButton2.Name = "simpleButton2";
             this.simpleButton2.Size = new System.Drawing.Size(112, 34);
             this.simpleButton2.TabIndex = 12;
@@ -839,6 +839,7 @@
             this.lblThongbao.Size = new System.Drawing.Size(51, 19);
             this.lblThongbao.TabIndex = 11;
             this.lblThongbao.Text = "label3";
+            this.lblThongbao.Visible = false;
             // 
             // panelControl4
             // 
@@ -902,7 +903,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1632, 195);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1637, 199);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -932,7 +933,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1632, 195);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1637, 199);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
