@@ -62,6 +62,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using GridView = DevExpress.XtraGrid.Views.Grid.GridView;
 using static iText.IO.Image.Jpeg2000ImageData;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 
 namespace SaovietTax
 {
@@ -78,6 +79,8 @@ namespace SaovietTax
         public DataTable result { get; set; }
         private BindingList<FileImport> people = new BindingList<FileImport>();
         private BindingList<FileImport> people2 = new BindingList<FileImport>();
+        private BindingList<FileImport> lstImportVao = new BindingList<FileImport>();
+        private BindingList<FileImport> lstImportRa = new BindingList<FileImport>();
         System.Windows.Forms.BindingSource bindingSource = new System.Windows.Forms.BindingSource();
         System.Windows.Forms.BindingSource bindingSource2 = new System.Windows.Forms.BindingSource();
         public class FileImportDetail
@@ -93,6 +96,7 @@ namespace SaovietTax
             public string TKCo { get; set; }
             public double TTien { get; set; }
             public double TgTThue { get; set; }
+          
             public FileImportDetail(string ten, int parentId, string soHieu, double soluong, double dongia, string dVT, string maCT, string tkNo, string tkCo,double ttien)
             {
                 Ten = ten;
@@ -166,13 +170,53 @@ namespace SaovietTax
         {
             InitializeComponent();
         }
+        private List<People> GetListFileImport()
+        {
 
+            return null;
+        }
         private void LoadDataGridview(int type)
         {
             if (type == 1)
-            {   
+            {
+                lstImportVao = new BindingList<FileImport>();
                 // For individual GridControl 
-                bindingSource.DataSource = people;
+                //Load data từ database 
+                string queryCheckVatTu = @"SELECT * FROM tbimport WHERE NLap > ? AND NLap < ? AND Type= ?";
+
+                var parameterss = new OleDbParameter[]
+                {
+                 new OleDbParameter("?",dtTungay.DateTime),
+                 new OleDbParameter("?", dtDenngay.DateTime),
+                 new OleDbParameter("?", type)
+                };
+                var kq = ExecuteQuery(queryCheckVatTu, parameterss);
+                if (kq.Rows.Count > 0)
+                { 
+                    foreach(DataRow item in kq.Rows)
+                    {
+                        
+                        FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()));
+                        //add detail
+                        fileImport.ID = int.Parse(item["ID"].ToString());
+                         queryCheckVatTu = @"SELECT * FROM tbimportdetail WHERE   ParentId= ?";
+                         parameterss = new OleDbParameter[]
+                         {
+                            new OleDbParameter("?",int.Parse(item["ID"].ToString())) 
+                         };
+                        var kq2 = ExecuteQuery(queryCheckVatTu, parameterss); 
+                        if (kq2.Rows.Count > 0)
+                        {
+                            foreach (DataRow itemDetail in kq2.Rows)
+                            {
+                                FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()),Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                fileImport.fileImportDetails.Add(fileImportDetail);
+                            }
+                        }
+                        lstImportVao.Add(fileImport); 
+                    }
+                }
+                bindingSource.DataSource = lstImportVao;
                 gridControl1.DataSource = bindingSource;
                  
                 gridView1.OptionsDetail.EnableMasterViewMode = true;
@@ -206,7 +250,7 @@ namespace SaovietTax
                 gridView.OptionsView.EnableAppearanceOddRow = true;
 
                 // Thiết lập màu sắc cho hàng chẵn
-                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.LightYellow; // Màu nền cho hàng chẵn
+                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.LightGreen; // Màu nền cho hàng chẵn
                 gridView.Appearance.EvenRow.ForeColor = System.Drawing.Color.Black; // Màu chữ cho hàng chẵn
 
                 // Thiết lập màu sắc cho hàng lẻ
@@ -404,6 +448,16 @@ namespace SaovietTax
                 else
                 {
                     // Kiểm tra xem cột tkoco đã tồn tại hay chưa
+                    if (!ColumnExists(connection, "tbimport", "Path"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "Path", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "Type"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "Type", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbimport", "TPhi"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -1859,7 +1913,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
            
         }
         private void LoadXmlFilesOptimized(string path, int type)
-        {
+            {
             progressPanel1.Visible = true;
             lblThongbao.Text = "Bắt đầu chạy";
             progressPanel1.Caption = "Bắt đầu chạy...";
@@ -2081,8 +2135,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         sohieuKH = existingKhachHang2.Where(m => m.Key == Helpers.ConvertUnicodeToVni(ten.ToLower())).FirstOrDefault().Value[2].ToString();
                     }
                 }
+                string newxmlFile = "";
+                if (type == 1)
+                    newxmlFile = xmlFile.Replace("HDVao", "HDVaoChonLoc").ToString();
+                else
+                    newxmlFile = xmlFile.Replace("HDRa", "HDRaChonLoc").ToString();
 
-                FileImport newFileImport = new FileImport(xmlFile, sHDon, kHHDon, nLap, ten ?? "Khách vãng lai", diengiai, tkNo.ToString(), tkCo.ToString(), tkThue, mst=="00"? sohieuKH:mst, thanhtien, vat, 1, "", isAcess, tPhi, tgTCThue, tgTThue);
+                FileImport newFileImport = new FileImport(newxmlFile, sHDon, kHHDon, nLap, ten ?? "Khách vãng lai", diengiai, tkNo.ToString(), tkCo.ToString(), tkThue, mst == "00" ? sohieuKH : mst, thanhtien, vat, type, "", isAcess, tPhi, tgTCThue, tgTThue);
                 peopleTemp.Add(newFileImport);
 
                 // Thêm chi tiết hóa đơn
@@ -2324,12 +2383,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             XulyFolder();
             progressBarControl1.EditValue = 0;
             if (chkDauvao.Checked)
-                LoadXmlFilesOptimized(savedPath,1);
-            LoadExcel(savedPath,1);
-            LoadDataGridview(1);
+            {
+                LoadXmlFilesOptimized(savedPath, 1);
+                LoadExcel(savedPath, 1);
+                ImportHD(people, "HDVao");
+                LoadDataGridview(1);
+            }
             if (chkDaura.Checked)
+            {
                 LoadXmlFilesOptimized(savedPath, 2);
-            LoadDataGridview(2);
+                ImportHD(people, "HDRa");
+                LoadDataGridview(2);
+
+            }
             progressPanel1.Visible = false;
 
         }
@@ -4693,6 +4759,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void btnimport_Click(object sender, EventArgs e)
         {
             progressPanel1.Caption = "Đang xử lý";
+            //Cập nhật cho đầu vào
+            if (chkDauvao.Checked)
+            {
+                foreach(var item in lstImportVao)
+                {
+                   
+                }
+            } 
             if (chkDauvao.Checked)
             {
                 foreach (var it in people)
@@ -4828,8 +4902,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             }
 
                             string query = @"
-                        INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP, TPhi, TgTCThue, TgTThue)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung, TKCo, TKNo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP, TPhi, TgTCThue, TgTThue,Type,Path)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
 
                             string newTen = Helpers.ConvertUnicodeToVni(item.Ten);
                             string newNoidung = Helpers.ConvertUnicodeToVni(item.Noidung);
@@ -4852,7 +4926,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         new OleDbParameter("?", item.SoHieuTP.ToString()),
                         new OleDbParameter("?", item.TPhi.ToString()),
                         new OleDbParameter("?", item.TgTCThue.ToString()),
-                        new OleDbParameter("?", item.TgTThue.ToString())
+                        new OleDbParameter("?", item.TgTThue.ToString()),
+                        new OleDbParameter("?", item.Type.ToString()),
+                        new OleDbParameter("?", item.Path.ToString())
                             };
 
                             int rowsAffected = ExecuteQueryResult(query, parameters);
@@ -4885,9 +4961,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         MoveHtmlFiles(data, type); // Move files after successful import
                         if (!isNull)
                         {
-                            XtraMessageBox.Show("Lấy dữ liệu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            isClick = true;
-                            this.Close();
+                           // XtraMessageBox.Show("Lấy dữ liệu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            isClick = true; 
                         }
                     }
                     catch (Exception ex)
@@ -4921,7 +4996,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     string destFile = file.Replace(type, type + "ChonLoc");
                     try
                     {
-                        File.Move(file, destFile);
+                        if (!File.Exists(destFile))
+                            File.Move(file, destFile);
+                        else
+                            File.Delete(file);
                     }
                     catch (Exception ex)
                     {
@@ -4941,6 +5019,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     {
                         File.Move(item.Path, destMainFile);
                     }
+                    else
+                        File.Delete(item.Path);
                 }
                 catch (Exception ex)
                 {
@@ -5281,7 +5361,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             FileImport dt = view.GetRow(e.RowHandle) as FileImport;
             if (dt != null)
-                e.IsEmpty = !people.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
+                e.IsEmpty = !lstImportVao.Any(m => m.fileImportDetails.Any(j => j.ParentId == dt.ID));
         }
 
         private void gridView1_MasterRowGetChildList(object sender, MasterRowGetChildListEventArgs e)
@@ -5807,7 +5887,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void gridView1_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
-            toolTipController.HideHint();
+            toolTipController.HideHint(); 
+
+            var columns = e.Column;
+
             if (e.Column.ToString() == "TKNo")
             {
                 var newValue = e.Value;
@@ -5835,13 +5918,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
 
             // Kiểm tra nếu hàng có detail view đang mở
-            if (gridView.GetDetailView(e.RowHandle, 0) != null)
-            {
-                return; // Nếu có hàng con mở, không thực hiện hành động
-            }
+            //if (gridView.GetDetailView(e.RowHandle, 0) != null)
+            //{
+            //    return; // Nếu có hàng con mở, không thực hiện hành động
+            //}
 
             // Chỉ thực hiện khi không có hàng con mở
-            foreach (var item in people)
+            foreach (var item in lstImportVao)
             {
                 foreach (var it2 in item.fileImportDetails)
                 {
@@ -5850,7 +5933,25 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
 
-            gridControl1.Refresh();
+            var gridViews = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            var idValue = gridViews.GetRowCellValue(e.RowHandle, "ID");
+            UpdateData(int.Parse(idValue.ToString()), lstImportVao);
+            gridControl1.DataSource = lstImportVao;
+            gridControl1.RefreshDataSource();
+        }
+        private void UpdateData(int id,BindingList<FileImport> lst)
+        {
+            var getfip = lst.Where(m => m.ID == id).FirstOrDefault();
+            string query = @"UPDATE tbimport SET NoiDung=?, TKNo=?, TKCo=?, TKThue=? where ID=? ";
+           var parameters = new OleDbParameter[]
+            {
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(getfip.Noidung)),
+            new OleDbParameter("?", getfip.TKNo),
+            new OleDbParameter("?",  getfip.TKCo) ,
+              new OleDbParameter("?", getfip.TkThue),
+               new OleDbParameter("?", getfip.ID)
+            };
+            int rowsAffected = ExecuteQueryResult(query, parameters);
         }
 
         private void gridView1_KeyUp(object sender, KeyEventArgs e)
@@ -6359,6 +6460,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 // Mã dọn dẹp (nếu cần)
                 Console.WriteLine("Đã hoàn thành việc đọc PDF.");
             }
+        }
+
+        private void gridView2_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+
         }
 
         public static string NormalizeVietnameseString(string input)
