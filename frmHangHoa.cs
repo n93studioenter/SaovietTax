@@ -81,7 +81,7 @@ namespace SaovietTax
                     // Thêm từng mục vào ComboBoxEdit
                     comboBoxEdit1.Properties.Items.Add(new Item
                     {
-                        Name = row["SoHieu"].ToString() +" - "+ Helpers.ConvertVniToUnicode(row["TenPhanLoai"].ToString()),
+                        Name = Helpers.ConvertVniToUnicode(row["SoHieu"].ToString()) +" - "+ Helpers.ConvertVniToUnicode(row["TenPhanLoai"].ToString()),
                         Id = Convert.ToInt32(row["MaSo"])
                     });
                 }
