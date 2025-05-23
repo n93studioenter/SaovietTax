@@ -57,6 +57,7 @@
             this.colPath = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colAcess = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colisHaschild = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colMST = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoHieu3 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -316,7 +317,8 @@
             this.colChecked,
             this.colPath,
             this.colAcess,
-            this.colisHaschild});
+            this.colisHaschild,
+            this.colMST});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsDetail.ShowDetailTabs = false;
@@ -473,6 +475,14 @@
             this.colisHaschild.MinWidth = 30;
             this.colisHaschild.Name = "colisHaschild";
             this.colisHaschild.Width = 112;
+            // 
+            // colMST
+            // 
+            this.colMST.Caption = "gridColumn11";
+            this.colMST.FieldName = "Mst";
+            this.colMST.MinWidth = 30;
+            this.colMST.Name = "colMST";
+            this.colMST.Width = 112;
             // 
             // gridView4
             // 
@@ -1345,5 +1355,6 @@
         private DevExpress.XtraEditors.SimpleButton btnReadPDF;
         private DevExpress.XtraGrid.Columns.GridColumn colThanhTien;
         private DevExpress.XtraGrid.Columns.GridColumn colThanhtien2;
+        private DevExpress.XtraGrid.Columns.GridColumn colMST;
     }
 }

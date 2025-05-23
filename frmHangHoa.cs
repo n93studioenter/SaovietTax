@@ -42,19 +42,33 @@ namespace SaovietTax
         }
         private void LoadData(int Maso)
         {
-            string query = @" SELECT *  FROM Vattu where MaPhanLoai= ? ";
-            var parameterss = new OleDbParameter[]
+            string query = "";
+            if (Maso != 0)
             {
+                query= @" SELECT *  FROM Vattu where MaPhanLoai= ?";
+                var parameterss = new OleDbParameter[]
+                {
                 new OleDbParameter("?",Maso)
-               };
-            var kq = ExecuteQuery(query, parameterss);
-            foreach(DataRow item in kq.Rows)
-            {
-                item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
-                item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
+                   };
+                var kq = ExecuteQuery(query, parameterss);
+                foreach (DataRow item in kq.Rows)
+                {
+                    item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
+                    item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
+                }
+                gridControl1.DataSource = kq;
             }
-            gridControl1.DataSource = kq;
-           
+            else
+            {
+                query = @" SELECT *  FROM Vattu  "; 
+                var kq = ExecuteQuery(query, null);
+                foreach (DataRow item in kq.Rows)
+                {
+                    item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
+                    item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
+                }
+                gridControl1.DataSource = kq;
+            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -75,7 +89,7 @@ namespace SaovietTax
             if (dt != null && dt.Rows.Count > 0)
             {
                 comboBoxEdit1.Properties.Items.Clear(); // Xóa các mục cũ
-
+                comboBoxEdit1.Properties.Items.Add(new Item { Name = "Tất cả", Id = 0 });
                 foreach (DataRow row in dt.Rows)
                 {
                     // Thêm từng mục vào ComboBoxEdit
@@ -287,7 +301,11 @@ namespace SaovietTax
         {
             int selectedId = 0;
             var selectedItem = comboBoxEdit1.SelectedItem as Item;
-
+            if (selectedItem.Id == 0)
+            {
+                XtraMessageBox.Show("Vui lòng chọn danh mục");
+                return;
+            }
             if (selectedItem != null)
             {
                 selectedId = selectedItem.Id; // Lấy giá trị Id  
@@ -399,16 +417,27 @@ namespace SaovietTax
             List<TonKho> lstTonkho = new List<TonKho>();
             if (kq.Rows.Count > 0)
             {
-                TonKho tk = new TonKho();
-                int cnt = 0;
-                while (kq.Rows[0]["Luong_" + cnt].ToString() == "0")
+                try
                 {
-                    cnt += 1;
+                    TonKho tk = new TonKho();
+                    int cnt = 0;
+                    while (kq.Rows[0]["Luong_" + cnt].ToString() == "0")
+                    {
+                        cnt += 1;
+                    }
+                    tk.SoLuong = kq.Rows[0]["Luong_" + cnt] != null ? double.Parse(kq.Rows[0]["Luong_" + cnt].ToString()) : 0;
+                    tk.ThanhTien = kq.Rows[0]["Tien_" + cnt] != null ? double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) : 0;
+                    if (tk.SoLuong!=0 && tk.ThanhTien!=0)
+                    {
+                        tk.DonGia = Math.Round(double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) / tk.SoLuong, 2);
+                        lstTonkho.Add(tk);
+                    }
                 }
-                tk.SoLuong = kq.Rows[0]["Luong_" + cnt] != null ? double.Parse(kq.Rows[0]["Luong_" + cnt].ToString()) : 0;
-                tk.ThanhTien = kq.Rows[0]["Tien_" + cnt] != null ? double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) : 0;
-                tk.DonGia = Math.Round(double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) / tk.SoLuong,2);
-                lstTonkho.Add(tk);
+                catch(Exception ex)
+                {
+
+                }
+              
             }
             gridControl2.DataSource = lstTonkho;
         }

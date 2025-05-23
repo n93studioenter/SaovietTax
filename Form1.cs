@@ -6072,6 +6072,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                   
                 }
+                if (currentColumnName == "Ten")
+                {
+                    frmKhachhang frmKhachhang = new frmKhachhang();
+                    frmKhachhang.frmMain = this;
+
+                    frmKhachhang.Khachhang vatTu = new frmKhachhang.Khachhang();
+                    vatTu.SoHieu = cellValue.ToString();
+                    var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
+                    vatTu.Mst = gridView.GetRowCellValue(currentRowHandle, "Mst").ToString();
+                    vatTu.Ten = tenvattu; 
+                    frmKhachhang.dtoVatTu = vatTu;
+                    frmKhachhang.ShowDialog();
+                }
               
             }
            

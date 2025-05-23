@@ -436,3 +436,4 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\Microsoft.Extensions.Logging
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\Microsoft.Extensions.Options.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\Newtonsoft.Json.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\System.Diagnostics.DiagnosticSource.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmKhachhang.resources

@@ -1,0 +1,364 @@
+﻿namespace SaovietTax
+{
+    partial class frmKhachhang
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmKhachhang));
+            this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.gridControl2 = new DevExpress.XtraGrid.GridControl();
+            this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.colSoLuong = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colDongia = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colThanhTien = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.txtMaSo = new DevExpress.XtraEditors.TextEdit();
+            this.btnThoat = new DevExpress.XtraEditors.SimpleButton();
+            this.btnXoa = new DevExpress.XtraEditors.SimpleButton();
+            this.btnGhi = new DevExpress.XtraEditors.SimpleButton();
+            this.btnThem = new DevExpress.XtraEditors.SimpleButton();
+            this.txtGhichu = new DevExpress.XtraEditors.TextEdit();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtDonvi = new DevExpress.XtraEditors.TextEdit();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtTenvattu = new DevExpress.XtraEditors.TextEdit();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtSohieu = new DevExpress.XtraEditors.TextEdit();
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.gridControl1 = new DevExpress.XtraGrid.GridControl();
+            this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.colTenVattu = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colSoHieu = new DevExpress.XtraGrid.Columns.GridColumn();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
+            this.panelControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtTenvattu.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtSohieu.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // panelControl1
+            // 
+            this.panelControl1.Controls.Add(this.gridControl2);
+            this.panelControl1.Controls.Add(this.txtMaSo);
+            this.panelControl1.Controls.Add(this.btnThoat);
+            this.panelControl1.Controls.Add(this.btnXoa);
+            this.panelControl1.Controls.Add(this.btnGhi);
+            this.panelControl1.Controls.Add(this.btnThem);
+            this.panelControl1.Controls.Add(this.txtGhichu);
+            this.panelControl1.Controls.Add(this.label4);
+            this.panelControl1.Controls.Add(this.txtDonvi);
+            this.panelControl1.Controls.Add(this.label3);
+            this.panelControl1.Controls.Add(this.txtTenvattu);
+            this.panelControl1.Controls.Add(this.label2);
+            this.panelControl1.Controls.Add(this.txtSohieu);
+            this.panelControl1.Controls.Add(this.label1);
+            this.panelControl1.Location = new System.Drawing.Point(742, 23);
+            this.panelControl1.Name = "panelControl1";
+            this.panelControl1.Size = new System.Drawing.Size(597, 572);
+            this.panelControl1.TabIndex = 6;
+            // 
+            // gridControl2
+            // 
+            this.gridControl2.Location = new System.Drawing.Point(29, 267);
+            this.gridControl2.MainView = this.gridView2;
+            this.gridControl2.Name = "gridControl2";
+            this.gridControl2.Size = new System.Drawing.Size(549, 187);
+            this.gridControl2.TabIndex = 16;
+            this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridView2});
+            // 
+            // gridView2
+            // 
+            this.gridView2.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.colSoLuong,
+            this.colDongia,
+            this.colThanhTien});
+            this.gridView2.GridControl = this.gridControl2;
+            this.gridView2.Name = "gridView2";
+            this.gridView2.OptionsView.ShowGroupPanel = false;
+            // 
+            // colSoLuong
+            // 
+            this.colSoLuong.Caption = "Số lượng";
+            this.colSoLuong.DisplayFormat.FormatString = "N2";
+            this.colSoLuong.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colSoLuong.FieldName = "SoLuong";
+            this.colSoLuong.MinWidth = 30;
+            this.colSoLuong.Name = "colSoLuong";
+            this.colSoLuong.OptionsColumn.AllowEdit = false;
+            this.colSoLuong.Visible = true;
+            this.colSoLuong.VisibleIndex = 0;
+            this.colSoLuong.Width = 112;
+            // 
+            // colDongia
+            // 
+            this.colDongia.Caption = "Đơn giá";
+            this.colDongia.DisplayFormat.FormatString = "N2";
+            this.colDongia.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colDongia.FieldName = "DonGia";
+            this.colDongia.MinWidth = 30;
+            this.colDongia.Name = "colDongia";
+            this.colDongia.OptionsColumn.AllowEdit = false;
+            this.colDongia.Visible = true;
+            this.colDongia.VisibleIndex = 1;
+            this.colDongia.Width = 112;
+            // 
+            // colThanhTien
+            // 
+            this.colThanhTien.Caption = "Thành tiền";
+            this.colThanhTien.DisplayFormat.FormatString = "N2";
+            this.colThanhTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.colThanhTien.FieldName = "ThanhTien";
+            this.colThanhTien.MinWidth = 30;
+            this.colThanhTien.Name = "colThanhTien";
+            this.colThanhTien.OptionsColumn.AllowEdit = false;
+            this.colThanhTien.Visible = true;
+            this.colThanhTien.VisibleIndex = 2;
+            this.colThanhTien.Width = 112;
+            // 
+            // txtMaSo
+            // 
+            this.txtMaSo.Location = new System.Drawing.Point(29, 540);
+            this.txtMaSo.Name = "txtMaSo";
+            this.txtMaSo.Size = new System.Drawing.Size(549, 27);
+            this.txtMaSo.TabIndex = 15;
+            this.txtMaSo.Visible = false;
+            // 
+            // btnThoat
+            // 
+            this.btnThoat.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnThoat.ImageOptions.Image")));
+            this.btnThoat.Location = new System.Drawing.Point(447, 215);
+            this.btnThoat.Name = "btnThoat";
+            this.btnThoat.Size = new System.Drawing.Size(131, 34);
+            this.btnThoat.TabIndex = 11;
+            this.btnThoat.Text = "Thoát";
+            // 
+            // btnXoa
+            // 
+            this.btnXoa.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnXoa.ImageOptions.Image")));
+            this.btnXoa.Location = new System.Drawing.Point(305, 215);
+            this.btnXoa.Name = "btnXoa";
+            this.btnXoa.Size = new System.Drawing.Size(122, 34);
+            this.btnXoa.TabIndex = 10;
+            this.btnXoa.Text = "Xóa";
+            // 
+            // btnGhi
+            // 
+            this.btnGhi.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnGhi.ImageOptions.Image")));
+            this.btnGhi.Location = new System.Drawing.Point(171, 215);
+            this.btnGhi.Name = "btnGhi";
+            this.btnGhi.Size = new System.Drawing.Size(119, 34);
+            this.btnGhi.TabIndex = 9;
+            this.btnGhi.Text = "&Ghi";
+            // 
+            // btnThem
+            // 
+            this.btnThem.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnThem.ImageOptions.Image")));
+            this.btnThem.Location = new System.Drawing.Point(29, 215);
+            this.btnThem.Name = "btnThem";
+            this.btnThem.Size = new System.Drawing.Size(121, 34);
+            this.btnThem.TabIndex = 8;
+            this.btnThem.Text = "Thêm";
+            // 
+            // txtGhichu
+            // 
+            this.txtGhichu.Location = new System.Drawing.Point(113, 182);
+            this.txtGhichu.Name = "txtGhichu";
+            this.txtGhichu.Size = new System.Drawing.Size(465, 27);
+            this.txtGhichu.TabIndex = 7;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(25, 185);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(63, 19);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Ghi chú";
+            // 
+            // txtDonvi
+            // 
+            this.txtDonvi.Location = new System.Drawing.Point(113, 126);
+            this.txtDonvi.Name = "txtDonvi";
+            this.txtDonvi.Size = new System.Drawing.Size(465, 27);
+            this.txtDonvi.TabIndex = 5;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(25, 129);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(55, 19);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Đơn vị";
+            // 
+            // txtTenvattu
+            // 
+            this.txtTenvattu.Location = new System.Drawing.Point(113, 71);
+            this.txtTenvattu.Name = "txtTenvattu";
+            this.txtTenvattu.Size = new System.Drawing.Size(465, 27);
+            this.txtTenvattu.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(25, 74);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(36, 19);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Tên";
+            // 
+            // txtSohieu
+            // 
+            this.txtSohieu.Location = new System.Drawing.Point(113, 18);
+            this.txtSohieu.Name = "txtSohieu";
+            this.txtSohieu.Size = new System.Drawing.Size(465, 27);
+            this.txtSohieu.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(25, 26);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(50, 19);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Mã số";
+            // 
+            // comboBoxEdit1
+            // 
+            this.comboBoxEdit1.Location = new System.Drawing.Point(12, 23);
+            this.comboBoxEdit1.Name = "comboBoxEdit1";
+            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit1.Size = new System.Drawing.Size(724, 27);
+            this.comboBoxEdit1.TabIndex = 7;
+            this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
+            // 
+            // gridControl1
+            // 
+            this.gridControl1.Location = new System.Drawing.Point(12, 56);
+            this.gridControl1.MainView = this.gridView1;
+            this.gridControl1.Name = "gridControl1";
+            this.gridControl1.Size = new System.Drawing.Size(724, 539);
+            this.gridControl1.TabIndex = 5;
+            this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridView1});
+            // 
+            // gridView1
+            // 
+            this.gridView1.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.colTenVattu,
+            this.colSoHieu});
+            this.gridView1.GridControl = this.gridControl1;
+            this.gridView1.Name = "gridView1";
+            this.gridView1.OptionsView.ShowGroupPanel = false;
+            // 
+            // colTenVattu
+            // 
+            this.colTenVattu.Caption = "Tên khách hàng";
+            this.colTenVattu.FieldName = "Ten";
+            this.colTenVattu.MinWidth = 30;
+            this.colTenVattu.Name = "colTenVattu";
+            this.colTenVattu.OptionsColumn.AllowEdit = false;
+            this.colTenVattu.Visible = true;
+            this.colTenVattu.VisibleIndex = 0;
+            this.colTenVattu.Width = 412;
+            // 
+            // colSoHieu
+            // 
+            this.colSoHieu.Caption = "Số hiệu";
+            this.colSoHieu.FieldName = "SoHieu";
+            this.colSoHieu.MinWidth = 30;
+            this.colSoHieu.Name = "colSoHieu";
+            this.colSoHieu.OptionsColumn.AllowEdit = false;
+            this.colSoHieu.Visible = true;
+            this.colSoHieu.VisibleIndex = 1;
+            this.colSoHieu.Width = 90;
+            // 
+            // frmKhachhang
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1386, 715);
+            this.Controls.Add(this.panelControl1);
+            this.Controls.Add(this.comboBoxEdit1);
+            this.Controls.Add(this.gridControl1);
+            this.Name = "frmKhachhang";
+            this.Text = "frmKhachhang";
+            this.Load += new System.EventHandler(this.frmKhachhang_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
+            this.panelControl1.ResumeLayout(false);
+            this.panelControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtTenvattu.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtSohieu.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private DevExpress.XtraEditors.PanelControl panelControl1;
+        private DevExpress.XtraGrid.GridControl gridControl2;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView2;
+        private DevExpress.XtraGrid.Columns.GridColumn colSoLuong;
+        private DevExpress.XtraGrid.Columns.GridColumn colDongia;
+        private DevExpress.XtraGrid.Columns.GridColumn colThanhTien;
+        private DevExpress.XtraEditors.TextEdit txtMaSo;
+        private DevExpress.XtraEditors.SimpleButton btnThoat;
+        private DevExpress.XtraEditors.SimpleButton btnXoa;
+        private DevExpress.XtraEditors.SimpleButton btnGhi;
+        private DevExpress.XtraEditors.SimpleButton btnThem;
+        private DevExpress.XtraEditors.TextEdit txtGhichu;
+        private System.Windows.Forms.Label label4;
+        private DevExpress.XtraEditors.TextEdit txtDonvi;
+        private System.Windows.Forms.Label label3;
+        private DevExpress.XtraEditors.TextEdit txtTenvattu;
+        private System.Windows.Forms.Label label2;
+        private DevExpress.XtraEditors.TextEdit txtSohieu;
+        private System.Windows.Forms.Label label1;
+        private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
+        private DevExpress.XtraGrid.GridControl gridControl1;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
+        private DevExpress.XtraGrid.Columns.GridColumn colTenVattu;
+        private DevExpress.XtraGrid.Columns.GridColumn colSoHieu;
+    }
+}
