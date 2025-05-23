@@ -183,17 +183,21 @@ namespace SaovietTax
                 lstImportVao = new BindingList<FileImport>();
                 // For individual GridControl 
                 //Load data từ database 
-                string queryCheckVatTu = @"SELECT * FROM tbimport 
-                                    WHERE NLap > ? AND NLap < ? AND Type = ? AND Status  <> 1";
-
+                string queryCheckVatTu = @"SELECT * FROM tbimport   WHERE  Status <> 1 AND Type = ?";
 
                 var parameterss = new OleDbParameter[]
-                {
-                 new OleDbParameter("?",dtTungay.DateTime),
-                 new OleDbParameter("?", dtDenngay.DateTime),
+                { 
                  new OleDbParameter("?", type)
                 };
                 var kq = ExecuteQuery(queryCheckVatTu, parameterss);
+                if (kq.Rows.Count > 0)
+                {
+                    kq = kq.AsEnumerable()
+                       .Where(row => DateTime.TryParse(row["NLap"].ToString(), out DateTime nl)
+                                     && nl >= dtTungay.DateTime && nl <= dtDenngay.DateTime)
+                       .CopyToDataTable();
+                }
+               
                 if (kq.Rows.Count > 0)
                 { 
                     foreach(DataRow item in kq.Rows)
@@ -229,16 +233,20 @@ namespace SaovietTax
             else if (type == 2)
             {
                 lstImportRa = new BindingList<FileImport>();
-                string queryCheckVatTu = @"SELECT * FROM tbimport 
-                                    WHERE NLap > ? AND NLap < ? AND Type = ? AND Status  <> 1";
+                string queryCheckVatTu = @"SELECT * FROM tbimport    WHERE  Status <> 1  AND Type = ?";
 
                 var parameterss = new OleDbParameter[]
                 {
-                 new OleDbParameter("?",dtTungay.DateTime),
-                 new OleDbParameter("?", dtDenngay.DateTime),
                  new OleDbParameter("?", type)
                 };
                 var kq = ExecuteQuery(queryCheckVatTu, parameterss);
+                if (kq.Rows.Count > 0)
+                {
+                    kq = kq.AsEnumerable()
+                       .Where(row => DateTime.TryParse(row["NLap"].ToString(), out DateTime nl)
+                                     && nl >= dtTungay.DateTime && nl <= dtDenngay.DateTime)
+                       .CopyToDataTable();
+                }
                 if (kq.Rows.Count > 0)
                 {
                     foreach (DataRow item in kq.Rows)
@@ -2686,7 +2694,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 mst: taxCode,
                 tongTien: amountBeforeTax,
                 vat: taxRate,
-                type: 2,       // Assuming type 2 for these invoices
+                type: 1,       // Assuming type 2 for these invoices
                 tenTP: "",     // Empty for now
                 isacess: true,
                 tPhi: 0,
@@ -4806,6 +4814,32 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 foreach (var item in lstImportVao)
                 {
+
+                    //Thực hiện 154
+                    if (item.TKNo.Contains("|"))
+                    {
+                        var getsplit = item.TKNo.Split('|');
+                        item.TKNo = getsplit[0];
+                        item.SoHieuTP = getsplit[1];
+                        string query = @"UPDATE tbimport SET  TKNo =?,SohieuTP=? WHERE ID=?";
+                        var parameters = new OleDbParameter[]
+                         {
+                              new OleDbParameter("?", item.TKNo),
+                               new OleDbParameter("?", item.SoHieuTP),
+                              new OleDbParameter("?", item.ID)
+                         };
+                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                        //Xóa đi con 
+                         query = @"delete from  tbimportdetail WHERE ParentId=?";
+                         parameters = new OleDbParameter[]
+                         {
+            new OleDbParameter("?", item.ID)
+                         };
+                         rowsAffected = ExecuteQueryResult(query, parameters);
+                        item.fileImportDetails = new List<FileImportDetail>();
+
+                    }
+
                     if (!item.Checked)
                     {
                         string query = @"UPDATE tbimport SET  Status =-1 WHERE ID=?";
@@ -4827,6 +4861,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     // Thực hiện insert Vật tư
                     foreach(var  it in item.fileImportDetails)
                     {
+                        if (it.TKNo.Contains("|"))
+                        {
+                            var getsplit = it.TKNo.Split('|');
+                            it.TKNo = getsplit[0];
+                            it.MaCT=getsplit[1];
+                            string query = @"UPDATE tbimportdetail SET  TKNo =?,MaCT=? WHERE ID=?";
+                            var parameters = new OleDbParameter[]
+                             {
+                              new OleDbParameter("?", it.TKNo),
+                               new OleDbParameter("?", it.MaCT),
+                              new OleDbParameter("?", it.ID)
+                             };
+                            int rowsAffected = ExecuteQueryResult(query, parameters);
+                        }
+                        //Sửa cho trường hợp có công trình
                         InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu,Helpers.ConvertUnicodeToVni(it.Ten));
                     }
                    
@@ -4836,6 +4885,30 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 foreach (var item in lstImportRa)
                 {
+                    //Thực hiện 154
+                    if (item.TKCo.Contains("|"))
+                    {
+                        var getsplit = item.TKCo.Split('|');
+                        item.TKCo = getsplit[0];
+                        item.SoHieuTP = getsplit[1];
+                        string query = @"UPDATE tbimport SET  TKCo =?,SohieuTP=? WHERE ID=?";
+                        var parameters = new OleDbParameter[]
+                         {
+                              new OleDbParameter("?", item.TKCo),
+                               new OleDbParameter("?", item.SoHieuTP),
+                              new OleDbParameter("?", item.ID)
+                         };
+                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                        //Xóa đi con 
+                        query = @"delete from  tbimportdetail WHERE ParentId=?";
+                        parameters = new OleDbParameter[]
+                        {
+            new OleDbParameter("?", item.ID)
+                        };
+                        rowsAffected = ExecuteQueryResult(query, parameters);
+                        item.fileImportDetails = new List<FileImportDetail>();
+
+                    }
                     if (!item.Checked)
                     {
                         string query = @"UPDATE tbimport SET  Status =-1 WHERE ID=?";
@@ -4857,7 +4930,22 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     // Thực hiện insert Vật tư
                     foreach (var it in item.fileImportDetails)
                     {
-                        InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu, Helpers.ConvertUnicodeToVni(it.Ten));
+                        if (it.TKCo.Contains("|"))
+                        {
+                            var getsplit = it.TKCo.Split('|');
+                            it.TKCo = getsplit[0];
+                            it.MaCT = getsplit[1];
+                            string query = @"UPDATE tbimportdetail SET  TKCo =?,MaCT=? WHERE ID=?";
+                            var parameters = new OleDbParameter[]
+                             {
+                              new OleDbParameter("?", it.TKCo),
+                               new OleDbParameter("?", it.MaCT),
+                              new OleDbParameter("?", it.ID)
+                             };
+                            int rowsAffected = ExecuteQueryResult(query, parameters);
+                        }
+                        if (!it.TKCo.Contains("5113"))
+                            InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu, Helpers.ConvertUnicodeToVni(it.Ten));
                     }
 
                 }
@@ -4962,12 +5050,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             }
 
                             // Đảo ngược TKNo và TKCo cho HDRa
-                            if (type == "HDRa")
-                            {
-                                string temp = item.TKCo;
-                                item.TKCo = item.TKNo;
-                                item.TKNo = temp;
-                            }
+                            //if (type == "HDRa")
+                            //{
+                            //    string temp = item.TKCo;
+                            //    item.TKCo = item.TKNo;
+                            //    item.TKNo = temp;
+                            //}
 
                             if (item.TKCo == "711")
                             {
@@ -5046,9 +5134,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             {
                                 if (item.isHaschild)
                                 {
-                                    if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || (item.TKNo.Contains("154") && !parenthasCT) || item.TKNo.Contains("711") || (item.TKNo.Contains("511") && !parenthasCT)) //them 5111
+                                    if (item.TKNo.Contains("152") || item.TKNo.Contains("153") || item.TKNo.Contains("156") || (item.TKNo.Contains("154") && !parenthasCT) || item.TKNo.Contains("711") || (item.TKCo.Contains("511") && !parenthasCT)) //them 5111
                                     {
-                                        if (!item.TKNo.Contains("5113"))
+                                        if (!item.TKCo.Contains("5113"))
                                         {
                                             InsertImportDetails(connection, transaction, item, parentID, type);
                                         }
@@ -5064,7 +5152,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
 
                         transaction.Commit();
-                        MoveHtmlFiles(data, type); // Move files after successful import
+                        MoveHtmlFiles(data, type); // Move files after successful import 
                         if (!isNull)
                         {
                            // XtraMessageBox.Show("Lấy dữ liệu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -5132,6 +5220,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                 }
             }
+
+            //Xóa excel
+            if (type == "1")
+            {
+                var pp = savedPath + "\\HDVao"+dtTungay.DateTime.Month;
+                var pp2 = savedPath + "\\HDVao\\" + +dtTungay.DateTime.Month;
+                // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
+                string[] excelFiles = Directory.GetFiles(pp, "*.xlsx");
+                
+            }
         }
         private void InsertImportDetails(OleDbConnection connection, OleDbTransaction transaction, FileImport item, int parentId,string type)
         {
@@ -5177,13 +5275,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         detail.MaCT = getsplit[1];
                     } 
                 }
-                if (type == "HDRa")
-                {
-                    string temp = detail.TKCo;
-                    detail.TKCo = detail.TKNo;
-                    detail.TKNo = temp;
+                //if (type == "HDRa")
+                //{
+                //    string temp = detail.TKCo;
+                //    detail.TKCo = detail.TKNo;
+                //    detail.TKNo = temp;
 
-                }
+                //}
 
                 string query = @"
             INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo,TTien)
@@ -5210,7 +5308,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         bool isClick = false;
         private void InsertHangHoa(string DVTinh, string sohieu, string newName)
-        {
+        { 
             sohieu = sohieu.ToUpper();
 
             if (string.IsNullOrEmpty(DVTinh) || DVTinh == "Exception" || DVTinh == "kWh")
@@ -6046,13 +6144,20 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void UpdateData(int id,BindingList<FileImport> lst)
         {
             var getfip = lst.Where(m => m.ID == id).FirstOrDefault();
-            string query = @"UPDATE tbimport SET NoiDung=?, TKNo=?, TKCo=?, TKThue=? where ID=? ";
+            string query = @"UPDATE tbimport SET NoiDung=?, TKNo=?, TKCo=?, TKThue=?,SohieuTP=? where ID=? ";
+            //if (getfip.TKNo.Contains("|"))
+            //{
+            //    var getsplit = getfip.TKNo.Split('|');
+            //    getfip.TKNo = getsplit[0];
+            //    getfip.SoHieuTP= getsplit[1];
+            //}
            var parameters = new OleDbParameter[]
             {
             new OleDbParameter("?", Helpers.ConvertUnicodeToVni(getfip.Noidung)),
             new OleDbParameter("?", getfip.TKNo),
             new OleDbParameter("?",  getfip.TKCo) ,
               new OleDbParameter("?", getfip.TkThue),
+                new OleDbParameter("?", getfip.SoHieuTP),
                new OleDbParameter("?", getfip.ID)
             };
             int rowsAffected = ExecuteQueryResult(query, parameters);
@@ -6208,7 +6313,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             //}
 
             // Chỉ thực hiện khi không có hàng con mở
-            foreach (var item in people2)
+            foreach (var item in lstImportRa)
             {
                 foreach (var it2 in item.fileImportDetails)
                 {
