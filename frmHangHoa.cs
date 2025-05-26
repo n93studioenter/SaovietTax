@@ -20,6 +20,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DevExpress.Xpo.DB.Helpers;
 using System.Web.UI.WebControls;
+using Windows.UI.Xaml.Controls;
 
 namespace SaovietTax
 {
@@ -82,7 +83,8 @@ namespace SaovietTax
             return base.ProcessCmdKey(ref msg, keyData); // Chuyển tiếp cho xử lý tiếp
         }
         private void frmHangHoa_Load(object sender, EventArgs e)
-        { 
+        {
+            gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
 
             string query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai"; 
             var dt = ExecuteQuery(query, null);
@@ -293,6 +295,8 @@ namespace SaovietTax
                 frmMain.hiddenValue2= hiddenValue2.ToString();
                 frmMain.hiddenValue3 = hiddenValue3.ToString();
                 isChange = true;
+                //
+
                 this.Close();
             }
         }
@@ -348,6 +352,16 @@ namespace SaovietTax
             // [Optional] Xử lý kết quả trả về (ví dụ: thông báo thành công/thất bại)
             if (rowsAffected > 0)
             {
+
+                //var hiddenValue = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["SoHieu"]);
+                //var hiddenValue2 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["DonVi"]);
+                //var hiddenValue3 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["TenVattu"]);
+                frmMain.hiddenValue = txtSohieu.Text;
+                frmMain.hiddenValue2 = txtDonvi.Text;
+                frmMain.hiddenValue3 = txtTenvattu.Text;
+                isChange = true;
+                this.Close();
+
                 LoadData(selectedItem.Id);
                 // RefreshData();
                 DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView; // Lấy GridView

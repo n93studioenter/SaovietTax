@@ -63,6 +63,8 @@ using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using GridView = DevExpress.XtraGrid.Views.Grid.GridView;
 using static iText.IO.Image.Jpeg2000ImageData;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using System.Threading.Tasks;
 
 namespace SaovietTax
 {
@@ -76,7 +78,7 @@ namespace SaovietTax
         bool isetupDbpath = false;
         string password, connectionString;
         public string MasterMST = "3502264379";
-        public DataTable result { get; set; }
+        public System.Data.DataTable result { get; set; }
         private BindingList<FileImport> people = new BindingList<FileImport>();
         private BindingList<FileImport> people2 = new BindingList<FileImport>();
         private BindingList<FileImport> lstImportVao = new BindingList<FileImport>();
@@ -113,7 +115,7 @@ namespace SaovietTax
             }
         }
         public class FileImport
-        {
+        { 
             public string Path { get; set; }
             public bool Checked { get; set; }
             public int ID { get; set; }
@@ -178,6 +180,8 @@ namespace SaovietTax
         }
         private void LoadDataGridview(int type)
         {
+            System.Data.DataTable tbDinhDanhtaikhoan = LoadDinhDanhTaiKhoan();
+            System.Data.DataTable tbDinhDanhtaikhoanUuTien = LoadDinhDanhTaiKhoanUuTien(type);
             if (type == 1)
             {
                 lstImportVao = new BindingList<FileImport>();
@@ -192,15 +196,27 @@ namespace SaovietTax
                 var kq = ExecuteQuery(queryCheckVatTu, parameterss);
                 if (kq.Rows.Count > 0)
                 {
-                    kq = kq.AsEnumerable()
-                       .Where(row => DateTime.TryParse(row["NLap"].ToString(), out DateTime nl)
-                                     && nl >= dtTungay.DateTime && nl <= dtDenngay.DateTime)
-                       .CopyToDataTable();
+                    var filteredRows = kq.AsEnumerable()
+                        .Where(row => DateTime.TryParse(row["NLap"].ToString(), out DateTime nl)
+                                      && nl >= dtTungay.DateTime && nl <= dtDenngay.DateTime);
+
+                    // Kiểm tra xem có hàng nào sau khi lọc không
+                    if (filteredRows.Any())
+                    {
+                        kq = filteredRows.CopyToDataTable(); 
+                    }
+                    else
+                    {
+                        // Xử lý trường hợp không có hàng nào
+                        // Ví dụ: tạo DataTable rỗng hoặc thông báo cho người dùng
+                        kq = kq.Clone(); // Tạo một DataTable rỗng với cấu trúc giống như kq
+                    }
                 }
-               
+
                 if (kq.Rows.Count > 0)
-                { 
-                    foreach(DataRow item in kq.Rows)
+                {
+                    lblSofiles.Text = kq.Rows.Count.ToString();
+                    foreach (DataRow item in kq.Rows)
                     {
                         
                         FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()));
@@ -224,9 +240,30 @@ namespace SaovietTax
                         lstImportVao.Add(fileImport); 
                     }
                 }
+                //load matdinhtaikhoan
+                foreach (DataRow it in kq.Rows)
+                {
+                    FileImport item = lstImportVao.Where(m => m.ID == int.Parse(it["ID"].ToString())).FirstOrDefault();
+                    if (item != null)
+                    {
+                        ApplyDefaultAndRuleBasedAccounts(item, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien);
+                        if (item.fileImportDetails.Count > 0 && string.IsNullOrEmpty(item.Noidung))
+                        {
+                            item.Noidung = item.fileImportDetails.FirstOrDefault().Ten;
+                        }
+                    }
+                   
+                }
                 bindingSource.DataSource = lstImportVao;
                 gridControl1.DataSource = bindingSource;
-                 
+                //gridView1.Columns.Add(new DevExpress.XtraGrid.Columns.GridColumn
+                //{
+                //    Caption = "STT",
+                //    FieldName = "Index",
+                //    Visible = true,
+                //    UnboundType = DevExpress.Data.UnboundColumnType.Integer,
+                //    VisibleIndex = 0
+                //});
                 gridView1.OptionsDetail.EnableMasterViewMode = true;
                 progressPanel1.Visible = false; // Ẩn progressPanel
             }
@@ -249,6 +286,7 @@ namespace SaovietTax
                 }
                 if (kq.Rows.Count > 0)
                 {
+                    lblSofiles2.Text = kq.Rows.Count.ToString();
                     foreach (DataRow item in kq.Rows)
                     {
 
@@ -301,7 +339,8 @@ namespace SaovietTax
                 gridView.OptionsView.EnableAppearanceOddRow = true;
 
                 // Thiết lập màu sắc cho hàng chẵn
-                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.LightGreen; // Màu nền cho hàng chẵn
+                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.FromArgb(223, 255, 254);
+
                 gridView.Appearance.EvenRow.ForeColor = System.Drawing.Color.Black; // Màu chữ cho hàng chẵn
 
                 // Thiết lập màu sắc cho hàng lẻ
@@ -350,7 +389,7 @@ namespace SaovietTax
             try
             {
                 // Kiểm tra sự tồn tại của bảng
-                DataTable schemaTable = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                System.Data.DataTable schemaTable = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
                 foreach (DataRow row in schemaTable.Rows)
                 {
                     if (row["TABLE_NAME"].ToString().Equals(tableName, StringComparison.OrdinalIgnoreCase))
@@ -670,7 +709,7 @@ namespace SaovietTax
             {
                 using (OleDbDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly))
                 {
-                    DataTable schemaTable = reader.GetSchemaTable();
+                    System.Data.DataTable schemaTable = reader.GetSchemaTable();
                     if (schemaTable != null)
                     {
                         foreach (DataRow row in schemaTable.Rows)
@@ -1324,7 +1363,7 @@ WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
 
                 lblThongbao.Text = "Kiểm tra khách hàng";
                 Application.DoEvents();
-                DataTable result = ExecuteQuery(querykh, new OleDbParameter("?", mst));
+                System.Data.DataTable result = ExecuteQuery(querykh, new OleDbParameter("?", mst));
                 if (result.Rows.Count == 0 && !string.IsNullOrEmpty(mst))
                 {
                     string diachi = nBanNode.SelectSingleNode("DChi")?.InnerText;
@@ -1334,7 +1373,7 @@ WHERE kh.MST = ?"; // Sử dụng ? thay cho @mst trong OleDb
                         diachi = Helpers.ConvertUnicodeToVni(diachi);
                     query = @" SELECT TOP 1 *  FROM KhachHang As kh
 WHERE kh.SoHieu = ?";
-                    DataTable result2 = ExecuteQuery(query, new OleDbParameter("?", Sohieu));
+                    System.Data.DataTable result2 = ExecuteQuery(query, new OleDbParameter("?", Sohieu));
                     if (result2.Rows.Count > 0)
                         Sohieu = "0" + Sohieu;
                     if (string.IsNullOrEmpty(diachi))
@@ -1638,12 +1677,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             return rowCount;
         }
-        private DataTable LoadExistingData(string tableName, string keyColumn1, string keyColumn2)
+        private System.Data.DataTable LoadExistingData(string tableName, string keyColumn1, string keyColumn2)
         {
             string query = $"SELECT {keyColumn1}, {keyColumn2} FROM {tableName}";
             return ExecuteQuery(query, null);
         }
-        private DataTable LoadExistingData2(string tableName, string keyColumn1, string keyColumn2, string keyColumn3)
+        private System.Data.DataTable LoadExistingData2(string tableName, string keyColumn1, string keyColumn2, string keyColumn3)
         {
             string query = $"SELECT {keyColumn1}, {keyColumn2}, {keyColumn3} FROM {tableName}";
             return ExecuteQuery(query, null);
@@ -1652,7 +1691,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private Dictionary<string, DataRow> LoadExistingKhachHang(string tableName, string keyColumn)
         {
             string query = $"SELECT * FROM {tableName}";
-            DataTable dt = ExecuteQuery(query, null);
+            System.Data.DataTable dt = ExecuteQuery(query, null);
             Dictionary<string, DataRow> khachHangDictionary = new Dictionary<string, DataRow>();
             foreach (DataRow row in dt.Rows)
             {
@@ -1671,7 +1710,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private Dictionary<string, DataRow> LoadExistingVatTu(string tableName, string keyColumn1, string keyColumn2)
         {
             string query = $"SELECT * FROM {tableName}";
-            DataTable dt = ExecuteQuery(query, null);
+            System.Data.DataTable dt = ExecuteQuery(query, null);
             Dictionary<string, DataRow> vatTuDictionary = new Dictionary<string, DataRow>();
             foreach (DataRow row in dt.Rows)
             {
@@ -1689,13 +1728,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
 
 
-        private DataTable LoadDinhDanhTaiKhoan()
+        private System.Data.DataTable LoadDinhDanhTaiKhoan()
         {
             string query = @"SELECT * FROM tbDinhdanhtaikhoan";
             return ExecuteQuery(query, null);
         }
 
-        private DataTable LoadDinhDanhTaiKhoanUuTien(int type)
+        private System.Data.DataTable LoadDinhDanhTaiKhoanUuTien(int type)
         {
             string query = (type == 1)
                 ? @"SELECT * FROM tbDinhdanhtaikhoan WHERE KeyValue LIKE '%Ưu tiên vào%'"
@@ -1705,7 +1744,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private DataRow LoadKhachHangByMST(string mst)
         {
             string query = "SELECT TOP 1 * FROM KhachHang WHERE MST = ?";
-            DataTable result = ExecuteQuery(query, new OleDbParameter("?", mst));
+            System.Data.DataTable result = ExecuteQuery(query, new OleDbParameter("?", mst));
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
         private string GenerateKhachVangLaiMST(string ten, string diachi)
@@ -1737,7 +1776,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             else
                 return false;
         }
-        private void ApplyDefaultAndRuleBasedAccounts(FileImport item, DataTable dinhDanhChung, DataTable dinhDanhUuTien)
+        private void ApplyDefaultAndRuleBasedAccounts(FileImport item, System.Data.DataTable dinhDanhChung, System.Data.DataTable dinhDanhUuTien)
         {
             if (item.fileImportDetails.Count == 1 && string.IsNullOrEmpty(item.fileImportDetails[0].DVT))
             {
@@ -1746,63 +1785,63 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 item.TkThue = 1331;
             }
 
-            if (string.IsNullOrEmpty(item.TKNo) || item.TKNo == "0")
-            {
-                if (item.fileImportDetails.Count > 0)
-                {
-                    foreach (DataRow row in dinhDanhChung.Rows)
-                    {
-                        string[] conditions = row["KeyValue"].ToString().Split('&');
-                        int hasMatch = 0;
-                        foreach (string condition in conditions)
-                        {
-                            string[] parts = Regex.Split(condition, @"([><=%]+)");
-                            if (parts.Length == 3)
-                            {
-                                string key = parts[0];
-                                string operatorStr = parts[1];
-                                string valueStr = parts[2].Trim('"');
-                                string chuoiBinhThuong = Helpers.ConvertUnicodeToVni(valueStr);
+            //if (string.IsNullOrEmpty(item.TKNo) || item.TKNo == "0")
+            //{
+            //    if (item.fileImportDetails.Count > 0)
+            //    {
 
-                                foreach (var detail in item.fileImportDetails)
-                                {
-                                    if (key == "Ten" && !string.IsNullOrEmpty(detail.Ten) && detail.Ten.IndexOf(chuoiBinhThuong, StringComparison.OrdinalIgnoreCase) >= 0)
-                                    {
-                                        hasMatch++;
-                                        break; // Chỉ cần một chi tiết thỏa mãn
-                                    }
-                                }
-                                if (key == "TongTien" && double.TryParse(valueStr, out var val) && EvaluateCondition(item.TongTien, operatorStr, val))
-                                {
-                                    hasMatch++;
-                                }
-                                if (key == "MST" && item.Mst?.Equals(valueStr, StringComparison.OrdinalIgnoreCase) == true)
-                                {
-                                    hasMatch++;
-                                }
+            //    }
+            //    else
+            //    {
+            //        item.TKCo = "1111";
+            //        item.TkThue = 1331;
+            //    }
+            //}
+            foreach (DataRow row in dinhDanhChung.Rows)
+            {
+                string[] conditions = row["KeyValue"].ToString().Split('&');
+                int hasMatch = 0;
+                foreach (string condition in conditions)
+                {
+                    string[] parts = Regex.Split(condition, @"([><=%]+)");
+                    if (parts.Length == 3)
+                    {
+                        string key = parts[0];
+                        string operatorStr = parts[1];
+                        string valueStr = parts[2].Trim('"');
+                        string chuoiBinhThuong = Helpers.ConvertUnicodeToVni(valueStr);
+
+                        foreach (var detail in item.fileImportDetails)
+                        {
+                            if (key == "Ten" && !string.IsNullOrEmpty(detail.Ten) && detail.Ten.IndexOf(chuoiBinhThuong, StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                hasMatch++;
+                                break; // Chỉ cần một chi tiết thỏa mãn
                             }
                         }
-
-                        if (hasMatch == conditions.Length)
+                        if (key == "TongTien" && double.TryParse(valueStr, out var val) && EvaluateCondition(item.TongTien, operatorStr, val))
                         {
-                            item.TKNo = row["TKNo"].ToString();
-                            item.TKCo = row["TKCo"].ToString();
-                            item.TkThue = int.Parse(row["TkThue"].ToString());
-                            if (string.IsNullOrEmpty(item.Noidung) && conditions.Any(c => c.StartsWith("MST")) && item.TKNo == "6422")
-                            {
-                                item.Noidung = row["Type"].ToString();
-                            }
-                            return; // Tìm thấy quy tắc phù hợp, thoát
+                            hasMatch++;
+                        }
+                        if (key == "MST" && item.Mst?.Equals(valueStr, StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            hasMatch++;
                         }
                     }
                 }
-                else
+
+                if (hasMatch == conditions.Length)
                 {
-                    item.TKCo = "1111";
-                    item.TkThue = 1331;
+                    item.TKNo = row["TKNo"].ToString();
+                    item.TKCo = row["TKCo"].ToString();
+                    item.TkThue = int.Parse(row["TkThue"].ToString());
+                    if ( conditions.Any(c => c.StartsWith("MST")) && item.TKNo == "6422")
+                    {
+                        item.Noidung = row["Type"].ToString();
+                    }
+                    return; // Tìm thấy quy tắc phù hợp, thoát
                 }
             }
-
             // Áp dụng quy tắc ưu tiên
             if (dinhDanhUuTien.Rows.Count > 0)
             {
@@ -1855,18 +1894,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 {
                     if (xtraTabControl2.SelectedTabPageIndex == 0)
                     {
-                        foreach (var item in people)
+                        foreach (var item in lstImportVao)
                         {
                             if (Helpers.ConvertUnicodeToVni(item.Ten.ToLower()) == tenkh.ToLower())
                             {
                                 item.Noidung = noidung;
                             }
                         }
-                        gridControl1.DataSource = people;
+                        gridControl1.DataSource = lstImportVao;
                         gridControl1.RefreshDataSource();
-                    }
-                    //Mật định tài khoản
-                    string getMST = kq.Rows[0]["MST"].ToString();
+                    } 
+                        //Mật định tài khoản
+                        string getMST = kq.Rows[0]["MST"].ToString();
                       query = @"select * FROM tbDinhdanhtaikhoan 
                                     WHERE KeyValue LIKE ? ";
                      parameterss = new OleDbParameter[]
@@ -1919,15 +1958,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     // Lấy chỉ số dòng đang được chọn trong GridView con
                     int focusedChildRowHandle = childView.FocusedRowHandle;
                     var parentId = childView.GetRowCellValue(focusedChildRowHandle, "ParentId");
-                    string sohieu = childView.GetRowCellValue(focusedChildRowHandle, "SoHieu").ToString();
-                    var getparent = people.Where(m => m.ID == (int)parentId).FirstOrDefault();
+                    int getID = (int)childView.GetRowCellValue(focusedChildRowHandle, "ID");
+                    var getparent = lstImportVao.Where(m => m.ID == (int)parentId).FirstOrDefault();
                     if (getparent != null)
                     {
-                        var getcurrent = getparent.fileImportDetails.Where(m => m.SoHieu == sohieu).FirstOrDefault();
+                        var getcurrent = getparent.fileImportDetails.Where(m => m.ID == getID).FirstOrDefault();
                         if (getcurrent != null)
                         {
                             getparent.fileImportDetails.Add(new FileImportDetail(getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
-                            gridControl1.DataSource = people;
+                            gridControl1.DataSource = lstImportVao;
                         }
 
                     }
@@ -1947,15 +1986,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     // Lấy chỉ số dòng đang được chọn trong GridView con
                     int focusedChildRowHandle = childView.FocusedRowHandle;
                     var parentId = childView.GetRowCellValue(focusedChildRowHandle, "ParentId");
-                    string sohieu = childView.GetRowCellValue(focusedChildRowHandle, "SoHieu").ToString();
-                    var getparent = people2.Where(m => m.ID == (int)parentId).FirstOrDefault();
+                    int getID = (int)childView.GetRowCellValue(focusedChildRowHandle, "ID");
+                    var getparent = lstImportRa.Where(m => m.ID == (int)parentId).FirstOrDefault();
                     if (getparent != null)
                     {
-                        var getcurrent = getparent.fileImportDetails.Where(m => m.SoHieu == sohieu).FirstOrDefault();
+                        var getcurrent = getparent.fileImportDetails.Where(m => m.ID == getID).FirstOrDefault();
                         if (getcurrent != null)
                         {
                             getparent.fileImportDetails.Add(new FileImportDetail(getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
-                            gridControl2.DataSource = people2;
+                            gridControl2.DataSource = lstImportRa;
                         }
 
                     }
@@ -1980,67 +2019,67 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             DateTime startDate = dtTungay.DateTime.Date;
             DateTime endDate = dtDenngay.DateTime.Date.AddDays(1).AddSeconds(-1); // Để bao gồm cả ngày cuối
 
-            lblThongbao.Text = "Đếm và lọc file";
-            progressPanel1.Caption = "Đếm và lọc file...";
-            Application.DoEvents();
+            //lblThongbao.Text = "Đếm và lọc file";
+            //progressPanel1.Caption = "Đếm và lọc file...";
+            //Application.DoEvents();
             var allFiles = Directory.EnumerateFiles(dataPath, "*.*", SearchOption.AllDirectories)
                 .Where(file => IsFileInMonthRange(file, dataPath, startMonth, endMonth)).ToList();
 
             var xmlFiles = allFiles.Where(f => f.ToLower().EndsWith(".xml")).ToList();
             var excelFiles = allFiles.Where(f => f.ToLower().EndsWith(".xlsx")).ToList();
-            List<string> lstdelete = new List<string>();
-            foreach (var item in xmlFiles)
-            {
-                XmlDocument xmlDoc = new XmlDocument();
-                string fullPath = item;
-                using (StreamReader reader = new StreamReader(fullPath, Encoding.UTF8))
-                {
-                    try
-                    {
-                        xmlDoc.Load(reader); // Tải file XML
-                    }
-                    catch (XmlException ex)
-                    {
-                        Console.WriteLine($"Lỗi khi tải file XML: {ex.Message}");
-                        return;
-                    }
-                    XmlNode root = xmlDoc.DocumentElement;
-                    XmlNode nTTChungNode = root.SelectSingleNode("//TTChung");
-                    DateTime NLap = DateTime.Parse(nTTChungNode.SelectSingleNode("NLap")?.InnerText);
-                    if (NLap >= dtTungay.DateTime && NLap <= dtDenngay.DateTime)
-                        continue;
-                    else
-                        lstdelete.Add(item);
+            //List<string> lstdelete = new List<string>();
+            //foreach (var item in xmlFiles)
+            //{
+            //    XmlDocument xmlDoc = new XmlDocument();
+            //    string fullPath = item;
+            //    using (StreamReader reader = new StreamReader(fullPath, Encoding.UTF8))
+            //    {
+            //        try
+            //        {
+            //            xmlDoc.Load(reader); // Tải file XML
+            //        }
+            //        catch (XmlException ex)
+            //        {
+            //            Console.WriteLine($"Lỗi khi tải file XML: {ex.Message}");
+            //            return;
+            //        }
+            //        XmlNode root = xmlDoc.DocumentElement;
+            //        XmlNode nTTChungNode = root.SelectSingleNode("//TTChung");
+            //        DateTime NLap = DateTime.Parse(nTTChungNode.SelectSingleNode("NLap")?.InnerText);
+            //        if (NLap >= dtTungay.DateTime && NLap <= dtDenngay.DateTime)
+            //            continue;
+            //        else
+            //            lstdelete.Add(item);
 
-                }
-            }
-            foreach (var item in lstdelete)
-            {
-                xmlFiles.Remove(item);
-            }
+            //    }
+            //}
+            //foreach (var item in lstdelete)
+            //{
+            //    xmlFiles.Remove(item);
+            //}
             int totalCount = xmlFiles.Count + CountExcelRows(excelFiles, startDate, endDate);
-            lblSofiles.Text = totalCount.ToString();
+            //lblSofiles.Text = totalCount.ToString();
             Application.DoEvents();
             if (type == 2) lblSofiles2.Text = totalCount.ToString();
 
             int filesLoaded = 0;
 
             // Tải dữ liệu hóa đơn và tbimport vào bộ nhớ để kiểm tra nhanh hơn
-            DataTable existingHoaDon = LoadExistingData2("HoaDon", "KyHieu", "SoHD","NgayPH");
-            DataTable existingTbImport = LoadExistingData("tbimport", "KHHDon", "SHDon");
+            System.Data.DataTable existingHoaDon = LoadExistingData2("HoaDon", "KyHieu", "SoHD","NgayPH");
+            System.Data.DataTable existingTbImport = LoadExistingData("tbimport", "KHHDon", "SHDon");
             Dictionary<string, DataRow> existingKhachHang = LoadExistingKhachHang("KhachHang", "MST");
             Dictionary<string, DataRow> existingKhachHang2 = LoadExistingKhachHang("KhachHang", "Ten");
             Dictionary<string, DataRow> existingVatTu = LoadExistingVatTu("Vattu", "TenVattu", "DonVi");
-            DataTable tbDinhDanhtaikhoan = LoadDinhDanhTaiKhoan();
-            DataTable tbDinhDanhtaikhoanUuTien = LoadDinhDanhTaiKhoanUuTien(type);
+            System.Data.DataTable tbDinhDanhtaikhoan = LoadDinhDanhTaiKhoan();
+            System.Data.DataTable tbDinhDanhtaikhoanUuTien = LoadDinhDanhTaiKhoanUuTien(type);
 
             foreach (string xmlFile in xmlFiles)
             {
                 lblThongbao.Text = $"Đọc file XML thứ {filesLoaded + 1}/{totalCount}";
-                progressPanel1.Caption = $"Đọc file XML thứ {filesLoaded + 1}/{totalCount}";
+                //progressPanel1.Caption = $"Đọc file XML thứ {filesLoaded + 1}/{totalCount}";
                // progressPercentage = (filesLoaded * 100) / totalCount;
                // progressBarControl1.EditValue = progressPercentage;
-                Application.DoEvents();
+                //Application.DoEvents();
                 filesLoaded++;
 
                 XmlDocument xmlDoc = new XmlDocument();
@@ -2236,7 +2275,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                         break;
                                 }
 
-                                soHieuVattu = existingDetail?.SoHieu ?? GenerateResultString(thhdVu.Trim());
+                                soHieuVattu = existingDetail?.SoHieu ?? GenerateResultString(NormalizeVietnameseString(thhdVu.Trim()));
                                 // Thêm mới vật tư (nếu cần và bạn muốn lưu vào DB ngay)
                                 // InitVatTu(soHieuVattu, Helpers.ConvertUnicodeToVni(thhdVu.Trim()), Helpers.ConvertUnicodeToVni(dvTinh));
                                 // Cập nhật Dictionary (nếu cần)
@@ -2551,7 +2590,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void ProcessCustomerInformation(FileImport fileImport)
         {
             string query = "SELECT TOP 1 * FROM KhachHang WHERE MST = ?";
-            DataTable result = ExecuteQuery(query, new OleDbParameter("?", fileImport.Mst));
+            System.Data.DataTable result = ExecuteQuery(query, new OleDbParameter("?", fileImport.Mst));
 
             if (result.Rows.Count == 0)
             {
@@ -2587,7 +2626,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void ApplyTaxCodeRules(FileImport fileImport)
         {
             string query = "SELECT * FROM tbDinhdanhtaikhoan where KeyValue like '%MST%'";
-            DataTable taxRules = ExecuteQuery(query);
+            System.Data.DataTable taxRules = ExecuteQuery(query);
 
             foreach (var item in people.Where(p => p.Mst == fileImport.Mst))
             {
@@ -2618,15 +2657,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void UpdateProgressUI()
         {
-            if (totalCount > 0)
-                progressPercentage = (filesLoaded * 100) / totalCount;
-            else
-                progressPercentage = 0;
+            //if (totalCount > 0)
+            //    progressPercentage = (filesLoaded * 100) / totalCount;
+            //else
+            //    progressPercentage = 0;
 
-            filesLoaded++;
-            progressBarControl1.EditValue = progressPercentage;
-            progressPanel1.Caption = $"Đọc file thứ {filesLoaded - 1}/{totalCount}";
-            Application.DoEvents();
+            //filesLoaded++;
+            //progressBarControl1.EditValue = progressPercentage;
+            //progressPanel1.Caption = $"Đọc file thứ {filesLoaded - 1}/{totalCount}";
+            //Application.DoEvents();
         }
         private FileImport ExtractFileImportData(IXLWorksheet worksheet, int row, string filePath)
         {
@@ -2792,8 +2831,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 options.AddUserProfilePreference("safebrowsing.disable_download_protection", true);
                 options.AddUserProfilePreference("safebrowsing.enabled", false); // Tắt Safe Browsing hoàn toàn
                 var driverPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                Driver = new ChromeDriver(driverPath, options);
+                ChromeDriverService chromeService = ChromeDriverService.CreateDefaultService(driverPath);
+                chromeService.HideCommandPromptWindow = true; // Để ẩn cửa sổ CMD của driver
 
+
+                Driver = new ChromeDriver(chromeService, options); 
                 //
                 try
                 {
@@ -2884,7 +2926,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         int globaltype = 0;
         Dictionary<int, int> dictionMonth = new Dictionary<int, int>();
         private int soThangtai=0;
-        private void Xulychonngay(WebDriverWait wait,int type,DateTime fd,DateTime td)
+        private void Xulychonngay(WebDriverWait wait, int type, DateTime fd, DateTime td)
         {
 
             // Tìm input với class 'ant-calendar-input' và placeholder 'Chọn thời điểm'
@@ -3163,7 +3205,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
                 var notificationButton = wait.Until(d => d.FindElement(By.XPath("//i[@aria-label='icon: bell']/parent::button")));
 
-                string targetUrl = "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don"; 
+                string targetUrl = "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don";
                 // Cách 1: Chuyển trang đơn giản
                 Driver.Navigate().GoToUrl(targetUrl);
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
@@ -3171,10 +3213,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     By.XPath("//div[@role='tab' and .//span[contains(text(),'Tra cứu hóa đơn điện tử mua vào')]]")
                 ));
                 tab.Click();
-                 
+
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
                 Thread.Sleep(200);
-                Xulychonngay(wait,1, fromdate, todate);
+                Xulychonngay(wait, 1, fromdate, todate);
                 Thread.Sleep(200);
                 new Actions(Driver)
 .SendKeys(Keys.Enter) // Tab lần 2
@@ -3188,8 +3230,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 //IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
                 //int rowCount = rows.Count;
                 //Chọn 50 rows
-                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-                
+                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(100));
+
 
                 var divElement = wait.Until(d => d.FindElements(By.XPath("//div[@class='ant-select-selection-selected-value' and @title='15']")));
                 // Nếu tìm thấy ít nhất một phần tử
@@ -3197,8 +3239,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 {
                     // Thực hiện cuộn đến phần tử với thời gian
                     var jsExecutor = (IJavaScriptExecutor)Driver;
-                    int scrollDuration = 2000; // Thời gian cuộn (ms)
-                    int scrollStep = 50; // Bước cuộn (px)
+                    int scrollDuration = 1000; // Thời gian cuộn (ms)
+                    int scrollStep = 20; // Bước cuộn (px)
 
                     for (int i = 0; i < scrollDuration; i += scrollStep)
                     {
@@ -3219,11 +3261,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     divElement[1].Click();
                     Console.WriteLine("Đã nhấp vào phần tử.");
                 }
+                Thread.Sleep(2000);
                 var dropdownMenu = wait.Until(d => d.FindElement(By.ClassName("ant-select-dropdown-menu")));
 
                 // Tìm phần tử <li> có nội dung là "50" và nhấp vào nó
                 var option50 = wait.Until(d => dropdownMenu.FindElements(By.XPath(".//li[text()='50']")));
-
+                Thread.Sleep(200);
                 // Nhấp vào phần tử "50"
                 if (option50 != null)
                 {
@@ -3236,7 +3279,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 // Cách 1: Target vào thẻ <i> có aria-label
                 //   d.FindElement(By.CssSelector("button.ant-btn-icon-only i[aria-label='icon: user']")
                 bool isPhantrang = false;
-                
+
                 try
                 {
                     while (isPhantrang == false)
@@ -3246,7 +3289,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         //// Đợi cho đến khi có ít nhất 1 dòng xuất hiện
                         //wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
                         //IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
-                      
+
                         //var rowCount = rows.Count;
 
                         //Console.WriteLine($"Số dòng trong bảng: {rowCount}");
@@ -3280,14 +3323,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
                                 //Kiểm tra xem  trong folder đã có chưa
                                 cell22252 = Helpers.InsertZero(cell22252);
-                                string pathkt =savedPath+ "\\HDVao\\"+dtTungay.DateTime.Month+"\\HD__" + dtTungay.DateTime.Month+"_" + cell22252 + "_" + cellC25TYY+".xml";
+                                string pathkt = savedPath + "\\HDVao\\" + dtTungay.DateTime.Month + "\\HD__" + dtTungay.DateTime.Month + "_" + cell22252 + "_" + cellC25TYY + ".xml";
                                 if (File.Exists(pathkt))
                                 {
                                     currentRow++;
                                     hasdata++;
                                     continue;
                                 }
-                                 
+
                                 string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
 
 
@@ -3369,21 +3412,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             isPhantrang = true;
                         }
                     }
-                  
+
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw ex;
                 }
                 Thread.Sleep(1000);
-                Cucthuekhngnhanma(wait, fromdate,todate); 
+                Cucthuekhngnhanma(wait, fromdate, todate);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi: {ex.Message}");
             }
         }
-        private void GiaiNenhoadon(int type)
+        public async Task GiaiNenhoadon(int type) // Hoặc private async Task nếu hàm này chỉ dùng nội bộ
         {
             try
             {
@@ -3394,93 +3437,148 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     typepath = "\\HDRa";
                 string pah = savedPath + typepath;
 
+                // Kiểm tra xem thư mục có tồn tại không trước khi lấy danh sách file
+                if (!Directory.Exists(pah))
+                {
+                    Console.WriteLine($"Thư mục '{pah}' không tồn tại để giải nén.");
+                    return; // Thoát nếu thư mục không tồn tại
+                }
+
+                // Directory.GetFiles là đồng bộ, nhưng việc này thường nhanh
                 string[] zipFiles = Directory.GetFiles(pah, "*.zip");
                 var i = 0;
+
+                // List để theo dõi các tác vụ giải nén
+                var extractionTasks = new System.Collections.Generic.List<Task>();
+
                 foreach (var zipFile in zipFiles)
                 {
                     string filename = "";
+                    // Lưu ý: Logic đặt tên file này có thể cần được xem xét lại nếu
+                    // tên file tải về không theo format invoice.zip, invoice (1).zip
+                    // Tốt hơn là lấy tên file từ Path.GetFileName(zipFile)
                     if (i == 0)
                     {
-                        filename = "invoice.zip";
-                        ExtractZip(pah, filename);
+                        filename = Path.GetFileName(zipFile); // Lấy tên file thực tế
+                                                              // Nếu bạn vẫn muốn cố định tên là "invoice.zip" cho file đầu tiên,
+                                                              // thì cần đảm bảo file đó thực sự được tải về với tên đó.
+                                                              // filename = "invoice.zip"; 
                     }
                     else
                     {
-                        filename = "invoice (" + i + ").zip";
-                        ExtractZip(pah, filename);
+                        filename = Path.GetFileName(zipFile); // Lấy tên file thực tế
+                                                              // Nếu bạn vẫn muốn cố định tên là "invoice (i).zip",
+                                                              // thì cần đảm bảo file đó thực sự được tải về với tên đó.
+                                                              // filename = "invoice (" + i + ").zip"; 
                     }
+
+                    // Gọi ExtractZip và chờ nó hoàn thành từng cái một (dù ExtractZip chạy trên thread pool)
+                    // Nếu bạn muốn giải nén CÙNG LÚC nhiều file, bạn có thể thay đổi cách gọi ở đây.
+                    // Để chạy tuần tự từng file một (nhưng bản thân mỗi file giải nén là async):
+                    await ExtractZip(pah, filename);
+
+                    // Nếu bạn muốn giải nén SONG SONG các file:
+                    // extractionTasks.Add(ExtractZip(pah, filename));
+
                     i++;
                 }
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-           
 
-        }
-        private void ExtractZip(string path, string filename)
-        {
-            string downloadPath = path;
-            string zipFileName = filename; // Thay bằng tên file thực tế
+                // Nếu bạn chọn giải nén SONG SONG, bạn cần chờ tất cả các tác vụ hoàn thành ở đây:
+                // await Task.WhenAll(extractionTasks);
+                // Console.WriteLine("Đã hoàn tất giải nén tất cả các file zip.");
 
-
-            string zipFilePath = System.IO.Path.Combine(downloadPath, zipFileName);
-            string extractPath = System.IO.Path.Combine(downloadPath, System.IO.Path.GetFileNameWithoutExtension(zipFileName));
-            // Tạo thư mục giải nén nếu chưa tồn tại
-            Directory.CreateDirectory(extractPath);
-
-            // Giải nén file
-            try
-            {
-                ZipFile.ExtractToDirectory(zipFilePath, extractPath);
-                Console.WriteLine($"Đã giải nén thành công vào: {extractPath}");
-                File.Delete(zipFilePath);
-                //Vào thư mục mới tạo
-                string invoiceFilePath = System.IO.Path.Combine(extractPath, "invoice.xml");
-                string htmlFilepath = System.IO.Path.Combine(extractPath, "invoice.html");
-                var newname = Getnewname(invoiceFilePath, 1);
-                var newnamehtml = Getnewname(invoiceFilePath, 2);
-                var getsplit = (newname.Split('_'))[2];
-                var getsplithtml = (newnamehtml.Split('_'))[2];
-                newname = getsplit + "\\" + newname;
-                newnamehtml = getsplithtml + "\\" + newnamehtml;
-                string newFilePath = System.IO.Path.Combine(path, newname);
-                string newFilePathhtml = System.IO.Path.Combine(path, newnamehtml);
-                if (File.Exists(invoiceFilePath))
-                {
-                    try
-                    {
-                        if (!File.Exists(newFilePath))
-                        {
-                            File.Move(invoiceFilePath, newFilePath);
-                        }
-                        else
-                        {
-                            File.Delete(invoiceFilePath);
-                        }
-                        if (!File.Exists(newFilePathhtml))
-                        {
-                            File.Move(htmlFilepath, newFilePathhtml);
-                        }
-                       
-                        Directory.Delete(extractPath, true); // true để xóa cả nội dung bên trong
-                    }
-                    catch (Exception ex)
-                    {
-                        var ms = ex.Message;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Tệp invoice.xml không tồn tại trong thư mục giải nén.");
-                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lỗi khi giải nén: {ex.Message}");
+                Console.WriteLine($"Lỗi trong GiaiNenhoadon: {ex.Message}");
+                // Không nên 'throw ex;' ở đây nếu đây là một event handler của UI hoặc không có handler cụ thể.
+                // Thay vào đó, hãy ghi log lỗi.
+                // Nếu bạn muốn ném lại ngoại lệ, hãy dùng 'throw;' (không phải 'throw ex;') để giữ nguyên stack trace.
+                // throw;
             }
         }
+        private async Task ExtractZip(string path, string filename)
+        {
+            string downloadPath = path;
+            string zipFileName = filename;
+
+            string zipFilePath = System.IO.Path.Combine(downloadPath, zipFileName);
+            string extractPath = System.IO.Path.Combine(downloadPath, System.IO.Path.GetFileNameWithoutExtension(zipFileName));
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    Directory.CreateDirectory(extractPath);
+                    ZipFile.ExtractToDirectory(zipFilePath, extractPath);
+                    Console.WriteLine($"Đã giải nén thành công vào: {extractPath}");
+                    File.Delete(zipFilePath);
+
+                    string invoiceFilePath = System.IO.Path.Combine(extractPath, "invoice.xml");
+                    string htmlFilepath = System.IO.Path.Combine(extractPath, "invoice.html");
+
+                    var newname = Getnewname(invoiceFilePath, 1);
+                    var newnamehtml = Getnewname(invoiceFilePath, 2);
+
+                    var getsplit = (newname.Split('_'))[2];
+                    var getsplithtml = (newnamehtml.Split('_'))[2];
+
+                    string targetDirXml = Path.Combine(path, getsplit);
+                    string targetDirHtml = Path.Combine(path, getsplithtml);
+
+                    Directory.CreateDirectory(targetDirXml); // Tạo thư mục đích cho file XML
+                    Directory.CreateDirectory(targetDirHtml); // Tạo thư mục đích cho file HTML
+
+                    newname = Path.Combine(getsplit, newname); // Correctly build the path
+                    newnamehtml = Path.Combine(getsplithtml, newnamehtml); // Correctly build the path
+
+                    string newFilePath = Path.Combine(path, newname);
+                    string newFilePathhtml = Path.Combine(path, newnamehtml);
+
+                    if (File.Exists(invoiceFilePath))
+                    {
+                        try
+                        {
+                            if (!File.Exists(newFilePath))
+                            {
+                                File.Move(invoiceFilePath, newFilePath);
+                            }
+                            else
+                            {
+                                File.Delete(invoiceFilePath);
+                            }
+
+                            if (File.Exists(htmlFilepath))
+                            {
+                                if (!File.Exists(newFilePathhtml))
+                                {
+                                    File.Move(htmlFilepath, newFilePathhtml);
+                                }
+                                else
+                                {
+                                    File.Delete(htmlFilepath);
+                                }
+                            }
+
+                            Directory.Delete(extractPath, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Lỗi khi di chuyển/xóa file: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Tệp invoice.xml không tồn tại trong thư mục giải nén.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi giải nén hoặc xử lý file: {ex.Message}");
+                }
+            });
+        }
+
         private string Getnewname(string path, int type)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -3919,7 +4017,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             // Nhấp vào phần tử đó
 
             divElement[1].Click();
-            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(100));
             var listItem = wait.Until(d => d.FindElements(By.XPath("//li[@role='option' and @class='ant-select-dropdown-menu-item']"))
             .FirstOrDefault(e => e.Text.Trim() == "Cục Thuế đã nhận không mã"));
 
@@ -3957,10 +4055,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 .Pause(TimeSpan.FromSeconds(2))
                 .Click()
                 .Perform();
-            Thread.Sleep(2000); // Hoặc sử dụng WebDriverWait để chờ điều kiện phù hợp
+            Thread.Sleep(1000); // Hoặc sử dụng WebDriverWait để chờ điều kiện phù hợp
                                 //Tải file excel  
             XulyxoaExcel(fromdate, todate);
-            Thread.Sleep(1000);
+            Thread.Sleep(200);
             Xulymaytinhtien(wait);
 
         }
@@ -3998,7 +4096,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     string qury = @"SELECT TOP 1 * FROM KhachHang AS kh
                          WHERE kh.SoHieu = ?"; // Sử dụng ? thay cho @mst trong OleDb
 
-                    DataTable rs = ExecuteQuery(qury, new OleDbParameter("?", "KV"));
+                    System.Data.DataTable rs = ExecuteQuery(qury, new OleDbParameter("?", "KV"));
 
                     if (rs.Rows.Count == 0)
                     {
@@ -4037,9 +4135,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             // Thực thi truy vấn và lấy kết quả
             int a = ExecuteQueryResult(query, parameters);
         }
-        private DataTable ExecuteQuery(string query, params OleDbParameter[] parameters)
+        private System.Data.DataTable ExecuteQuery(string query, params OleDbParameter[] parameters)
         {
-            DataTable dataTable = new DataTable();
+            System.Data.DataTable dataTable = new System.Data.DataTable();
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
@@ -4073,7 +4171,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private int ExecuteQueryResult(string query, params OleDbParameter[] parameters)
         {
-            DataTable dataTable = new DataTable();
+            System.Data.DataTable dataTable = new System.Data.DataTable();
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
@@ -4809,7 +4907,34 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
+            if (chkDauvao.Checked)
+            {
+                foreach (var item in lstImportVao)
+                {
+                    if(string.IsNullOrEmpty(item.Noidung) && item.Checked)
+                    { 
+                        XtraMessageBox.Show("Hóa đơn "+ item.SHDon + ", Nội dung không được đê trống!");
+                        return;
+                    }
+                }
+            }
+            if (chkDaura.Checked)
+            {
+                foreach (var item in lstImportRa)
+                {
+                    if (string.IsNullOrEmpty(item.Noidung) && item.Checked)
+                    {
+                        var index = lstImportRa.IndexOf(item);
+                        XtraMessageBox.Show("Hóa đơn " + item.SHDon + ", Nội dung không được đê trống!");
+                        return;
+                    }
+                }
+            }
             progressPanel1.Caption = "Đang xử lý";
+            progressPanel1.Visible = true;
+            //Cho tất cả hóa đơn dạng ko dc check, trừ nhung hoa don =1 hoặc bằng 2
+            string queryc = @"UPDATE tbimport SET  Status =-1 WHERE Status=0 ";
+            int rowsAffecteds = ExecuteQueryResult(queryc, null);
             if (chkDauvao.Checked)
             {
                 foreach (var item in lstImportVao)
@@ -4840,44 +4965,38 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                     }
 
-                    if (!item.Checked)
+                    if (item.Checked)
                     {
-                        string query = @"UPDATE tbimport SET  Status =-1 WHERE ID=?";
-                        var parameters = new OleDbParameter[]
-                         {
-            new OleDbParameter("?", item.ID)
-                         };
-                        int rowsAffected = ExecuteQueryResult(query, parameters);
-                    }
-                    else
-                    {
+
                         string query = @"UPDATE tbimport SET  Status =0 WHERE ID=?";
                         var parameters = new OleDbParameter[]
                          {
             new OleDbParameter("?", item.ID)
                          };
                         int rowsAffected = ExecuteQueryResult(query, parameters);
-                    }
-                    // Thực hiện insert Vật tư
-                    foreach(var  it in item.fileImportDetails)
-                    {
-                        if (it.TKNo.Contains("|"))
+                        foreach (var it in item.fileImportDetails)
                         {
-                            var getsplit = it.TKNo.Split('|');
-                            it.TKNo = getsplit[0];
-                            it.MaCT=getsplit[1];
-                            string query = @"UPDATE tbimportdetail SET  TKNo =?,MaCT=? WHERE ID=?";
-                            var parameters = new OleDbParameter[]
-                             {
+                            if (it.TKNo.Contains("|"))
+                            {
+                                var getsplit = it.TKNo.Split('|');
+                                it.TKNo = getsplit[0];
+                                it.MaCT = getsplit[1];
+                                 query = @"UPDATE tbimportdetail SET  TKNo =?,MaCT=? WHERE ID=?";
+                                 parameters = new OleDbParameter[]
+                                 {
                               new OleDbParameter("?", it.TKNo),
                                new OleDbParameter("?", it.MaCT),
                               new OleDbParameter("?", it.ID)
-                             };
-                            int rowsAffected = ExecuteQueryResult(query, parameters);
+                                 };
+                                int rowsAffected2 = ExecuteQueryResult(query, parameters);
+                            }
+                            //Sửa cho trường hợp có công trình
+                            if (item.TKNo.Contains("15"))
+                                InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu, Helpers.ConvertUnicodeToVni(it.Ten));
                         }
-                        //Sửa cho trường hợp có công trình
-                        InsertHangHoa(Helpers.ConvertUnicodeToVni(it.DVT), it.SoHieu,Helpers.ConvertUnicodeToVni(it.Ten));
-                    }
+                    } 
+                    // Thực hiện insert Vật tư
+                   
                    
                 }
             }
@@ -4950,7 +5069,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 }
             }
-                this.Close();
+
+            isClick = true;
+            this.Close();
                 return;
            
             //Cập nhật cho đầu vào
@@ -5022,13 +5143,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 return;
             }
 
-            if (data.Any(m => string.IsNullOrEmpty(m.TKCo) && m.Checked) ||
-                data.Any(m => string.IsNullOrEmpty(m.TKNo) && m.Checked) ||
-                data.Any(m => string.IsNullOrEmpty(m.Noidung) && m.Checked))
-            {
-                XtraMessageBox.Show("Thông tin không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            //if (data.Any(m => string.IsNullOrEmpty(m.TKCo) && m.Checked) ||
+            //    data.Any(m => string.IsNullOrEmpty(m.TKNo) && m.Checked) ||
+            //    data.Any(m => string.IsNullOrEmpty(m.Noidung) && m.Checked))
+            //{
+            //    XtraMessageBox.Show("Thông tin không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //    return;
+            //}
 
             bool isNull = false;
             using (OleDbConnection connection = new OleDbConnection(connectionString)) // Thay thế chuỗi kết nối
@@ -5063,15 +5184,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 item.TKCo = "331";
                             }
 
-                            if (string.IsNullOrEmpty(item.TKCo) ||
-                                string.IsNullOrEmpty(item.TKNo) ||
-                                string.IsNullOrEmpty(item.Noidung))
-                            {
-                                isNull = true;
-                                MessageBox.Show("Thông tin không được để trống");
-                                transaction.Rollback(); // Rollback giao dịch nếu có lỗi
-                                return;
-                            }
+                            //if (string.IsNullOrEmpty(item.TKCo) ||
+                            //    string.IsNullOrEmpty(item.TKNo) ||
+                            //    string.IsNullOrEmpty(item.Noidung))
+                            //{
+                            //    isNull = true;
+                            //    MessageBox.Show("Thông tin không được để trống");
+                            //    transaction.Rollback(); // Rollback giao dịch nếu có lỗi
+                            //    return;
+                            //}
                             bool parenthasCT = false;
                             // Xử lý 154 cho notk
                             if (item.TKNo.Contains('|'))
@@ -5156,7 +5277,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         if (!isNull)
                         {
                            // XtraMessageBox.Show("Lấy dữ liệu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            isClick = true; 
+                            //isClick = true; 
                         }
                     }
                     catch (Exception ex)
@@ -5606,7 +5727,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             // Lấy giá trị của cột 10
             object cellValue = gridView1.GetRowCellValue(e.RowHandle, gridView1.Columns["isAcess"]);
-
+           
             // Nếu giá trị là false, vô hiệu hóa ô chỉnh sửa
             //if (cellValue is bool && !(bool)cellValue)
             //{
@@ -6269,25 +6390,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             if (e.KeyCode == System.Windows.Forms.Keys.Delete)
             {
-                // Lấy hàng hiện tại
-                int rowHandle = gridView1.FocusedRowHandle;
                
-                GridView parentView = gridControl1.MainView as GridView;
-                GridView childView = parentView.GetDetailView(rowHandle, 0) as GridView;
-                var ID = (int)parentView.GetRowCellValue(rowHandle, "ID");
-                if (childView != null)
-                {
-                    // Lấy chỉ số dòng đang được chọn trong GridView con
-                    int focusedChildRowHandle = childView.FocusedRowHandle;
-                    var parentId = childView.GetRowCellValue(focusedChildRowHandle, "ParentId");
-                    string sohieu = (string)childView.GetRowCellValue(focusedChildRowHandle, "SoHieu");
-                    FileImportDetail itemToRemove = (FileImportDetail)childView.GetRow(rowHandle);
-                    var pp = people.Where(m => m.ID == ID).FirstOrDefault();
-                    pp.fileImportDetails.Remove(itemToRemove);
-                }
-                gridControl1.DataSource = people;
-                gridControl1.RefreshDataSource();
-            }
+               
+            } 
+           
         }
 
         private void gridView3_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
@@ -6699,7 +6805,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             // Lấy chỉ số dòng của gridView1
             int rowIndex = gridView1.FocusedRowHandle; // Thay vì CurrentRow.Index
-            int rowIndex2 = gridView2.FocusedRowHandle; // Thay vì CurrentRow.Index
+            int rowIndex2 = gridView2.FocusedRowHandle; // Thay vì CurrentRow.Index 
+            // Hoặc nếu bạn muốn sử dụng FieldName
+            string fieldName = e.Column.FieldName;
+            if (fieldName == "Soluong")
+            {
+                double soluong = (double)gridView2.GetRowCellValue(rowIndex2, "Soluong"); // Thay "ColumnName" bằng tên cột thực tế
+                double dongia = (double)gridView2.GetRowCellValue(rowIndex2, "Dongia"); // Thay "ColumnName" bằng tên cột thực tế
+                double Thanhtien = soluong * dongia;
+                gridView2.SetRowCellValue(rowIndex2, "TTien", Thanhtien);
+            }
             // Kiểm tra nếu chỉ số dòng hợp lệ
             if (rowIndex >= 0)
             {
@@ -6778,6 +6893,25 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
 
+        }
+
+        private void gridView1_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
+        {
+             if (e.Column.FieldName == "Index" && e.IsGetData)
+            {
+                e.Value = e.ListSourceRowIndex + 1; // Gán giá trị số thứ tự
+            }
+        }
+
+        private void gridView3_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
+        {
+           if (e.Column.FieldName == "Index")
+            {
+                if (e.IsGetData) // Kiểm tra xem có phải đang lấy dữ liệu không
+                {
+                    e.Value = e.ListSourceRowIndex + 1; // Gán số thứ tự
+                }
+            }
         }
 
         public static string NormalizeVietnameseString(string input)
