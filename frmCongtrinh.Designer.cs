@@ -49,6 +49,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txtSohieu = new DevExpress.XtraEditors.TextEdit();
             this.label1 = new System.Windows.Forms.Label();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
@@ -59,14 +60,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtTenvattu.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtSohieu.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // gridControl1
             // 
-            this.gridControl1.Location = new System.Drawing.Point(12, 12);
+            this.gridControl1.Location = new System.Drawing.Point(12, 45);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(525, 590);
+            this.gridControl1.Size = new System.Drawing.Size(525, 557);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -79,6 +81,8 @@
             this.colTenVattu});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
+            this.gridView1.OptionsView.GroupDrawMode = DevExpress.XtraGrid.Views.Grid.GroupDrawMode.Office2003;
+            this.gridView1.OptionsView.ShowGroupPanel = false;
             this.gridView1.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView1_RowClick);
             // 
             // colSoHieu
@@ -147,7 +151,6 @@
             this.txtId.Name = "txtId";
             this.txtId.Size = new System.Drawing.Size(549, 27);
             this.txtId.TabIndex = 12;
-            this.txtId.Visible = false;
             // 
             // simpleButton4
             // 
@@ -253,11 +256,22 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Số hiệu";
             // 
+            // comboBoxEdit1
+            // 
+            this.comboBoxEdit1.Location = new System.Drawing.Point(12, 12);
+            this.comboBoxEdit1.Name = "comboBoxEdit1";
+            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.comboBoxEdit1.Size = new System.Drawing.Size(525, 27);
+            this.comboBoxEdit1.TabIndex = 8;
+            this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
+            // 
             // frmCongtrinh
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1148, 628);
+            this.Controls.Add(this.comboBoxEdit1);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.gridControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -276,6 +290,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtTenvattu.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtSohieu.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -302,5 +317,6 @@
         private DevExpress.XtraEditors.TextEdit txtId;
         private System.Windows.Forms.Label label5;
         private DevExpress.XtraEditors.TextEdit txtTaikhoan;
+        private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
     }
 }

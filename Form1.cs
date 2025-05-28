@@ -65,6 +65,9 @@ using static iText.IO.Image.Jpeg2000ImageData;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using System.Threading.Tasks;
+using Windows.Media.Ocr;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using System.Runtime.Remoting.Contexts;
 
 namespace SaovietTax
 {
@@ -187,7 +190,7 @@ namespace SaovietTax
                 lstImportVao = new BindingList<FileImport>();
                 // For individual GridControl 
                 //Load data từ database 
-                string queryCheckVatTu = @"SELECT * FROM tbimport   WHERE  Status <> 1 AND Type = ?";
+                string queryCheckVatTu = @"SELECT * FROM tbimport   WHERE  Status <> 1 and Status <>2 AND Type = ?";
 
                 var parameterss = new OleDbParameter[]
                 { 
@@ -404,6 +407,24 @@ namespace SaovietTax
             }
             return false;
         }
+        static void CreateTableNganhang(OleDbConnection connection, string tableName)
+        {
+            string createTableQuery = $@"
+        CREATE TABLE {tableName} (
+            ID AUTOINCREMENT PRIMARY KEY,
+            SHDon TEXT,
+            NgayGD TEXT,
+            DienGiai TEXT,
+            TongTien NUMBER,
+            TKNo TEXT,  
+            TKCo TEXT 
+        );";
+
+            using (OleDbCommand command = new OleDbCommand(createTableQuery, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
         static void CreateTableDinhDanh(OleDbConnection connection, string tableName)
         {
             string createTableQuery = $@"
@@ -528,7 +549,14 @@ namespace SaovietTax
                 string tableName = "tbimport";
                 string tableNamedetail = "tbimportdetail";
                 string tableDinhdanh = "tbDinhdanhtaikhoan";
+                string tableNganhang = "tbNganhang";
                 // Kiểm tra xem bảng đã tồn tại hay không
+                if (!TableExists(connection, tableNganhang))
+                {
+                    // Tạo bảng nếu chưa tồn tại
+                    CreateTableNganhang(connection, tableNganhang);
+                    Console.WriteLine($"Bảng '{tableNganhang}' đã được tạo thành công.");
+                }
                 if (!TableExists(connection, tableDinhdanh))
                 {
                     // Tạo bảng nếu chưa tồn tại
@@ -537,6 +565,17 @@ namespace SaovietTax
                 }
                 else
                 {
+                    // Kiểm tra xem cột tkoco đã tồn tại hay chưa
+                    if (!ColumnExists(connection, "tbRegister", "col1"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbRegister", "col1", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbRegister", "col2"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbRegister", "col2", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     // Kiểm tra xem cột tkoco đã tồn tại hay chưa
                     if (!ColumnExists(connection, "tbimport", "Path"))
                     {
@@ -975,9 +1014,23 @@ namespace SaovietTax
             {
                 MSTCongTY = kq.Rows[0]["MaSoThue"].ToString();
             }
+        } 
+        public static double CalculateSimilarityPercentage(string str1, string str2)
+        {
+            var words1 = str1.Split(' ').Select(w => w.ToLower());
+            var words2 = str2.Split(' ').Select(w => w.ToLower());
+
+            int commonWordsCount = words1.Intersect(words2).Count(); // Số từ chung
+            int maxWordsCount = Math.Max(words1.Count(), words2.Count()); // Số từ lớn nhất
+
+            return (double)commonWordsCount / maxWordsCount * 100; // Tính tỷ lệ phần trăm
         }
         private void frmMain_Load(object sender, EventArgs e)
-        { 
+        {
+            string str1 = "Chất kết dính";
+            string str2 = "Chất kết dính từ Silicon";
+            double similarityPercentage = CalculateSimilarityPercentage(str1, str2);
+
             InitDB();
 
             InitData(); 
@@ -1883,11 +1936,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                  string noidung=  parentView.GetRowCellValue(focusedRowHandle, "Noidung").ToString();
                 string tenkh= Helpers.ConvertUnicodeToVni(parentView.GetRowCellValue(focusedRowHandle, "Ten").ToString());
+                string mst = Helpers.ConvertUnicodeToVni(parentView.GetRowCellValue(focusedRowHandle, "Mst").ToString());
                 string query = @"select * FROM KhachHang 
-                                    WHERE LCase(Ten) LIKE ? ";
+                                    WHERE MST = ? ";
                 var parameterss = new OleDbParameter[]
                 {
-                new OleDbParameter("?",tenkh.ToLower())
+                new OleDbParameter("?",mst)
                    };
                 var kq = ExecuteQuery(query, parameterss);
                 if (kq.Rows.Count > 0)
@@ -1896,9 +1950,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     {
                         foreach (var item in lstImportVao)
                         {
-                            if (Helpers.ConvertUnicodeToVni(item.Ten.ToLower()) == tenkh.ToLower())
+                            if (item.Mst == mst)
                             {
                                 item.Noidung = noidung;
+                                query = @"UPDATE tbimport SET Noidung=?  WHERE ID=?";
+                                var parameters = new OleDbParameter[]
+                         {
+                                new OleDbParameter("?", Helpers.ConvertUnicodeToVni(noidung)),
+                                   new OleDbParameter("?",item.ID),
+                         };
+                                int rowsAffected = ExecuteQueryResult(query, parameters);
                             }
                         }
                         gridControl1.DataSource = lstImportVao;
@@ -2001,9 +2062,29 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
            
+        } 
+        public static bool AreNamesSimilar(string name1, string name2)
+        {
+            string cleanName1 = CleanUpName(name1);
+            string cleanName2 = CleanUpName(name2);
+
+            // Kiểm tra nếu một tên chứa tên còn lại
+            return cleanName1.Contains(cleanName2) || cleanName2.Contains(cleanName1);
+        }
+
+        private static string CleanUpName(string name)
+        {
+            // Loại bỏ ký tự không phải chữ cái và số
+            string cleaned = Regex.Replace(name, @"[^\w\s]", "");
+
+            // Thay thế khoảng trắng đứng sau ký tự đặc biệt
+            cleaned = Regex.Replace(cleaned, @"\s+", " "); // Đảm bảo chỉ có 1 khoảng trắng
+            return cleaned.ToLower().Trim(); // Chuyển thành chữ thường và loại bỏ khoảng trắng thừa
+
         }
         private void LoadXmlFilesOptimized(string path, int type)
-            {
+            { 
+
             progressPanel1.Visible = true;
             lblThongbao.Text = "Bắt đầu chạy";
             progressPanel1.Caption = "Bắt đầu chạy...";
@@ -2067,6 +2148,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             // Tải dữ liệu hóa đơn và tbimport vào bộ nhớ để kiểm tra nhanh hơn
             System.Data.DataTable existingHoaDon = LoadExistingData2("HoaDon", "KyHieu", "SoHD","NgayPH");
             System.Data.DataTable existingTbImport = LoadExistingData("tbimport", "KHHDon", "SHDon");
+            System.Data.DataTable existingTbImportVattu = LoadExistingData2("Vattu", "TenVattu", "DonVi", "SoHieu");
             Dictionary<string, DataRow> existingKhachHang = LoadExistingKhachHang("KhachHang", "MST");
             Dictionary<string, DataRow> existingKhachHang2 = LoadExistingKhachHang("KhachHang", "Ten");
             Dictionary<string, DataRow> existingVatTu = LoadExistingVatTu("Vattu", "TenVattu", "DonVi");
@@ -2183,7 +2265,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 int tkThue = 0;
                 string sohieuKH = "";
                 // Kiểm tra và thêm mới khách hàng (tối ưu hóa bằng cách sử dụng Dictionary)
-                if (!string.IsNullOrEmpty(mst) )
+                if (!string.IsNullOrEmpty(mst))
                 {
                     if (!existingKhachHang.ContainsKey(mst))
                     {
@@ -2193,6 +2275,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         if (existingKhachHang.Values.Any(kh => kh["SoHieu"]?.ToString() == sohieuKH))
                         {
                             sohieuKH = "0" + sohieuKH;
+                        }
+                        if (existingKhachHang.Values.Any(kh => kh["SoHieu"]?.ToString() == sohieuKH))
+                        {
+                            sohieuKH = "00" + sohieuKH;
                         }
                         InitCustomer(type == 1 ? 2 : 3, sohieuKH, tenKHVni, diachiKHVni, mst);
                         // Cập nhật Dictionary sau khi thêm mới (nếu cần cho các file sau)
@@ -2260,9 +2346,24 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             string tenVattuVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(thhdVu.Trim())).ToLower();
                             string dvTinhVni = Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(dvTinh)).ToLower();
                             string soHieuVattu = "";
-
-
-                            if (!existingVatTu.ContainsKey($"{tenVattuVni}-{dvTinhVni}"))
+                            bool hasVattu = false;
+                            DataRow getrow = null;
+                            //Kểm tra vật tư
+                            foreach(DataRow row in existingTbImportVattu.Rows)
+                            {
+                                if(row["TenVattu"].ToString() == "chaát keát dính ñi töø Silicon Apolo")
+                                {
+                                    int test = 10;
+                                }
+                                if (AreNamesSimilar(row["TenVattu"].ToString().ToLower(), tenVattuVni.ToLower()))
+                                {
+                                    hasVattu = true;
+                                    getrow = row;
+                                    break;
+                                }
+                            }
+                            // if (!existingVatTu.ContainsKey($"{tenVattuVni}-{dvTinhVni}") || !hasVattu)
+                            if (!hasVattu)
                             {
                                 // Kiểm tra trong list tạm thời của file hiện tại
                                 //var existingDetail = newFileImport.fileImportDetails.FirstOrDefault(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni);
@@ -2284,7 +2385,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             }
                             else
                             {
-                                soHieuVattu = existingVatTu[$"{tenVattuVni}-{dvTinhVni}"]["SoHieu"]?.ToString();
+                                soHieuVattu= getrow["SoHieu"]?.ToString();
+                                //soHieuVattu = existingVatTu[$"{tenVattuVni}-{dvTinhVni}"]["SoHieu"]?.ToString();
                             }
 
                             FileImportDetail fileImportDetail = new FileImportDetail(NormalizeVietnameseString(thhdVu), newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString(), dttien);
@@ -2466,6 +2568,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnChonthang_Click(object sender, EventArgs e)
         {
+          
             Id = 1;
              filesLoaded = 0;
             totalCount = 0;
@@ -3266,7 +3369,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 // Tìm phần tử <li> có nội dung là "50" và nhấp vào nó
                 var option50 = wait.Until(d => dropdownMenu.FindElements(By.XPath(".//li[text()='50']")));
-                Thread.Sleep(200);
+                Thread.Sleep(2000);
                 // Nhấp vào phần tử "50"
                 if (option50 != null)
                 {
@@ -4907,6 +5010,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnimport_Click(object sender, EventArgs e)
         {
+            if (xtraTabControl2.SelectedTabPageIndex == 2)
+            {
+
+                return;
+            }
             if (chkDauvao.Checked)
             {
                 foreach (var item in lstImportVao)
@@ -4964,7 +5072,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         item.fileImportDetails = new List<FileImportDetail>();
 
                     }
-
+                    else
+                    {
+                        if (item.TKNo.Contains("154"))
+                        {
+                         var   query = @"delete from  tbimportdetail WHERE ParentId=?";
+                          var  parameters = new OleDbParameter[]
+                            {
+            new OleDbParameter("?", item.ID)
+                            };
+                           var rowsAffected = ExecuteQueryResult(query, parameters);
+                            item.fileImportDetails = new List<FileImportDetail>();
+                        }
+                    }
                     if (item.Checked)
                     {
 
@@ -4981,13 +5101,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 var getsplit = it.TKNo.Split('|');
                                 it.TKNo = getsplit[0];
                                 it.MaCT = getsplit[1];
-                                 query = @"UPDATE tbimportdetail SET  TKNo =?,MaCT=? WHERE ID=?";
-                                 parameters = new OleDbParameter[]
-                                 {
+                                query = @"UPDATE tbimportdetail SET  TKNo =?,MaCT=? WHERE ID=?";
+                                parameters = new OleDbParameter[]
+                                {
                               new OleDbParameter("?", it.TKNo),
                                new OleDbParameter("?", it.MaCT),
                               new OleDbParameter("?", it.ID)
-                                 };
+                                };
                                 int rowsAffected2 = ExecuteQueryResult(query, parameters);
                             }
                             //Sửa cho trường hợp có công trình
@@ -6177,6 +6297,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         // Thực hiện hành động mong muốn khi nhấn phím Tab
                         frmCongtrinh frmCongtrinh = new frmCongtrinh();
                         frmCongtrinh.frmMain = this;
+                        frmCongtrinh.VatTu vatTu = new frmCongtrinh.VatTu();
+                        vatTu.SoHieu = cellValue.ToString();
+                        frmCongtrinh.dtoVatTu = vatTu;
                         frmCongtrinh.ShowDialog();
                         if (cellValue.ToString().Contains("|"))
                             cellValue = cellValue.ToString().Split('|')[0];
@@ -6295,6 +6418,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                new OleDbParameter("?", getfip.ID)
             };
             int rowsAffected = ExecuteQueryResult(query, parameters);
+            //
+             query = @"UPDATE tbimportdetail SET  TKNo=?, TKCo=? where ParentId=? ";
+             parameters = new OleDbParameter[]
+           { 
+            new OleDbParameter("?", getfip.TKNo),
+            new OleDbParameter("?",  getfip.TKCo) , 
+               new OleDbParameter("?", getfip.ID)
+           };
+             rowsAffected = ExecuteQueryResult(query, parameters);
         }
 
         private void gridView1_KeyUp(object sender, KeyEventArgs e)
@@ -6468,6 +6600,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         // Thực hiện hành động mong muốn khi nhấn phím Tab
                         frmCongtrinh frmCongtrinh = new frmCongtrinh();
                         frmCongtrinh.frmMain = this;
+                        frmCongtrinh.VatTu vatTu = new frmCongtrinh.VatTu();
+                        vatTu.SoHieu = cellValue.ToString();  
+                        frmCongtrinh.dtoVatTu = vatTu;
                         frmCongtrinh.ShowDialog();
                         if (cellValue.ToString().Contains("|"))
                             cellValue = cellValue.ToString().Split('|')[0];
@@ -6536,6 +6671,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             // Thực hiện hành động mong muốn khi nhấn phím Tab
                             frmCongtrinh frmCongtrinh = new frmCongtrinh();
                             frmCongtrinh.frmMain = this;
+                            frmCongtrinh.VatTu vatTu = new frmCongtrinh.VatTu();
+                            vatTu.SoHieu = cellValue.ToString();
+                            frmCongtrinh.dtoVatTu = vatTu;
                             frmCongtrinh.ShowDialog();
                             if (cellValue.ToString().Contains("|"))
                                 cellValue = cellValue.ToString().Split('|')[0];
@@ -6728,70 +6866,412 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             LoadCustomDrawcell(sender, e);
         }
-
-        private void btnReadPDF_Click(object sender, EventArgs e)
+        private void ConvertImageTOexcel()
         {
-            string filePath = @"C:\Users\Admin\Desktop\file-sample_150kB.pdf"; // Đường dẫn đến file PDF
+            OpenFileDialog openFileDialog = new OpenFileDialog();
 
-
-            // Sử dụng lớp PdfReader để đọc file PDF
-            try
+            // Thiết lập các thuộc tính cho hộp thoại mở file
+            openFileDialog.Title = "Chọn file PDF hóa đơn"; // Tiêu đề của hộp thoại
+            openFileDialog.Filter = "Tệp PDF (*.pdf)|*.pdf|Tất cả các tệp (*.*)|*.*"; // Lọc loại file
+            openFileDialog.FilterIndex = 1; // Chọn bộ lọc mặc định là PDF
+            openFileDialog.RestoreDirectory = true; // Nhớ thư mục đã mở lần trước
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                // Đảm bảo rằng tệp tồn tại trước khi tiếp tục
-                if (!File.Exists(filePath))
+                // Người dùng đã chọn một file
+                string inputFile = openFileDialog.FileName; // Lấy đường dẫn file đã chọn
+
+                // Định nghĩa đường dẫn file đầu ra (bạn có thể muốn cho người dùng chọn cả đường dẫn này)
+                // Hiện tại, chúng ta sẽ đặt tên và thư mục mặc định gần file đầu vào
+                string outputDirectory = Path.Combine(Path.GetDirectoryName(inputFile), "Converted_Excel");
+                if (!Directory.Exists(outputDirectory))
                 {
-                    Console.WriteLine($"Lỗi: Không tìm thấy tệp PDF tại đường dẫn: {filePath}");
-                    return; // Kết thúc chương trình nếu tệp không tồn tại
+                    Directory.CreateDirectory(outputDirectory);
                 }
 
-                // Mở tệp PDF để đọc
-                using (PdfReader reader = new PdfReader(filePath))
-                {
-                    // Tạo một PdfDocument từ PdfReader
-                    using (PdfDocument pdfDoc = new PdfDocument(reader))
-                    {
-                        // Sử dụng StringBuilder để lưu trữ текст
-                        StringBuilder text = new StringBuilder();
-                        // Lặp qua từng trang trong PDF
-                        for (int pageNum = 1; pageNum <= pdfDoc.GetNumberOfPages(); pageNum++)
-                        {
-                            // Tạo một chiến lược trích xuất текст đơn giản
-                            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                            // Lấy đối tượng trang PDF
-                                                   PdfPage page = pdfDoc.GetPage(pageNum);
+                string outputFile = savedPath + @"\output.xlsx";
 
-                            if (page != null)
+                // Gọi phương thức để thực hiện chuyển đổi
+                // (Phương thức này sẽ chứa logic gọi ABBYY FineReader qua CMD)
+
+                // Định nghĩa đường dẫn đến file thực thi của ABBYY FineReader
+                string abbyyExePath = @"C:\Program Files\ABBYY FineReader 16\finereaderocr.exe";
+
+                // --- Kiểm tra trước khi chạy ---
+                if (!File.Exists(abbyyExePath))
+                {
+                    Console.WriteLine($"Lỗi: Không tìm thấy file thực thi của ABBYY FineReader tại: {abbyyExePath}");
+                    Console.WriteLine("Vui lòng kiểm tra lại đường dẫn cài đặt ABBYY FineReader.");
+                    return;
+                }
+
+                if (!File.Exists(inputFile))
+                {
+                    Console.WriteLine($"Lỗi: File đầu vào không tồn tại: {inputFile}");
+                    return;
+                }
+
+                // Tạo thư mục đầu ra nếu chưa có 
+                if (!string.IsNullOrEmpty(outputDirectory) && !Directory.Exists(outputDirectory))
+                {
+                    Directory.CreateDirectory(outputDirectory);
+                    Console.WriteLine($"Đã tạo thư mục đầu ra: {outputDirectory}");
+                }
+                // --- Kết thúc kiểm tra ---
+
+                // Xây dựng chuỗi đối số cho lệnh ABBYY
+                // Đảm bảo các đường dẫn có khoảng trắng được đặt trong dấu ngoặc kép kép (escape " thành "")
+                string arguments = $@"""{inputFile}"" /out ""{outputFile}"" /format ""XLSX"" /lang ""Vietnamese""";
+
+                Console.WriteLine($"\nĐang cố gắng gọi ABBYY FineReader với lệnh:");
+                Console.WriteLine($"Application: {abbyyExePath}");
+                Console.WriteLine($"Arguments: {arguments}");
+
+                try
+                {
+                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    {
+                        FileName = abbyyExePath,     // Đường dẫn đến file .exe cần chạy
+                        Arguments = arguments,       // Các tham số dòng lệnh
+                        UseShellExecute = false,     // Rất quan trọng để chuyển hướng output và ẩn cửa sổ
+                        RedirectStandardOutput = true, // Chuyển hướng output chuẩn
+                        RedirectStandardError = true,  // Chuyển hướng lỗi chuẩn
+                        CreateNoWindow = true        // Không hiển thị cửa sổ console riêng
+                    };
+
+                    using (Process process = Process.Start(startInfo))
+                    {
+                        // Đọc luồng output và error một cách bất đồng bộ để tránh deadlock
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+
+                        process.WaitForExit(); // Chờ process hoàn thành
+
+                        Console.WriteLine("\n--- Kết quả từ ABBYY Process ---");
+                        Console.WriteLine("Standard Output:\n" + output);
+                        Console.WriteLine("Standard Error:\n" + error);
+                        Console.WriteLine($"Mã thoát (Exit Code): {process.ExitCode}");
+                        Console.WriteLine("--------------------------------\n");
+
+                        if (process.ExitCode == 0)
+                        {
+                            Console.WriteLine("Lệnh ABBYY FineReader đã hoàn tất (Exit Code 0).");
+                            if (File.Exists(outputFile))
                             {
-                                // Trích xuất текст từ trang sử dụng PdfTextExtractor
-                                string pageText = PdfTextExtractor.GetTextFromPage(page, strategy);
-                                // Thêm текст của trang vào kết quả
-                                text.Append(pageText);
+
                             }
                             else
                             {
-                                Console.WriteLine($"Trang {pageNum} là null.");
+                                Console.WriteLine("Lệnh hoàn tất với Exit Code 0 nhưng file Excel đầu ra không được tìm thấy. Có thể do giới hạn giấy phép ABBYY FineReader PDF thông thường.");
                             }
                         }
-                        // In toàn bộ текст từ PDF
-                        Console.WriteLine(text.ToString());
+                        else
+                        {
+                            Console.WriteLine($"Lệnh ABBYY FineReader kết thúc với **mã lỗi {process.ExitCode}**. Vui lòng kiểm tra lỗi trên.");
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Đã xảy ra lỗi khi cố gắng chạy ABBYY FineReader: {ex.Message}");
+                    Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                }
             }
-            catch (IOException ex)
+            else
             {
-                // Xử lý исключение nếu có lỗi đọc tệp
-                Console.WriteLine($"Lỗi khi đọc tệp PDF: {ex.Message}");
+                MessageBox.Show("Bạn chưa chọn file nào.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+            // Đường dẫn đến file PDF và file đầu ra
+            // Định nghĩa các đường dẫn file
+
+        }
+        public class Nganhang
+        {
+            public int Stt { get; set; }
+            public DateTime NgayGD { get; set; }
+            public string Maso { get; set; }
+            public string Diengiai { get; set; }
+            public double ThanhTien { get; set; }
+            public double ThanhTien2 { get; set; }
+            public string TKNo { get; set; }
+            public string TKCo { get; set; }
+        }
+        private List<Nganhang> lstNganhan = new List<Nganhang>();
+        System.Windows.Forms.BindingSource bdNganhang = new System.Windows.Forms.BindingSource();
+        public static class DateHelper
+        {
+            /// <summary>
+            /// Phân tích một chuỗi ngày tháng có thể bị lỗi ở phần năm (ví dụ: "dd/MM/yyyyX HH:mm:ss")
+            /// hoặc có ký tự thừa ở cuối (ví dụ: "dd/MM/yyyy HH:mm:ss Z").
+            /// </summary>
+            /// <param name="invalidDateString">Chuỗi ngày tháng cần phân tích.</param>
+            /// <returns>Đối tượng DateTime nếu phân tích thành công, ngược lại là null.</returns>
+            public static DateTime? ParseAndCorrectDate(string dateStringFromExcel)
             {
-                // Xử lý các исключение khác
-                Console.WriteLine($"Một lỗi đã xảy ra: {ex.Message}");
+                if (string.IsNullOrWhiteSpace(dateStringFromExcel))
+                {
+                    return null;
+                }
+
+                DateTime parsedDate;
+                // Định dạng đầy đủ mà chúng ta muốn khớp (dd/MM/yyyy HH:mm:ss)
+                string fullFormat = "dd/MM/yyyy HH:mm:ss";
+                // Định dạng chỉ ngày (dd/MM/yyyy)
+                string dateFormat = "dd/MM/yyyy";
+
+                // Bước 1: Cố gắng phân tích chuỗi gốc với định dạng đầy đủ trước.
+                // Điều này xử lý các trường hợp chuỗi đã đúng định dạng (có hoặc không có ký tự thừa sau giây).
+                if (DateTime.TryParseExact(dateStringFromExcel, fullFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+                {
+                    return parsedDate;
+                }
+
+                // Bước 2: Nếu phân tích trực tiếp thất bại, thử phân tích và sửa lỗi bằng Regex.
+                // Regex để bắt các phần ngày (dd/MM/), năm (có thể 4 hoặc 5 chữ số), và TÙY CHỌN phần thời gian HH:mm:ss.
+                // Nó sẽ bỏ qua bất kỳ thứ gì sau phần thời gian (nếu có).
+                // ^(\d{2}/\d{2}/)(\d+)          : Bắt đầu chuỗi, ngày/tháng/ và năm (4 hoặc 5 chữ số)
+                // (?:\s*(\d{2}:\d{2}:\d{2}))? : TÙY CHỌN: khoảng trắng, sau đó là HH:mm:ss.
+                //                               Nếu không có, Group[3] sẽ không khớp.
+                // .* : Khớp bất kỳ ký tự nào còn lại (để bỏ qua phần '5139.88796' hoặc các ký tự thừa khác)
+                Match match = Regex.Match(dateStringFromExcel, @"^(\d{2}/\d{2}/)(\d+)(?:\s*(\d{2}:\d{2}:\d{2}))?.*");
+
+                if (match.Success)
+                {
+                    string datePartPrefix = match.Groups[1].Value; // Ví dụ: "01/04/"
+                    string yearPart = match.Groups[2].Value;       // Ví dụ: "2025" hoặc "20251"
+                                                                   // Nếu Group[3] khớp (tức là tìm thấy thời gian chuẩn), thì lấy giá trị đó.
+                                                                   // Ngược lại, mặc định thời gian là "00:00:00".
+                    string timePart = match.Groups[3].Success ? match.Groups[3].Value : "00:00:00";
+
+                    // Sửa phần năm nếu có 5 chữ số (như "20251" thành "2025")
+                    if (yearPart.Length == 5)
+                    {
+                        yearPart = yearPart.Substring(0, 4);
+                    }
+
+                    // Kết hợp lại thành chuỗi định dạng chuẩn để thử phân tích
+                    string combinedString = $"{datePartPrefix}{yearPart} {timePart}";
+
+                    if (DateTime.TryParseExact(combinedString, fullFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+                    {
+                        return parsedDate;
+                    }
+                }
+
+                // Bước 3: Nếu Regex phức tạp không khớp được, thử một cách đơn giản hơn: chỉ phân tích phần ngày.
+                // Điều này hữu ích nếu chuỗi chỉ chứa ngày và có thể có bất kỳ thứ gì sau đó.
+                // Ví dụ: "01/04/2025 5139.88796" hoặc "05/03/2020"
+                match = Regex.Match(dateStringFromExcel, @"^(\d{2}/\d{2}/\d{4})"); // Chỉ bắt dd/MM/yyyy từ đầu chuỗi
+
+                if (match.Success)
+                {
+                    string dateOnlyString = match.Groups[1].Value; // Lấy "01/04/2025"
+                    if (DateTime.TryParseExact(dateOnlyString, dateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+                    {
+                        // Nếu chỉ có ngày, thời gian sẽ là 00:00:00 (mặc định của DateTime khi chỉ parse ngày)
+                        return parsedDate;
+                    }
+                }
+
+                // Nếu không thể phân tích được với bất kỳ phương pháp nào, trả về null
+                return null;
             }
-            finally
+        }
+            private void ReadExcelBank(string filePath)
+        {
+            // Xóa dữ liệu cũ nếu phương thức này được gọi nhiều lần
+            lstNganhan.Clear();
+
+            using (var workbook = new XLWorkbook(filePath))
             {
-                // Mã dọn dẹp (nếu cần)
-                Console.WriteLine("Đã hoàn thành việc đọc PDF.");
+                var worksheet = workbook.Worksheet(1); // Lấy sheet đầu tiên
+
+                // --- TÌM HÀNG TIÊU ĐỀ VÀ CHỈ SỐ CỘT ---
+                int indexDiengiai = 0;
+                int indexNgaygiaodich = 0;
+                int indexMaGD = 0;
+                int indexTKCo = 0; // Số tiền rút (Debit)
+                int indexTKNo = 0; // Số tiền gửi (Credit)
+                int headerRowNumber = 0; // Số hàng chứa tiêu đề
+
+                // Duyệt qua tất cả các ô có dữ liệu để tìm hàng tiêu đề và các chỉ số cột
+                // headerRowNumber sẽ lưu lại số hàng cao nhất mà một tiêu đề được tìm thấy,
+                // giả định đó là hàng tiêu đề chính và dữ liệu sẽ bắt đầu từ hàng tiếp theo.
+                bool findSTT = true;
+                foreach (var cell in worksheet.CellsUsed())
+                {
+                    var getdata = cell.GetString().Trim(); // Lấy nội dung ô và loại bỏ khoảng trắng thừa
+
+                    if (getdata.Contains("STT") && findSTT)
+                    {
+                        // Cập nhật headerRowNumber nếu tìm thấy STT ở hàng thấp hơn hàng đã lưu
+                        if (cell.Address.RowNumber > headerRowNumber)
+                        {
+                            headerRowNumber = cell.Address.RowNumber;
+                            findSTT = false;
+                        }
+                    }
+                    //if (headerRowNumber!=0 && (cell.Address.RowNumber + 1) > headerRowNumber)
+                    //    break;
+                    // Tìm chỉ số cột, không phụ thuộc vào headerRowNumber hiện tại
+                    if (getdata.Contains("Ngày GD") || getdata.Contains("Ngày giao dịch") || getdata.Contains("Tran Date"))
+                    {
+                        indexNgaygiaodich = cell.Address.ColumnNumber;
+                        headerRowNumber= cell.Address.RowNumber;
+                    }
+                    else if (getdata.Contains("Description") || getdata.Contains("Transactions"))
+                    {
+                        indexDiengiai = cell.Address.ColumnNumber;
+                    }
+                    else if ( (getdata.Contains("GD") || getdata.Contains("GDV") || getdata.Contains("So CT")) && indexMaGD==0)
+                    {
+                        indexMaGD = cell.Address.ColumnNumber;
+                    }
+                    else if (getdata.Contains("Sô tiên rút") || getdata.Contains("Debit") || getdata.Contains("Phát sinh nợ"))
+                    {
+                        indexTKCo = cell.Address.ColumnNumber;
+                    }
+                    else if (getdata.Contains("SÔ tiên gửi") || getdata.Contains("Credit") || getdata.Contains("Phát sinh có"))
+                    {
+                        indexTKNo = cell.Address.ColumnNumber;
+                    }
+                    if (headerRowNumber>0 && (headerRowNumber < cell.Address.RowNumber))
+                        break;
+                }
+
+                // Kiểm tra xem đã tìm thấy đủ các cột cần thiết chưa
+                //if (headerRowNumber == 0 || indexNgaygiaodich == 0 || indexDiengiai == 0 || indexMaGD == 0 || indexTKCo == 0 || indexTKNo == 0)
+                //{
+                //    // Thông báo lỗi nếu không tìm thấy các tiêu đề cần thiết
+                //    System.Windows.Forms.MessageBox.Show("Không tìm thấy đủ các cột tiêu đề cần thiết (Ngày GD, Diễn giải, Mã GD, Số tiền rút/gửi). Vui lòng kiểm tra lại file Excel.", "Lỗi Định dạng", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                //    return; // Thoát phương thức
+                //}
+
+                // --- ĐỌC DỮ LIỆU TỪ CÁC HÀNG ---
+                // Bắt đầu vòng lặp từ hàng ngay sau hàng tiêu đề (headerRowNumber + 1)
+                // và kết thúc ở hàng cuối cùng có dữ liệu trong worksheet.
+                int sttValue= 1; 
+                for (int rowIndex = headerRowNumber + 1; rowIndex <= worksheet.LastCellUsed().Address.RowNumber; rowIndex++)
+                {
+                    var row = worksheet.Row(rowIndex);
+
+                    // --- Xác thực cơ bản để bỏ qua các hàng trống hoặc không phải dữ liệu ---
+                    // Kiểm tra xem ô STT hoặc ô Ngày GD có dữ liệu không.
+                    // Giả định cột 1 là cột STT, nếu nó trống, bỏ qua hàng.
+                    string sttCellContent = row.Cell(1).GetString().Trim();
+                    string ngayGDCellContent = row.Cell(indexNgaygiaodich).GetString().Trim();
+
+                    if (string.IsNullOrWhiteSpace(sttCellContent) && string.IsNullOrWhiteSpace(ngayGDCellContent))
+                    {
+                        continue; // Bỏ qua nếu cả ô STT và Ngày GD đều trống, có thể là hàng trống
+                    }
+
+                    // Cố gắng phân tích STT để đảm bảo đây là hàng dữ liệu thực sự (nếu STT là số)
+                    //int sttValue;
+                    //if (!int.TryParse(sttCellContent, out sttValue))
+                    //{
+                    //    // Nếu cột STT không phải là số, có thể đây là hàng tổng kết hoặc không phải dữ liệu giao dịch
+                    //    // Bạn có thể chọn continue hoặc break tùy thuộc vào cấu trúc file của bạn.
+                    //    continue;
+                    //}
+
+                    try
+                    {
+                        Nganhang nganhang = new Nganhang();
+                        nganhang.Stt = sttValue; // Gán STT đã đọc/parse
+                        sttValue += 1;
+                        // Ngay Giao dịch - Sử dụng hàm ParseAndCorrectDate() đã cung cấp
+                        if (indexMaGD == 0)
+                        {
+                            try
+                            {
+                                var getsplit = ngayGDCellContent.Split(' ');
+                                ngayGDCellContent = getsplit[0];
+                                nganhang.Maso = getsplit[1];
+                            }
+                            catch(Exception ex)
+                            {
+
+                            }
+                        }
+                        else
+                            nganhang.Maso = row.Cell(indexMaGD).GetString().Trim();
+                        DateTime? parsedNgayGD = DateHelper.ParseAndCorrectDate(ngayGDCellContent);
+                        if (parsedNgayGD.HasValue)
+                        {
+                            nganhang.NgayGD = parsedNgayGD.Value;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Cảnh báo: Không thể phân tích hoặc sửa ngày '{ngayGDCellContent}' tại hàng {rowIndex}. Bỏ qua dòng.");
+                            continue; // Bỏ qua dòng nếu ngày không hợp lệ
+                        }
+
+                        // Diễn giải
+                        nganhang.Diengiai = row.Cell(indexDiengiai).GetString().Trim();
+
+                        // Mã Giao dịch
+                       
+
+                        // Số tiền rút (TK Có) và Số tiền gửi (TK Nợ)
+                        double tkco = 0;
+                        // Sử dụng InvariantCulture để đảm bảo việc phân tích số nhất quán, loại bỏ dấu phẩy/chấm
+                        double.TryParse(row.Cell(indexTKCo).GetString().Replace(",", "").Replace(".", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
+
+                        double tkno = 0;
+                        double.TryParse(row.Cell(indexTKNo).GetString().Replace(",", "").Replace(".", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
+
+                        // Logic xác định ThanhTien, TKCo, TKNo dựa trên số tiền rút hoặc gửi
+                        if (tkco != 0)
+                        {
+                            nganhang.ThanhTien = tkco;
+                            nganhang.TKCo = "1121"; // Tài khoản Có mẫu
+                            nganhang.TKNo = "635";  // Tài khoản Nợ mẫu
+                        }
+                        else if (tkno != 0) // Dùng else if để tránh trường hợp cả hai đều có giá trị (nếu có lỗi dữ liệu)
+                        {
+                            nganhang.ThanhTien2 = tkno;
+                            nganhang.TKCo = "635";  // Tài khoản Có mẫu
+                            nganhang.TKNo = "1122"; // Tài khoản Nợ mẫu
+                        }
+                        else
+                        {
+                            // Nếu cả tkco và tkno đều là 0, có thể đây không phải là dòng giao dịch tiền tệ
+                            Console.WriteLine($"Cảnh báo: Dòng {rowIndex} không có giá trị Debit/Credit (TKCo/TKNo). Bỏ qua dòng.");
+                            continue; // Bỏ qua dòng này
+                        }
+
+                        lstNganhan.Add(nganhang); // Thêm đối tượng Nganhang vào danh sách
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Lỗi khi đọc dữ liệu tại hàng {rowIndex}: {ex.Message}");
+                        // Bạn có thể ghi log lỗi chi tiết hơn hoặc thông báo cho người dùng
+                        continue; // Tiếp tục xử lý các dòng khác ngay cả khi có lỗi ở dòng hiện tại
+                    }
+                }
+
+                // --- GÁN DỮ LIỆU VÀO ĐIỀU KHIỂN UI (GridControl) ---
+                // Đảm bảo bdNganhang và gridControl3 đã được khởi tạo và có thể truy cập được
+                // trong Form của bạn (ví dụ: là các thuộc tính công khai hoặc trường).
+                if (bdNganhang != null)
+                {
+                    bdNganhang.DataSource = null; // Xóa nguồn dữ liệu cũ
+                    bdNganhang.DataSource = lstNganhan; // Gán danh sách mới
+                }
+                if (gridControl3 != null)
+                {
+                    gridControl3.DataSource = bdNganhang; // GridControl lấy dữ liệu từ BindingSource
+                    gridControl3.RefreshDataSource(); // Yêu cầu GridControl làm mới để hiển thị dữ liệu
+                    xtraTabControl2.SelectedTabPageIndex = 3;
+                }
             }
+        } 
+
+        private void btnReadPDF_Click(object sender, EventArgs e)
+        {
+          //  ConvertImageTOexcel();
+            string path = savedPath + @"\output.xlsx";
+            ReadExcelBank(path);
         }
 
         private void gridView2_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)

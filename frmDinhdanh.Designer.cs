@@ -54,6 +54,9 @@
             this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.behaviorManager1 = new DevExpress.Utils.Behaviors.BehaviorManager(this.components);
+            this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
+            this.checkEdit2 = new DevExpress.XtraEditors.CheckEdit();
+            this.checkEdit1 = new DevExpress.XtraEditors.CheckEdit();
             ((System.ComponentModel.ISupportInitialize)(this.gcDinhdanh)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtTKThue.Properties)).BeginInit();
@@ -65,6 +68,10 @@
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
+            this.panelControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.checkEdit2.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // gcDinhdanh
@@ -75,7 +82,7 @@
             this.gcDinhdanh.Location = new System.Drawing.Point(3, 162);
             this.gcDinhdanh.MainView = this.gridView2;
             this.gcDinhdanh.Name = "gcDinhdanh";
-            this.gcDinhdanh.Size = new System.Drawing.Size(1327, 460);
+            this.gcDinhdanh.Size = new System.Drawing.Size(1591, 460);
             this.gcDinhdanh.TabIndex = 11;
             this.gcDinhdanh.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -229,7 +236,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDiengiai.Location = new System.Drawing.Point(685, 37);
             this.txtDiengiai.Name = "txtDiengiai";
-            this.txtDiengiai.Size = new System.Drawing.Size(626, 27);
+            this.txtDiengiai.Size = new System.Drawing.Size(642, 27);
             this.txtDiengiai.TabIndex = 13;
             // 
             // txtTukhoa
@@ -259,7 +266,7 @@
             this.panelControl1.Controls.Add(this.txtTKCo);
             this.panelControl1.Location = new System.Drawing.Point(3, 12);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1327, 144);
+            this.panelControl1.Size = new System.Drawing.Size(1342, 144);
             this.panelControl1.TabIndex = 21;
             // 
             // comboBoxEdit1
@@ -297,11 +304,39 @@
             this.labelControl7.TabIndex = 21;
             this.labelControl7.Text = "Từ khóa";
             // 
+            // panelControl2
+            // 
+            this.panelControl2.Controls.Add(this.checkEdit2);
+            this.panelControl2.Controls.Add(this.checkEdit1);
+            this.panelControl2.Location = new System.Drawing.Point(1352, 12);
+            this.panelControl2.Name = "panelControl2";
+            this.panelControl2.Size = new System.Drawing.Size(242, 144);
+            this.panelControl2.TabIndex = 22;
+            // 
+            // checkEdit2
+            // 
+            this.checkEdit2.Location = new System.Drawing.Point(19, 63);
+            this.checkEdit2.Name = "checkEdit2";
+            this.checkEdit2.Properties.Caption = "Kèm đơn vị tính";
+            this.checkEdit2.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
+            this.checkEdit2.Size = new System.Drawing.Size(217, 31);
+            this.checkEdit2.TabIndex = 1;
+            // 
+            // checkEdit1
+            // 
+            this.checkEdit1.Location = new System.Drawing.Point(19, 15);
+            this.checkEdit1.Name = "checkEdit1";
+            this.checkEdit1.Properties.Caption = "Tên gần giống";
+            this.checkEdit1.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
+            this.checkEdit1.Size = new System.Drawing.Size(217, 31);
+            this.checkEdit1.TabIndex = 0;
+            // 
             // frmDinhdanh
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1342, 634);
+            this.ClientSize = new System.Drawing.Size(1606, 634);
+            this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.gcDinhdanh);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -321,6 +356,10 @@
             this.panelControl1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
+            this.panelControl2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.checkEdit2.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -351,5 +390,8 @@
         private DevExpress.XtraGrid.Columns.GridColumn colDelete;
         private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
         private DevExpress.XtraEditors.LabelControl labelControl1;
+        private DevExpress.XtraEditors.PanelControl panelControl2;
+        private DevExpress.XtraEditors.CheckEdit checkEdit2;
+        private DevExpress.XtraEditors.CheckEdit checkEdit1;
     }
 }
