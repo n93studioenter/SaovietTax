@@ -686,6 +686,7 @@
             this.colIndex2.MinWidth = 30;
             this.colIndex2.Name = "colIndex2";
             this.colIndex2.OptionsColumn.AllowEdit = false;
+            this.colIndex2.UnboundDataType = typeof(int);
             this.colIndex2.Visible = true;
             this.colIndex2.VisibleIndex = 0;
             this.colIndex2.Width = 131;

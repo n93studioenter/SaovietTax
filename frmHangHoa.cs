@@ -158,9 +158,10 @@ namespace SaovietTax
                 // Lấy giá trị của cột STT
                 if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
                 {
-                    view.FocusedRowHandle = i; // Chọn dòng
-                    view.SelectRow(i); // Chọn dòng
-                    return; // Thoát sau khi tìm thấy
+                    view.FocusedRowHandle = i; // Đặt focus đến dòng
+                    view.MakeRowVisible(i); // Cuộn đến dòng
+                    //view.SelectRow(i); // Chọn dòng
+                    return;
                 }
             }
         }

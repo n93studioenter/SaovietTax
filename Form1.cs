@@ -344,7 +344,7 @@ namespace SaovietTax
                 gridView.OptionsView.EnableAppearanceOddRow = true;
 
                 // Thiết lập màu sắc cho hàng chẵn
-                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.FromArgb(223, 255, 254);
+                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.FromArgb(168, 255, 253);
 
                 gridView.Appearance.EvenRow.ForeColor = System.Drawing.Color.Black; // Màu chữ cho hàng chẵn
 
@@ -2612,7 +2612,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             }
             progressPanel1.Visible = false;
-
+            gridView1.BestFitColumns(); // Điều chỉnh kích thước cột 
         }
         public void LoadExcel(string filePath, int type)
         {
@@ -5952,7 +5952,17 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 if(columnName != "isHaschild")
                 gridView1.ShowEditor(); // Hiển thị chế độ chỉnh sửa
             }
+            if (e.RowHandle >= 0) // Đảm bảo là hàng hợp lệ
+            {
+                string columnName = gridView1.FocusedColumn.FieldName;
+                if (columnName == "Index")
+                {
+                    bool isExpanded = gridView1.GetMasterRowExpanded(e.RowHandle);
+                    gridView1.SetMasterRowExpanded(e.RowHandle, !isExpanded); // Chuyển đổi trạng thái
 
+                }
+
+            }
         }
 
         private void gridView3_RowClick(object sender, RowClickEventArgs e)
@@ -5965,6 +5975,17 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 if (columnName != "isHaschild")
                     if (columnName != "isHaschild")
                     gridView3.ShowEditor(); // Hiển thị chế độ chỉnh sửa
+            }
+            if (e.RowHandle >= 0) // Đảm bảo là hàng hợp lệ
+            {
+                string columnName = gridView3.FocusedColumn.FieldName;
+                if (columnName == "Index")
+                {
+                    bool isExpanded = gridView3.GetMasterRowExpanded(e.RowHandle);
+                    gridView3.SetMasterRowExpanded(e.RowHandle, !isExpanded); // Chuyển đổi trạng thái
+
+                }
+                    
             }
         }
 
@@ -6475,11 +6496,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             
         }
-
+        private List<int> lstrowSohieu = new List<int>();
         private void gridView2_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
+                lstrowSohieu = new List<int>();
                 getMessage = true;
                 DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
 
@@ -6519,6 +6541,24 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                             frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
                             vatTu.SoHieu = cellValue.ToString();
+                            //Kiểm tra xem có phải so hiệu tự tạo 
+                            string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
+                            var checkSH = ExecuteQuery(querydinhdanh, new OleDbParameter("?", vatTu.SoHieu));
+                            //Nếu chưa có, tìm hết danh sách
+                            if (checkSH.Rows.Count == 0)
+                            {
+                                foreach(var item in lstImportVao)
+                                {
+                                    foreach(var it in item.fileImportDetails)
+                                    {
+                                        if(it.SoHieu== vatTu.SoHieu)
+                                        {
+                                            lstrowSohieu.Add(it.ID);
+                                        }
+                                    }
+                                }
+                            }
+
                             var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
                             vatTu.TenVattu = tenvattu;
                             var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
@@ -6527,14 +6567,40 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                             frmHangHoa.ShowDialog();
 
-
+                        
+                            
                             if (!string.IsNullOrEmpty(hiddenValue) && frmHangHoa.isChange)
                             {
                                 gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
                                 gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
                                 gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
+                                //Fill lai cho lstrowSohieu
+                                foreach(var item in lstrowSohieu)
+                                {
+                                    foreach(var it in lstImportVao)
+                                    {
+                                        var findchild = it.fileImportDetails.Where(m => m.ID == item).FirstOrDefault();
+                                        if (findchild != null)
+                                        {
+                                            findchild.SoHieu = hiddenValue;
+                                            findchild.DVT = hiddenValue2;
+                                            findchild.Ten = hiddenValue3;
+                                            //Update vào database
+                                         var   query = @"UPDATE tbimportdetail SET  SoHieu=?,DVT=?,Ten=? where ID=? ";
+                                          var  parameters = new OleDbParameter[]
+                                          {
+                                                new OleDbParameter("?", hiddenValue),
+                                                new OleDbParameter("?",  Helpers.ConvertUnicodeToVni(hiddenValue2)) ,
+                                                new OleDbParameter("?", Helpers.ConvertUnicodeToVni(hiddenValue3)),
+                                                new OleDbParameter("?", findchild.ID)
+                                          };
+                                          var  rowsAffected = ExecuteQueryResult(query, parameters);
+                                        }
+                                    }
+                                }
+                                lstrowSohieu = new List<int>();
                             }
-                          
+
                         }
                     }
                 }
@@ -6647,6 +6713,24 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                             frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
                             vatTu.SoHieu = cellValue.ToString();
+
+                            string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
+                            var checkSH = ExecuteQuery(querydinhdanh, new OleDbParameter("?", vatTu.SoHieu));
+                            //Nếu chưa có, tìm hết danh sách
+                            if (checkSH.Rows.Count == 0)
+                            {
+                                foreach (var item in lstImportRa)
+                                {
+                                    foreach (var it in item.fileImportDetails)
+                                    {
+                                        if (it.SoHieu == vatTu.SoHieu)
+                                        {
+                                            lstrowSohieu.Add(it.ID);
+                                        }
+                                    }
+                                }
+                            }
+
                             var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
                             vatTu.TenVattu = tenvattu;
                             var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
@@ -6661,6 +6745,30 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
                                 gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
                                 gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
+                                foreach (var item in lstrowSohieu)
+                                {
+                                    foreach (var it in lstImportRa)
+                                    {
+                                        var findchild = it.fileImportDetails.Where(m => m.ID == item).FirstOrDefault();
+                                        if (findchild != null)
+                                        {
+                                            findchild.SoHieu = hiddenValue;
+                                            findchild.DVT = hiddenValue2;
+                                            findchild.Ten = hiddenValue3;
+                                            //Update vào database
+                                            var query = @"UPDATE tbimportdetail SET  SoHieu=?,DVT=?,Ten=? where ID=? ";
+                                            var parameters = new OleDbParameter[]
+                                            {
+                                        new OleDbParameter("?", hiddenValue),
+                                        new OleDbParameter("?",  Helpers.ConvertUnicodeToVni(hiddenValue2)) ,
+                                        new OleDbParameter("?", Helpers.ConvertUnicodeToVni(hiddenValue3)),
+                                        new OleDbParameter("?", findchild.ID)
+                                            };
+                                            var rowsAffected = ExecuteQueryResult(query, parameters);
+                                        }
+                                    }
+                                }
+                                lstrowSohieu = new List<int>();
                             }
 
                         }
@@ -7397,7 +7505,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
 
         private void gridView1_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
-        {
+            {
              if (e.Column.FieldName == "Index" && e.IsGetData)
             {
                 e.Value = e.ListSourceRowIndex + 1; // Gán giá trị số thứ tự
