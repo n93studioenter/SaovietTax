@@ -68,6 +68,8 @@ using System.Threading.Tasks;
 using Windows.Media.Ocr;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using System.Runtime.Remoting.Contexts;
+using AForge.Video.DirectShow;
+using AForge.Video;
 
 namespace SaovietTax
 {
@@ -284,10 +286,19 @@ namespace SaovietTax
                 var kq = ExecuteQuery(queryCheckVatTu, parameterss);
                 if (kq.Rows.Count > 0)
                 {
-                    kq = kq.AsEnumerable()
+                    var filteredRows = kq.AsEnumerable()
                        .Where(row => DateTime.TryParse(row["NLap"].ToString(), out DateTime nl)
-                                     && nl >= dtTungay.DateTime && nl <= dtDenngay.DateTime)
-                       .CopyToDataTable();
+                                     && nl >= dtTungay.DateTime && nl <= dtDenngay.DateTime);
+                    if (filteredRows.Any())
+                    {
+                        kq = filteredRows.CopyToDataTable();
+                    }
+                    else
+                    {
+                        // Xử lý trường hợp không có hàng nào
+                        // Ví dụ: tạo DataTable rỗng hoặc thông báo cho người dùng
+                        kq = kq.Clone(); // Tạo một DataTable rỗng với cấu trúc giống như kq
+                    }
                 }
                 if (kq.Rows.Count > 0)
                 {
@@ -1021,12 +1032,12 @@ namespace SaovietTax
         {
             // Thực hiện công việc khởi tạo ở đây
         }
-
+       
         private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressPanel2.Visible = false; // Ẩn ProgressPanel khi hoàn thành
         }
-        
+       
         private void frmMain_Load(object sender, EventArgs e)
         {
             string text1 = "Rau thập cẩm kho quẹt";
@@ -1044,8 +1055,9 @@ namespace SaovietTax
             
             CheckDB();
             ControlsSetup();
-           
 
+          
+             
 
             // Thiết lập ngôn ngữ cho Calendar
             // dateEdit1.Properties.CalendarTimeProperties.Culture = new CultureInfo("vi-VN");
@@ -2613,6 +2625,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             progressPanel1.Visible = false;
             gridView1.BestFitColumns(); // Điều chỉnh kích thước cột 
+            gridView3.BestFitColumns();
+            gridView2.BestFitColumns();
+            gridView4.BestFitColumns();
         }
         public void LoadExcel(string filePath, int type)
         {
@@ -7521,6 +7536,176 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     e.Value = e.ListSourceRowIndex + 1; // Gán số thứ tự
                 }
             }
+        }
+
+        private void gridView3_MouseDown(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void gridView4_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks == 2 && e.Button == MouseButtons.Left)
+            {
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                int currentRowHandle = gridView.FocusedRowHandle;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+
+                if (currentColumnName.ToString() == "SoHieu")
+                {
+                    frmHangHoa frmHangHoa = new frmHangHoa();
+                    frmHangHoa.frmMain = this;
+
+                    frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                    vatTu.SoHieu = cellValue.ToString();
+
+                    string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
+                    var checkSH = ExecuteQuery(querydinhdanh, new OleDbParameter("?", vatTu.SoHieu));
+                    //Nếu chưa có, tìm hết danh sách
+                    if (checkSH.Rows.Count == 0)
+                    {
+                        foreach (var item in lstImportRa)
+                        {
+                            foreach (var it in item.fileImportDetails)
+                            {
+                                if (it.SoHieu == vatTu.SoHieu)
+                                {
+                                    lstrowSohieu.Add(it.ID);
+                                }
+                            }
+                        }
+                    }
+
+                    var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
+                    vatTu.TenVattu = tenvattu;
+                    var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
+                    vatTu.DonVi = dvt;
+                    frmHangHoa.dtoVatTu = vatTu;
+
+                    frmHangHoa.ShowDialog();
+
+
+                    if (!string.IsNullOrEmpty(hiddenValue) && frmHangHoa.isChange)
+                    {
+                        gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
+                        gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
+                        gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
+                        foreach (var item in lstrowSohieu)
+                        {
+                            foreach (var it in lstImportRa)
+                            {
+                                var findchild = it.fileImportDetails.Where(m => m.ID == item).FirstOrDefault();
+                                if (findchild != null)
+                                {
+                                    findchild.SoHieu = hiddenValue;
+                                    findchild.DVT = hiddenValue2;
+                                    findchild.Ten = hiddenValue3;
+                                    //Update vào database
+                                    var query = @"UPDATE tbimportdetail SET  SoHieu=?,DVT=?,Ten=? where ID=? ";
+                                    var parameters = new OleDbParameter[]
+                                    {
+                                        new OleDbParameter("?", hiddenValue),
+                                        new OleDbParameter("?",  Helpers.ConvertUnicodeToVni(hiddenValue2)) ,
+                                        new OleDbParameter("?", Helpers.ConvertUnicodeToVni(hiddenValue3)),
+                                        new OleDbParameter("?", findchild.ID)
+                                    };
+                                    var rowsAffected = ExecuteQueryResult(query, parameters);
+                                }
+                            }
+                        }
+                        lstrowSohieu = new List<int>();
+                    }
+
+                }
+            }
+
+        }
+
+        private void gridView2_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks == 2 && e.Button == MouseButtons.Left)
+            {
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                int currentRowHandle = gridView.FocusedRowHandle;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+                if (currentColumnName.ToString() == "SoHieu")
+                {
+                    frmHangHoa frmHangHoa = new frmHangHoa();
+                    frmHangHoa.frmMain = this;
+
+                    frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                    vatTu.SoHieu = cellValue.ToString();
+                    //Kiểm tra xem có phải so hiệu tự tạo 
+                    string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
+                    var checkSH = ExecuteQuery(querydinhdanh, new OleDbParameter("?", vatTu.SoHieu));
+                    //Nếu chưa có, tìm hết danh sách
+                    if (checkSH.Rows.Count == 0)
+                    {
+                        foreach (var item in lstImportVao)
+                        {
+                            foreach (var it in item.fileImportDetails)
+                            {
+                                if (it.SoHieu == vatTu.SoHieu)
+                                {
+                                    lstrowSohieu.Add(it.ID);
+                                }
+                            }
+                        }
+                    }
+
+                    var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
+                    vatTu.TenVattu = tenvattu;
+                    var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
+                    vatTu.DonVi = dvt;
+                    frmHangHoa.dtoVatTu = vatTu;
+
+                    frmHangHoa.ShowDialog();
+
+
+
+                    if (!string.IsNullOrEmpty(hiddenValue) && frmHangHoa.isChange)
+                    {
+                        gridView.SetRowCellValue(currentRowHandle, currentColumnName, hiddenValue);
+                        gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
+                        gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
+                        //Fill lai cho lstrowSohieu
+                        foreach (var item in lstrowSohieu)
+                        {
+                            foreach (var it in lstImportVao)
+                            {
+                                var findchild = it.fileImportDetails.Where(m => m.ID == item).FirstOrDefault();
+                                if (findchild != null)
+                                {
+                                    findchild.SoHieu = hiddenValue;
+                                    findchild.DVT = hiddenValue2;
+                                    findchild.Ten = hiddenValue3;
+                                    //Update vào database
+                                    var query = @"UPDATE tbimportdetail SET  SoHieu=?,DVT=?,Ten=? where ID=? ";
+                                    var parameters = new OleDbParameter[]
+                                    {
+                                                new OleDbParameter("?", hiddenValue),
+                                                new OleDbParameter("?",  Helpers.ConvertUnicodeToVni(hiddenValue2)) ,
+                                                new OleDbParameter("?", Helpers.ConvertUnicodeToVni(hiddenValue3)),
+                                                new OleDbParameter("?", findchild.ID)
+                                    };
+                                    var rowsAffected = ExecuteQueryResult(query, parameters);
+                                }
+                            }
+                        }
+                        lstrowSohieu = new List<int>();
+                    }
+
+                }
+            }
+        }
+
+        private void btnScanCmera_Click(object sender, EventArgs e)
+        {
+            frmCamera camera = new frmCamera();
+            camera.ShowDialog();
+
         }
 
         public static string NormalizeVietnameseString(string input)

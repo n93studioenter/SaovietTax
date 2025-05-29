@@ -21,6 +21,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using DevExpress.Xpo.DB.Helpers;
 using System.Web.UI.WebControls;
 using Windows.UI.Xaml.Controls;
+using DevExpress.Utils;
 
 namespace SaovietTax
 {
@@ -139,8 +140,7 @@ namespace SaovietTax
                 txtMaSo.Text = kq.Rows[0]["MaSo"].ToString();
                 txtGhichu.Text = kq.Rows[0]["GhiChu"].ToString();
                 int mapl = int.Parse(kq.Rows[0]["MaPhanLoai"].ToString());
-               
-
+                
                 //comboBoxEdit1.SelectedItem=
                 foreach (Item item in comboBoxEdit1.Properties.Items)
                 {
@@ -158,9 +158,15 @@ namespace SaovietTax
                 // Lấy giá trị của cột STT
                 if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
                 {
-                    view.FocusedRowHandle = i; // Đặt focus đến dòng
-                    view.MakeRowVisible(i); // Cuộn đến dòng
-                    //view.SelectRow(i); // Chọn dòng
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
+                        {
+                            gridView1.FocusedRowHandle = i; // Đặt focus
+                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
+                            gridView1.SelectRow(i); // Chọn dòng
+                        }
+                    });
                     return;
                 }
             }
@@ -483,6 +489,11 @@ namespace SaovietTax
                 }
             }
             
+        }
+
+        private void gridView1_DataSourceChanged(object sender, EventArgs e)
+        {
+           
         }
     }
 }

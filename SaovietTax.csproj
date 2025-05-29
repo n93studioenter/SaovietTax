@@ -1,5 +1,11 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <PackageReference Include="AForge.Video">
+      <Version>2.2.5</Version>
+    </PackageReference>
+    <PackageReference Include="AForge.Video.DirectShow">
+      <Version>2.2.5</Version>
+    </PackageReference>
     <PackageReference Include="itext7">
       <Version>9.2.0</Version>
     </PackageReference>
@@ -165,6 +171,12 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmCamera.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCamera.Designer.cs">
+      <DependentUpon>frmCamera.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmCongtrinh.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -203,6 +215,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCamera.resx">
+      <DependentUpon>frmCamera.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCongtrinh.resx">
       <DependentUpon>frmCongtrinh.cs</DependentUpon>

@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode3 = new DevExpress.XtraGrid.GridLevelNode();
             DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
-            DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -85,6 +85,7 @@
             this.colisHaschild2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
+            this.progressPanel2 = new DevExpress.XtraWaitForm.ProgressPanel();
             this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.progressPanel1 = new DevExpress.XtraWaitForm.ProgressPanel();
@@ -114,7 +115,6 @@
             this.colTKCo1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.lblDpPath = new DevExpress.XtraEditors.LabelControl();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
-            this.progressPanel2 = new DevExpress.XtraWaitForm.ProgressPanel();
             this.dtDenngay = new DevExpress.XtraEditors.DateEdit();
             this.chkDaura = new DevExpress.XtraEditors.CheckEdit();
             this.dtTungay = new DevExpress.XtraEditors.DateEdit();
@@ -138,6 +138,7 @@
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
             this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.btnScanCmera = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -200,6 +201,7 @@
             this.gridView2.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView2_CellValueChanged);
             this.gridView2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyDown);
             this.gridView2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyUp);
+            this.gridView2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView2_MouseDown);
             // 
             // colTen2
             // 
@@ -207,6 +209,7 @@
             this.colTen2.FieldName = "Ten";
             this.colTen2.MinWidth = 30;
             this.colTen2.Name = "colTen2";
+            this.colTen2.OptionsColumn.AllowEdit = false;
             this.colTen2.Visible = true;
             this.colTen2.VisibleIndex = 0;
             this.colTen2.Width = 287;
@@ -217,6 +220,7 @@
             this.colSohieu2.FieldName = "SoHieu";
             this.colSohieu2.MinWidth = 30;
             this.colSohieu2.Name = "colSohieu2";
+            this.colSohieu2.OptionsColumn.AllowEdit = false;
             this.colSohieu2.Visible = true;
             this.colSohieu2.VisibleIndex = 1;
             this.colSohieu2.Width = 122;
@@ -297,10 +301,10 @@
             // 
             this.gridControl1.DataSource = this.fileImportBindingSource;
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            gridLevelNode1.LevelTemplate = this.gridView2;
-            gridLevelNode1.RelationName = "Detail";
+            gridLevelNode3.LevelTemplate = this.gridView2;
+            gridLevelNode3.RelationName = "Detail";
             this.gridControl1.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode1});
+            gridLevelNode3});
             this.gridControl1.Location = new System.Drawing.Point(0, 0);
             this.gridControl1.LookAndFeel.SkinName = "Office 2019 Colorful";
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -538,6 +542,7 @@
             this.gridView4.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView4_RowCellStyle);
             this.gridView4.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView4_CellValueChanged);
             this.gridView4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView4_KeyDown);
+            this.gridView4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView4_MouseDown);
             // 
             // colTen3
             // 
@@ -545,6 +550,7 @@
             this.colTen3.FieldName = "Ten";
             this.colTen3.MinWidth = 30;
             this.colTen3.Name = "colTen3";
+            this.colTen3.OptionsColumn.AllowEdit = false;
             this.colTen3.Visible = true;
             this.colTen3.VisibleIndex = 0;
             this.colTen3.Width = 311;
@@ -555,6 +561,7 @@
             this.colSoHieu3.FieldName = "SoHieu";
             this.colSoHieu3.MinWidth = 30;
             this.colSoHieu3.Name = "colSoHieu3";
+            this.colSoHieu3.OptionsColumn.AllowEdit = false;
             this.colSoHieu3.Visible = true;
             this.colSoHieu3.VisibleIndex = 1;
             this.colSoHieu3.Width = 121;
@@ -627,10 +634,10 @@
             // 
             this.gridControl2.DataSource = this.fileImportBindingSource;
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            gridLevelNode2.LevelTemplate = this.gridView4;
-            gridLevelNode2.RelationName = "Detail";
+            gridLevelNode1.LevelTemplate = this.gridView4;
+            gridLevelNode1.RelationName = "Detail";
             this.gridControl2.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode2});
+            gridLevelNode1});
             this.gridControl2.Location = new System.Drawing.Point(0, 0);
             this.gridControl2.LookAndFeel.SkinName = "Office 2016 Colorful";
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -678,6 +685,7 @@
             this.gridView3.CustomUnboundColumnData += new DevExpress.XtraGrid.Views.Base.CustomColumnDataEventHandler(this.gridView3_CustomUnboundColumnData);
             this.gridView3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView3_KeyDown);
             this.gridView3.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView3_KeyUp);
+            this.gridView3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView3_MouseDown);
             // 
             // colIndex2
             // 
@@ -837,6 +845,7 @@
             // 
             // xtraTabPage1
             // 
+            this.xtraTabPage1.Controls.Add(this.progressPanel2);
             this.xtraTabPage1.Controls.Add(this.simpleButton2);
             this.xtraTabPage1.Controls.Add(this.panelControl2);
             this.xtraTabPage1.Controls.Add(this.lblThongbao);
@@ -853,9 +862,20 @@
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
+            // progressPanel2
+            // 
+            this.progressPanel2.Appearance.BackColor = System.Drawing.Color.Transparent;
+            this.progressPanel2.Appearance.Options.UseBackColor = true;
+            this.progressPanel2.Location = new System.Drawing.Point(1018, 486);
+            this.progressPanel2.Name = "progressPanel2";
+            this.progressPanel2.Size = new System.Drawing.Size(132, 33);
+            this.progressPanel2.TabIndex = 13;
+            this.progressPanel2.Text = "progressPanel2";
+            this.progressPanel2.Visible = false;
+            // 
             // simpleButton2
             // 
-            this.simpleButton2.Location = new System.Drawing.Point(454, 502);
+            this.simpleButton2.Location = new System.Drawing.Point(878, 485);
             this.simpleButton2.Name = "simpleButton2";
             this.simpleButton2.Size = new System.Drawing.Size(112, 34);
             this.simpleButton2.TabIndex = 12;
@@ -1147,7 +1167,6 @@
             // 
             // panelControl3
             // 
-            this.panelControl3.Controls.Add(this.progressPanel2);
             this.panelControl3.Controls.Add(this.dtDenngay);
             this.panelControl3.Controls.Add(this.chkDaura);
             this.panelControl3.Controls.Add(this.dtTungay);
@@ -1162,16 +1181,6 @@
             this.panelControl3.Name = "panelControl3";
             this.panelControl3.Size = new System.Drawing.Size(833, 185);
             this.panelControl3.TabIndex = 6;
-            // 
-            // progressPanel2
-            // 
-            this.progressPanel2.Appearance.BackColor = System.Drawing.Color.Transparent;
-            this.progressPanel2.Appearance.Options.UseBackColor = true;
-            this.progressPanel2.Location = new System.Drawing.Point(635, 10);
-            this.progressPanel2.Name = "progressPanel2";
-            this.progressPanel2.Size = new System.Drawing.Size(438, 66);
-            this.progressPanel2.TabIndex = 13;
-            this.progressPanel2.Text = "progressPanel2";
             // 
             // dtDenngay
             // 
@@ -1305,6 +1314,7 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.btnScanCmera);
             this.panelControl1.Controls.Add(this.btnReadPDF);
             this.panelControl1.Controls.Add(this.btnimport);
             this.panelControl1.Controls.Add(this.btnMdtk);
@@ -1384,6 +1394,16 @@
             // radialMenu1
             // 
             this.radialMenu1.Name = "radialMenu1";
+            // 
+            // btnScanCmera
+            // 
+            this.btnScanCmera.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnScanCmera.ImageOptions.SvgImage")));
+            this.btnScanCmera.Location = new System.Drawing.Point(373, 64);
+            this.btnScanCmera.Name = "btnScanCmera";
+            this.btnScanCmera.Size = new System.Drawing.Size(275, 59);
+            this.btnScanCmera.TabIndex = 11;
+            this.btnScanCmera.Text = "Scan camera";
+            this.btnScanCmera.Click += new System.EventHandler(this.btnScanCmera_Click);
             // 
             // frmMain
             // 
@@ -1552,5 +1572,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn11;
         private DevExpress.XtraWaitForm.ProgressPanel progressPanel2;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private DevExpress.XtraEditors.SimpleButton btnScanCmera;
     }
 }

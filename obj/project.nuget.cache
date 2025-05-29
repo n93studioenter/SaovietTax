@@ -1,9 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "ym/l7nn3s1w=",
+  "dgSpecHash": "qrv8gN4r+XE=",
   "success": true,
   "projectFilePath": "C:\\TCP\\Saoviet\\DAP3\\SaovietTax\\SaovietTax\\SaovietTax.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\aforge\\2.2.5\\aforge.2.2.5.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\aforge.video\\2.2.5\\aforge.video.2.2.5.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\aforge.video.directshow\\2.2.5\\aforge.video.directshow.2.2.5.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\excss\\4.2.3\\excss.4.2.3.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\itext\\9.2.0\\itext.9.2.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\itext.commons\\9.2.0\\itext.commons.9.2.0.nupkg.sha512",
