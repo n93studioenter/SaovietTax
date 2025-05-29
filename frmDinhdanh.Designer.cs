@@ -321,6 +321,7 @@
             this.checkEdit2.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
             this.checkEdit2.Size = new System.Drawing.Size(217, 31);
             this.checkEdit2.TabIndex = 1;
+            this.checkEdit2.CheckedChanged += new System.EventHandler(this.checkEdit2_CheckedChanged);
             // 
             // checkEdit1
             // 
@@ -330,6 +331,7 @@
             this.checkEdit1.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
             this.checkEdit1.Size = new System.Drawing.Size(217, 31);
             this.checkEdit1.TabIndex = 0;
+            this.checkEdit1.CheckedChanged += new System.EventHandler(this.checkEdit1_CheckedChanged);
             // 
             // frmDinhdanh
             // 

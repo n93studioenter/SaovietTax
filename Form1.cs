@@ -174,8 +174,10 @@ namespace SaovietTax
         #region loadData
         public frmMain()
         {
-            InitializeComponent();
+            InitializeComponent(); 
+
         }
+        
         private List<People> GetListFileImport()
         {
 
@@ -1014,22 +1016,24 @@ namespace SaovietTax
             {
                 MSTCongTY = kq.Rows[0]["MaSoThue"].ToString();
             }
-        } 
-        public static double CalculateSimilarityPercentage(string str1, string str2)
-        {
-            var words1 = str1.Split(' ').Select(w => w.ToLower());
-            var words2 = str2.Split(' ').Select(w => w.ToLower());
-
-            int commonWordsCount = words1.Intersect(words2).Count(); // Số từ chung
-            int maxWordsCount = Math.Max(words1.Count(), words2.Count()); // Số từ lớn nhất
-
-            return (double)commonWordsCount / maxWordsCount * 100; // Tính tỷ lệ phần trăm
         }
+        private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // Thực hiện công việc khởi tạo ở đây
+        }
+
+        private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            progressPanel2.Visible = false; // Ẩn ProgressPanel khi hoàn thành
+        }
+        
         private void frmMain_Load(object sender, EventArgs e)
         {
-            string str1 = "Chất kết dính";
-            string str2 = "Chất kết dính từ Silicon";
-            double similarityPercentage = CalculateSimilarityPercentage(str1, str2);
+            string text1 = "Rau thập cẩm kho quẹt";
+            string text2 = "Rau thập cẩm kho quẹt  (đĩa lớn)";
+
+            // So sánh không quan tâm thứ tự từ
+            double similarity1 = Helpers.StringWordSimilarity.CalculateSimilarity(text1, text2); 
 
             InitDB();
 
@@ -2082,6 +2086,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             return cleaned.ToLower().Trim(); // Chuyển thành chữ thường và loại bỏ khoảng trắng thừa
 
         }
+        public class Vattucheck
+        {
+            public string SoHieu { get; set; }
+            public string Namecore { get; set; }
+            public string Namecheck { get; set; }
+            public double Percent { get; set; }
+            public double Price { get; set; }
+        }
         private void LoadXmlFilesOptimized(string path, int type)
             { 
 
@@ -2349,21 +2361,29 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             bool hasVattu = false;
                             DataRow getrow = null;
                             //Kểm tra vật tư
+                            List<Vattucheck> lstChonloc = new List<Vattucheck>();
                             foreach(DataRow row in existingTbImportVattu.Rows)
                             {
-                                if(row["TenVattu"].ToString() == "chaát keát dính ñi töø Silicon Apolo")
+                                //if (AreNamesSimilar(row["TenVattu"].ToString().ToLower(), tenVattuVni.ToLower()))
+                                //{
+                                //    hasVattu = true;
+                                //    getrow = row; 
+                                //}
+                                string getRowname = row["TenVattu"].ToString().ToLower();
+                                var getpercent= Helpers.StringWordSimilarity.CalculateSimilarity(getRowname, tenVattuVni.ToLower()); 
+                                if (getpercent >=70)
                                 {
-                                    int test = 10;
-                                }
-                                if (AreNamesSimilar(row["TenVattu"].ToString().ToLower(), tenVattuVni.ToLower()))
-                                {
-                                    hasVattu = true;
-                                    getrow = row;
-                                    break;
+                                    Vattucheck Vattucheck = new Vattucheck();
+                                    Vattucheck.Namecore = tenVattuVni.ToLower();
+                                    Vattucheck.Namecheck = getRowname;
+                                    Vattucheck.Percent = getpercent;
+                                    Vattucheck.SoHieu= row["SoHieu"]?.ToString();
+                                    lstChonloc.Add(Vattucheck);
                                 }
                             }
+                            var chk = lstChonloc.OrderByDescending(m => m.Percent).Where(n=>n.Percent>=70).FirstOrDefault();
                             // if (!existingVatTu.ContainsKey($"{tenVattuVni}-{dvTinhVni}") || !hasVattu)
-                            if (!hasVattu)
+                            if (chk == null)
                             {
                                 // Kiểm tra trong list tạm thời của file hiện tại
                                 //var existingDetail = newFileImport.fileImportDetails.FirstOrDefault(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni);
@@ -2371,9 +2391,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 FileImportDetail existingDetail = null;
                                 foreach (var it in peopleTemp)
                                 {
-                                    existingDetail = it.fileImportDetails.Where(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni).FirstOrDefault();
+                                    //existingDetail = it.fileImportDetails.Where(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni && Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.DVT.Trim())).ToLower() == dvTinhVni).FirstOrDefault();
+                                    existingDetail = it.fileImportDetails.Where(d => Helpers.ConvertUnicodeToVni(NormalizeVietnameseString(d.Ten.Trim())).ToLower() == tenVattuVni).FirstOrDefault();
                                     if (existingDetail != null)
-                                        break;
+                                       break;
                                 }
 
                                 soHieuVattu = existingDetail?.SoHieu ?? GenerateResultString(NormalizeVietnameseString(thhdVu.Trim()));
@@ -2385,7 +2406,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             }
                             else
                             {
-                                soHieuVattu= getrow["SoHieu"]?.ToString();
+                                soHieuVattu = chk.SoHieu;
+                                //soHieuVattu= row["SoHieu"]?.ToString();
                                 //soHieuVattu = existingVatTu[$"{tenVattuVni}-{dvTinhVni}"]["SoHieu"]?.ToString();
                             }
 
@@ -3188,7 +3210,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     {
                         try
                         {
-                            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
+                            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(1));
                             var row = wait.Until(d =>
                             {
                                 try
@@ -3264,7 +3286,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                 }
             }
-
+            Thread.Sleep(1000);
             Xulymaytinhtien2(wait);
             dictionMonth.Add(DoTask, Sohoadoncuathan);
             //DoTask += 1;
@@ -3753,6 +3775,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 bool isnext = true;
                 //while ((currentRow) <= rowCount)
                 bool isfirst = true;
+                
                 while (isnext)
                 {
                     try
@@ -3771,23 +3794,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 return null; // Trả về null nếu không tìm thấy
                             }
                         });
-                        var cellC25TYY = row[0].FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
-                        var cell22252 = row[0].FindElement(By.XPath("./td[4]")).Text; // 22252
-                        if (string.IsNullOrEmpty(cellC25TYY))
-                        {
-                            oldRow++; // Vẫn tiếp tục với dòng tiếp theo
-                            continue;
-                        }
-                        string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-
-
-                        // Tạo mảng tham số với giá trị cho câu lệnh SQL
-                        OleDbParameter[] parameters = new OleDbParameter[]
-                        {
-            new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
-            new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
-                        };
-
+                        //var cellC25TYY = row[0].FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
+                        //var cell22252 = row[0].FindElement(By.XPath("./td[4]")).Text; // 22252
+                        //if (string.IsNullOrEmpty(cellC25TYY))
+                        //{
+                        //    oldRow++; // Vẫn tiếp tục với dòng tiếp theo
+                        //    continue;
+                        //}
                         // Click vào dòng
                         row[0].Click();
                         var button = wait.Until(d =>
@@ -5600,11 +5613,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
 
                         // Kiểm tra và thêm mới vật tư
-                        string queryCheckVatTu = @"SELECT MaSo FROM Vattu WHERE LCase(SoHieu) = LCase(?) AND LCase(DonVi) = LCase(?)";
+                        string queryCheckVatTu = @"SELECT MaSo FROM Vattu WHERE LCase(SoHieu) = LCase(?)";
                         using (OleDbCommand checkVatTuCmd = new OleDbCommand(queryCheckVatTu, connection, transaction))
                         {
                             checkVatTuCmd.Parameters.AddWithValue("?", sohieu.ToLower());
-                            checkVatTuCmd.Parameters.AddWithValue("?", DVTinh.ToLower());
+                            //checkVatTuCmd.Parameters.AddWithValue("?", DVTinh.ToLower());
                             object resultVatTu = checkVatTuCmd.ExecuteScalar();
                             if (resultVatTu == null)
                             {
@@ -6076,7 +6089,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 uutienselect = 2;
                 chkDaura.Checked = true;
                 chkDauvao.Checked = false;
-                xtraTabControl2.SelectedTabPageIndex = 2;
+                xtraTabControl2.SelectedTabPageIndex = 1;
             }
             int getthang = 0;
             try
@@ -6086,13 +6099,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 if (files != null)
                 {
                     var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
-                    getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
-                    DateTime now = DateTime.Now; // Ngày hiện tại
-                    int year = now.Year; // Năm hiện tại 
+                   
+                    try
+                    {
+                        getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
+                        DateTime now = DateTime.Now; // Ngày hiện tại
+                        int year = now.Year; // Năm hiện tại 
 
-                    DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
-                    dtTungay.DateTime = new DateTime(year, getthang, 1);
-                    dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+                        DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
+                        dtTungay.DateTime = new DateTime(year, getthang, 1);
+                        dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+                    }
+                    catch(Exception ex)
+                    {
+
+                    }
                 }
                 else
                 {

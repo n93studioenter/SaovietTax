@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static ClosedXML.Excel.XLPredefinedFormat;
 
@@ -9,7 +10,80 @@ namespace SaovietTax
 {
     public static class Helpers
     {
-      
+        public static class StringWordSimilarity
+        {
+            public static double CalculateSimilarity(string product1, string product2)
+            {
+                // Kiểm tra chuỗi rỗng/null
+                if (string.IsNullOrWhiteSpace(product1)) return 0;
+                if (string.IsNullOrWhiteSpace(product2)) return 0;
+
+                // Chuẩn hóa chuỗi
+                product1 = NormalizeProductName(product1);
+                product2 = NormalizeProductName(product2);
+
+                // Nếu giống nhau hoàn toàn sau chuẩn hóa
+                if (product1.Equals(product2)) return 100;
+
+                // Tách thành các token
+                var tokens1 = TokenizeProductName(product1);
+                var tokens2 = TokenizeProductName(product2);
+
+                // Kiểm tra số có khác nhau không (bao gồm cả đơn vị)
+                if (HasDifferentNumberUnits(tokens1, tokens2))
+                    return 0;
+
+                // Tính similarity chỉ trên phần chữ (bỏ qua số và đơn vị)
+                var textParts1 = tokens1.Where(t => !IsNumberWithUnit(t)).ToArray();
+                var textParts2 = tokens2.Where(t => !IsNumberWithUnit(t)).ToArray();
+
+                var commonWords = textParts1.Intersect(textParts2).Count();
+                var totalUniqueWords = textParts1.Union(textParts2).Count();
+
+                return totalUniqueWords == 0 ? 100 : (double)commonWords / totalUniqueWords * 100;
+            }
+
+            private static string NormalizeProductName(string input)
+            {
+                // Chuẩn hóa khoảng trắng và ký tự đặc biệt
+                input = Regex.Replace(input, @"[^\w\s]", " ");
+                input = Regex.Replace(input, @"\s+", " ").Trim();
+                return input.ToLower();
+            }
+
+            private static string[] TokenizeProductName(string input)
+            {
+                return input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            private static bool HasDifferentNumberUnits(string[] tokens1, string[] tokens2)
+            {
+                var numbers1 = tokens1.Where(IsNumberWithUnit).Select(NormalizeNumber).ToArray();
+                var numbers2 = tokens2.Where(IsNumberWithUnit).Select(NormalizeNumber).ToArray();
+
+                // Nếu cả hai không có số → không có số khác nhau
+                if (!numbers1.Any() && !numbers2.Any()) return false;
+
+                // Nếu một bên có số, một bên không → coi như khác
+                if (numbers1.Any() != numbers2.Any()) return true;
+
+                // So sánh các số đã được chuẩn hóa
+                return !numbers1.SequenceEqual(numbers2);
+            }
+
+            private static bool IsNumberWithUnit(string token)
+            {
+                // Nhận diện token có chứa số (có thể kèm đơn vị)
+                return Regex.IsMatch(token, @"\d+");
+            }
+
+            private static string NormalizeNumber(string token)
+            {
+                // Chuẩn hóa số: giữ lại chỉ phần số (bỏ đơn vị)
+                return Regex.Match(token, @"\d+").Value;
+            }
+        }
+
         private static readonly Dictionary<char, string> UnicodeToVniMap = new Dictionary<char, string>
 {
    

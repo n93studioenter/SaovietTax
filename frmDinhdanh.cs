@@ -69,6 +69,23 @@ namespace SaovietTax
 
             InitDB();
             LoadDataDinhDanh();
+            LoadMacdinhVattu();
+        }
+        private void LoadMacdinhVattu()
+        {
+            string querykh = @" SELECT *  FROM tbRegister"; // Sử dụng ? thay cho @mst trong OleDb
+
+            result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+            string col1 = result.Rows[0]["Col1"].ToString();
+            string col2 = result.Rows[0]["Col2"].ToString();
+            if(col1=="1")
+            {
+                checkEdit1.Checked = true;
+            }
+            if (col2 == "1")
+            {
+                checkEdit2.Checked = true;
+            }
         }
         private void LoadDataDinhDanh()
         {
@@ -236,6 +253,26 @@ namespace SaovietTax
         private void txtTKNo_EditValueChanging(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e)
         {
 
+        }
+
+        private void checkEdit1_CheckedChanged(object sender, EventArgs e)
+        {
+            string sql = "UPDATE tbRegister set col1= ?";
+            OleDbParameter[] parameters = new OleDbParameter[]
+        {
+        new OleDbParameter("?", checkEdit1.Checked==true?"1":""),
+        };
+            int resl = ExecuteQueryResult(sql, parameters);
+        }
+
+        private void checkEdit2_CheckedChanged(object sender, EventArgs e)
+        {
+            string sql = "UPDATE tbRegister set col2= ?";
+            OleDbParameter[] parameters = new OleDbParameter[]
+        {
+        new OleDbParameter("?", checkEdit2.Checked==true?"1":""),
+        };
+            int resl = ExecuteQueryResult(sql, parameters);
         }
 
         private int ExecuteQueryResult(string query, params OleDbParameter[] parameters)

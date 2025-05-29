@@ -114,6 +114,7 @@
             this.colTKCo1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.lblDpPath = new DevExpress.XtraEditors.LabelControl();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
+            this.progressPanel2 = new DevExpress.XtraWaitForm.ProgressPanel();
             this.dtDenngay = new DevExpress.XtraEditors.DateEdit();
             this.chkDaura = new DevExpress.XtraEditors.CheckEdit();
             this.dtTungay = new DevExpress.XtraEditors.DateEdit();
@@ -136,6 +137,7 @@
             this.fileImportDetailBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
             this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -543,7 +545,6 @@
             this.colTen3.FieldName = "Ten";
             this.colTen3.MinWidth = 30;
             this.colTen3.Name = "colTen3";
-            this.colTen3.OptionsColumn.AllowEdit = false;
             this.colTen3.Visible = true;
             this.colTen3.VisibleIndex = 0;
             this.colTen3.Width = 311;
@@ -1018,7 +1019,7 @@
             // 
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1634, 201);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1628, 188);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
             // gridControl3
@@ -1028,7 +1029,7 @@
             this.gridControl3.Location = new System.Drawing.Point(0, 0);
             this.gridControl3.MainView = this.gridView5;
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1634, 201);
+            this.gridControl3.Size = new System.Drawing.Size(1628, 188);
             this.gridControl3.TabIndex = 0;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView5});
@@ -1145,6 +1146,7 @@
             // 
             // panelControl3
             // 
+            this.panelControl3.Controls.Add(this.progressPanel2);
             this.panelControl3.Controls.Add(this.dtDenngay);
             this.panelControl3.Controls.Add(this.chkDaura);
             this.panelControl3.Controls.Add(this.dtTungay);
@@ -1159,6 +1161,16 @@
             this.panelControl3.Name = "panelControl3";
             this.panelControl3.Size = new System.Drawing.Size(833, 185);
             this.panelControl3.TabIndex = 6;
+            // 
+            // progressPanel2
+            // 
+            this.progressPanel2.Appearance.BackColor = System.Drawing.Color.Transparent;
+            this.progressPanel2.Appearance.Options.UseBackColor = true;
+            this.progressPanel2.Location = new System.Drawing.Point(635, 10);
+            this.progressPanel2.Name = "progressPanel2";
+            this.progressPanel2.Size = new System.Drawing.Size(438, 66);
+            this.progressPanel2.TabIndex = 13;
+            this.progressPanel2.Text = "progressPanel2";
             // 
             // dtDenngay
             // 
@@ -1537,5 +1549,7 @@
         private DevExpress.XtraGrid.Columns.GridColumn colTKNo1;
         private DevExpress.XtraGrid.Columns.GridColumn colTKCo1;
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn11;
+        private DevExpress.XtraWaitForm.ProgressPanel progressPanel2;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
