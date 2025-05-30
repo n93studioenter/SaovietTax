@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraGrid.GridLevelNode gridLevelNode3 = new DevExpress.XtraGrid.GridLevelNode();
             DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -128,6 +128,7 @@
             this.progressBarControl1 = new DevExpress.XtraEditors.ProgressBarControl();
             this.comboBoxEdit2 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.btnScanCmera = new DevExpress.XtraEditors.SimpleButton();
             this.btnReadPDF = new DevExpress.XtraEditors.SimpleButton();
             this.btnimport = new DevExpress.XtraEditors.SimpleButton();
             this.btnMdtk = new DevExpress.XtraEditors.SimpleButton();
@@ -138,7 +139,6 @@
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
             this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.btnScanCmera = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -209,7 +209,6 @@
             this.colTen2.FieldName = "Ten";
             this.colTen2.MinWidth = 30;
             this.colTen2.Name = "colTen2";
-            this.colTen2.OptionsColumn.AllowEdit = false;
             this.colTen2.Visible = true;
             this.colTen2.VisibleIndex = 0;
             this.colTen2.Width = 287;
@@ -228,6 +227,8 @@
             // colSoluong2
             // 
             this.colSoluong2.Caption = "Số lượng";
+            this.colSoluong2.DisplayFormat.FormatString = "N2";
+            this.colSoluong2.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colSoluong2.FieldName = "Soluong";
             this.colSoluong2.MinWidth = 30;
             this.colSoluong2.Name = "colSoluong2";
@@ -301,10 +302,10 @@
             // 
             this.gridControl1.DataSource = this.fileImportBindingSource;
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            gridLevelNode3.LevelTemplate = this.gridView2;
-            gridLevelNode3.RelationName = "Detail";
+            gridLevelNode1.LevelTemplate = this.gridView2;
+            gridLevelNode1.RelationName = "Detail";
             this.gridControl1.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode3});
+            gridLevelNode1});
             this.gridControl1.Location = new System.Drawing.Point(0, 0);
             this.gridControl1.LookAndFeel.SkinName = "Office 2019 Colorful";
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -550,7 +551,6 @@
             this.colTen3.FieldName = "Ten";
             this.colTen3.MinWidth = 30;
             this.colTen3.Name = "colTen3";
-            this.colTen3.OptionsColumn.AllowEdit = false;
             this.colTen3.Visible = true;
             this.colTen3.VisibleIndex = 0;
             this.colTen3.Width = 311;
@@ -634,10 +634,10 @@
             // 
             this.gridControl2.DataSource = this.fileImportBindingSource;
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            gridLevelNode1.LevelTemplate = this.gridView4;
-            gridLevelNode1.RelationName = "Detail";
+            gridLevelNode2.LevelTemplate = this.gridView4;
+            gridLevelNode2.RelationName = "Detail";
             this.gridControl2.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode1});
+            gridLevelNode2});
             this.gridControl2.Location = new System.Drawing.Point(0, 0);
             this.gridControl2.LookAndFeel.SkinName = "Office 2016 Colorful";
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -1325,6 +1325,16 @@
             this.panelControl1.Size = new System.Drawing.Size(654, 185);
             this.panelControl1.TabIndex = 1;
             // 
+            // btnScanCmera
+            // 
+            this.btnScanCmera.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnScanCmera.ImageOptions.SvgImage")));
+            this.btnScanCmera.Location = new System.Drawing.Point(373, 64);
+            this.btnScanCmera.Name = "btnScanCmera";
+            this.btnScanCmera.Size = new System.Drawing.Size(275, 59);
+            this.btnScanCmera.TabIndex = 11;
+            this.btnScanCmera.Text = "Scan camera";
+            this.btnScanCmera.Click += new System.EventHandler(this.btnScanCmera_Click);
+            // 
             // btnReadPDF
             // 
             this.btnReadPDF.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnReadPDF.ImageOptions.Image")));
@@ -1394,16 +1404,6 @@
             // radialMenu1
             // 
             this.radialMenu1.Name = "radialMenu1";
-            // 
-            // btnScanCmera
-            // 
-            this.btnScanCmera.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnScanCmera.ImageOptions.SvgImage")));
-            this.btnScanCmera.Location = new System.Drawing.Point(373, 64);
-            this.btnScanCmera.Name = "btnScanCmera";
-            this.btnScanCmera.Size = new System.Drawing.Size(275, 59);
-            this.btnScanCmera.TabIndex = 11;
-            this.btnScanCmera.Text = "Scan camera";
-            this.btnScanCmera.Click += new System.EventHandler(this.btnScanCmera_Click);
             // 
             // frmMain
             // 

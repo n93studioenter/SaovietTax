@@ -82,7 +82,7 @@
             this.gcDinhdanh.Location = new System.Drawing.Point(3, 162);
             this.gcDinhdanh.MainView = this.gridView2;
             this.gcDinhdanh.Name = "gcDinhdanh";
-            this.gcDinhdanh.Size = new System.Drawing.Size(1591, 460);
+            this.gcDinhdanh.Size = new System.Drawing.Size(1589, 458);
             this.gcDinhdanh.TabIndex = 11;
             this.gcDinhdanh.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -236,7 +236,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDiengiai.Location = new System.Drawing.Point(685, 37);
             this.txtDiengiai.Name = "txtDiengiai";
-            this.txtDiengiai.Size = new System.Drawing.Size(642, 27);
+            this.txtDiengiai.Size = new System.Drawing.Size(640, 27);
             this.txtDiengiai.TabIndex = 13;
             // 
             // txtTukhoa
@@ -266,7 +266,7 @@
             this.panelControl1.Controls.Add(this.txtTKCo);
             this.panelControl1.Location = new System.Drawing.Point(3, 12);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1342, 144);
+            this.panelControl1.Size = new System.Drawing.Size(1340, 144);
             this.panelControl1.TabIndex = 21;
             // 
             // comboBoxEdit1
@@ -337,7 +337,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1606, 634);
+            this.ClientSize = new System.Drawing.Size(1604, 632);
             this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.gcDinhdanh);

@@ -83,6 +83,7 @@ namespace SaovietTax
             }
             return base.ProcessCmdKey(ref msg, keyData); // Chuyển tiếp cho xử lý tiếp
         }
+        private bool firstload=true;
         private void frmHangHoa_Load(object sender, EventArgs e)
         {
             gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
@@ -105,11 +106,20 @@ namespace SaovietTax
 
                 comboBoxEdit1.Properties.NullText = "Chọn Tài khoản";
                 comboBoxEdit1.Properties.TextEditStyle = TextEditStyles.DisableTextEditor; // Ngăn người dùng nhập trực tiếp
+                int idsl = 0;
                 if (comboBoxEdit1.Properties.Items.Count > 0)
                 {
-                    comboBoxEdit1.SelectedIndex = frmMain.currentselectId; // Chọn phần tử đầu tiên
+                    foreach(Item item in comboBoxEdit1.Properties.Items)
+                    {
+                         if(item.Id== frmMain.currentselectId)
+                        {
+                            idsl = comboBoxEdit1.Properties.Items.IndexOf(item);
+                            break;
+                        }
+                    }
+                    comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
                     var selectedItem = comboBoxEdit1.SelectedItem as Item;
-
+                    firstload = false;
                     LoadData(selectedItem.Id);
                 }
             }
@@ -175,7 +185,7 @@ namespace SaovietTax
         public class Item
         {
             public string Name { get; set; }
-            public int Id { get; set; }
+            public int Id { get; set; } 
 
             public override string ToString()
             {
@@ -268,7 +278,7 @@ namespace SaovietTax
 
         private void comboBoxEdit1_SelectedIndexChanged(object sender, EventArgs e)
         {
-           if (comboBoxEdit1.SelectedItem != null)
+           if (comboBoxEdit1.SelectedItem != null && !firstload)
             {
                 // Lấy phần tử được chọn
                 var selectedItem = comboBoxEdit1.SelectedItem as Item;
@@ -276,7 +286,7 @@ namespace SaovietTax
                 if (selectedItem != null)
                 {
                     int selectedId = selectedItem.Id; // Lấy giá trị Id 
-                    frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
+                    //frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
                     LoadData(selectedId);
                 }
             }

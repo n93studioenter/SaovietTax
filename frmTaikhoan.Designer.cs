@@ -1,6 +1,6 @@
 ﻿namespace SaovietTax
 {
-    partial class frmCamera
+    partial class frmTaikhoan
     {
         /// <summary>
         /// Required designer variable.
@@ -28,37 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.treeList1 = new DevExpress.XtraTreeList.TreeList();
+            ((System.ComponentModel.ISupportInitialize)(this.treeList1)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // treeList1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(12, 12);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1414, 706);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.treeList1.Location = new System.Drawing.Point(32, 22);
+            this.treeList1.Name = "treeList1";
+            this.treeList1.Size = new System.Drawing.Size(926, 549);
+            this.treeList1.TabIndex = 1;
             // 
-            // frmCamera
+            // frmTaikhoan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1438, 730);
-            this.Controls.Add(this.pictureBox1);
-            this.Name = "frmCamera";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "frmCamera";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmCamera_FormClosing);
-            this.Load += new System.EventHandler(this.frmCamera_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.ClientSize = new System.Drawing.Size(995, 597);
+            this.Controls.Add(this.treeList1);
+            this.Name = "frmTaikhoan";
+            this.Text = "frmTaikhoan";
+            this.Load += new System.EventHandler(this.frmTaikhoan_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.treeList1)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private DevExpress.XtraTreeList.TreeList treeList1;
     }
 }

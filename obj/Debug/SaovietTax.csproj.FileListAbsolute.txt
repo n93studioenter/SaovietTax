@@ -441,3 +441,4 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.Video.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.Video.DirectShow.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmCamera.resources
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmTaikhoan.resources

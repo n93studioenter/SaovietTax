@@ -23,6 +23,8 @@ namespace SaovietTax
         private VideoCaptureDevice videoSource; // Camera hiện tại
         private void frmCamera_Load(object sender, EventArgs e)
         {
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage; // Hoặc PictureBoxSizeMode.Zoom
+
             // Chọn camera đầu tiên
             // Lấy danh sách camera
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
@@ -39,8 +41,21 @@ namespace SaovietTax
         }
         private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
-            // Hiển thị hình ảnh từ camera vào PictureBox
-            pictureBox1.Image = (Bitmap)eventArgs.Frame.Clone();
+            if (pictureBox1.SizeMode == PictureBoxSizeMode.StretchImage || pictureBox1.SizeMode == PictureBoxSizeMode.Zoom)
+            {
+                pictureBox1.Image?.Dispose(); // Giải phóng hình ảnh cũ
+                pictureBox1.Image = (Bitmap)eventArgs.Frame.Clone(); // Cập nhật hình ảnh mới
+            }
+        }
+
+        private void frmCamera_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Dừng camera khi đóng form
+            if (videoSource != null && videoSource.IsRunning)
+            {
+                videoSource.SignalToStop();
+                videoSource.WaitForStop();
+            }
         }
     }
 }
