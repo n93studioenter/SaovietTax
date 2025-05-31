@@ -286,6 +286,9 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\x64\tesseract50.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\SaovietTax.exe.config
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\SaovietTax.exe
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\SaovietTax.pdb
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.Video.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.Video.DirectShow.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ExCSS.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\itext.barcodes.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\itext.bouncy-castle-connector.dll
@@ -329,6 +332,7 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraEditors.v22.1
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraGrid.v22.1.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraLayout.v22.1.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraPrinting.v22.1.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraTreeList.v22.1.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DocumentFormat.OpenXml.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DocumentFormat.OpenXml.Framework.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ExcelNumberFormat.dll
@@ -347,7 +351,6 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\WebDriver.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Pdf.v22.1.Core.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Pdf.v22.1.Drawing.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.RichEdit.v22.1.Core.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraTreeList.v22.1.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Office.v22.1.Core.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ClosedXML.pdb
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ClosedXML.xml
@@ -362,6 +365,7 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Printing.v22.1.Co
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraGrid.v22.1.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraLayout.v22.1.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraPrinting.v22.1.xml
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraTreeList.v22.1.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DocumentFormat.OpenXml.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DocumentFormat.OpenXml.Framework.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ExcelNumberFormat.xml
@@ -379,7 +383,6 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\WebDriver.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Pdf.v22.1.Core.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Pdf.v22.1.Drawing.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.RichEdit.v22.1.Core.xml
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.XtraTreeList.v22.1.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\DevExpress.Office.v22.1.Core.xml
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.Data.v22.1.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.Data.v22.1.resources.dll
@@ -408,15 +411,15 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.XtraLayout.v22
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.XtraPrinting.v22.1.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.XtraPrinting.v22.1.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.XtraPrinting.v22.1.resources.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.XtraTreeList.v22.1.resources.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.XtraTreeList.v22.1.resources.dll
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.XtraTreeList.v22.1.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.Pdf.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.Pdf.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.Pdf.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.RichEdit.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.RichEdit.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.RichEdit.v22.1.Core.resources.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.XtraTreeList.v22.1.resources.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.XtraTreeList.v22.1.resources.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.XtraTreeList.v22.1.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\de\DevExpress.Office.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\es\DevExpress.Office.v22.1.Core.resources.dll
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\ja\DevExpress.Office.v22.1.Core.resources.dll
@@ -425,10 +428,12 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.SuggestedB
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.exe.config
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmMain.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.Form2.resources
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmCamera.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmCongtrinh.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmDinhdanh.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmHangHoa.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmKhachhang.resources
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmTaikhoan.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmWebbrowser.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.Properties.Resources.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.GenerateResource.cache
@@ -437,8 +442,3 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.CoreCompil
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.Up2Date
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.exe
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.pdb
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.Video.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\bin\Debug\AForge.Video.DirectShow.dll
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmCamera.resources
-C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmTaikhoan.resources

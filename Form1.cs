@@ -579,6 +579,11 @@ namespace SaovietTax
                 }
                 else
                 {
+                    if (!ColumnExists(connection, "tbNganhang", "TongTien2"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbNganhang", "TongTien2", "NUMBER"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     // Kiểm tra xem cột tkoco đã tồn tại hay chưa
                     if (!ColumnExists(connection, "tbRegister", "col1"))
                     {
@@ -2225,13 +2230,26 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 if (existingTbImport.Rows.Cast<DataRow>().Any(row => row["KHHDon"]?.ToString() == kHHDon && row["SHDon"]?.ToString().Contains(sHDon) == true)) continue;
 
                 XmlNode nBanNode = (type == 1) ? ndhDonNode.SelectSingleNode("NBan") : ndhDonNode.SelectSingleNode("NMua");
-                string ten = nBanNode?.SelectSingleNode("Ten").InnerText;
-                if (string.IsNullOrEmpty(ten))
+                var getten = nBanNode?.SelectSingleNode("Ten");
+                string ten = "";
+                if (getten == null )
                 {
                     ten = nBanNode?.SelectSingleNode("HVTNMHang").InnerText;
+                    //HVTNMHang 
                 }
-                //ten = RemoveSpecialCharacters(ten).Trim();
-                string mst = nBanNode?.SelectSingleNode("MST")?.InnerText;
+                else 
+                {
+                    if(string.IsNullOrEmpty(getten.InnerText))
+                    {
+                        ten = nBanNode?.SelectSingleNode("HVTNMHang").InnerText;
+                    }
+                    else
+                    {
+                        ten = getten.InnerText;
+                    }
+                }
+                    //ten = RemoveSpecialCharacters(ten).Trim();
+                    string mst = nBanNode?.SelectSingleNode("MST")?.InnerText;
                 string diachiBan = nBanNode?.SelectSingleNode("DChi")?.InnerText;
                 //Thêm khách hàng
                 //InitCustomer(type == 1 ? 2 : 3, "", ten, diachiBan, mst);
@@ -5062,11 +5080,28 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             progressPanel1.Visible = true;
             if (xtraTabControl2.SelectedTabPageIndex == 2)
             {
-
-                return;
+                foreach(var item in lstNganhan)
+                {
+                   var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo) VALUES (?, ?, ?, ?, ?,?,?)";
+                 var   parameters = new OleDbParameter[]
+                    {
+            new OleDbParameter("?", item.Maso),
+            new OleDbParameter("?", item.NgayGD),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(item.Diengiai)),
+            new OleDbParameter("?", item.ThanhTien),
+               new OleDbParameter("?", item.ThanhTien2),
+            new OleDbParameter("?", item.TKNo),
+            new OleDbParameter("?", item.TKCo),
+                    };
+                    int rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+                this.Close();
             }
+          
+          
             if (chkDauvao.Checked)
             {
+
                 foreach (var item in lstImportVao)
                 {
                     if(string.IsNullOrEmpty(item.Noidung) && item.Checked)
@@ -7405,14 +7440,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         if (tkco != 0)
                         {
                             nganhang.ThanhTien = tkco;
-                            nganhang.TKCo = "1121"; // Tài khoản Có mẫu
-                            nganhang.TKNo = "635";  // Tài khoản Nợ mẫu
+                            nganhang.TKCo = "11211";  // Tài khoản Có mẫu
+                            nganhang.TKNo = "1111"; // Tài khoản Nợ mẫu
                         }
                         else if (tkno != 0) // Dùng else if để tránh trường hợp cả hai đều có giá trị (nếu có lỗi dữ liệu)
                         {
                             nganhang.ThanhTien2 = tkno;
-                            nganhang.TKCo = "635";  // Tài khoản Có mẫu
-                            nganhang.TKNo = "1122"; // Tài khoản Nợ mẫu
+                          
+                            nganhang.TKCo = "1111"; // Tài khoản Có mẫu
+                            nganhang.TKNo = "11211";  // Tài khoản Nợ mẫu
                         }
                         else
                         {
@@ -7751,12 +7787,17 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
         }
 
-        private void btnScanCmera_Click(object sender, EventArgs e)
+        private void btnMatdinhnganhang_Click(object sender, EventArgs e)
         {
-            frmCamera camera = new frmCamera();
-            camera.ShowDialog();
 
         }
+
+        //private void btnScanCmera_Click(object sender, EventArgs e)
+        //{
+        //    frmCamera camera = new frmCamera();
+        //    camera.ShowDialog();
+
+        //}
 
         public static string NormalizeVietnameseString(string input)
         {
