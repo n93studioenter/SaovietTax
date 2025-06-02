@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data.cs" />
+    <Compile Include="DTO\VatTu.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

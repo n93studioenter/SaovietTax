@@ -22,54 +22,59 @@ using DevExpress.Xpo.DB.Helpers;
 using System.Web.UI.WebControls;
 using Windows.UI.Xaml.Controls;
 using DevExpress.Utils;
+using SaovietTax.DTO;
 
 namespace SaovietTax
 {
 	public partial class frmHangHoa: DevExpress.XtraEditors.XtraForm
 	{
-        public class VatTu
-        {
-            public int MaSo { get; set; }
-            public int MaPhanLoai { get; set; }
-            public string SoHieu { get; set; }
-            public string TenVattu { get; set; }
-            public string DonVi { get; set; }
-        }
+      
         public VatTu dtoVatTu { get; set; }
         public frmHangHoa()
 		{
             InitializeComponent();
             dtoVatTu = new VatTu();
+        }
+        public void GridStripRow(DevExpress.XtraGrid.Views.Grid.GridView gridView)
+        {
+            if (gridView != null)
+            {
+                // Kích hoạt kiểu dáng hàng chẵn và lẻ
+                gridView.OptionsView.EnableAppearanceEvenRow = true;
+                gridView.OptionsView.EnableAppearanceOddRow = true;
 
+                // Thiết lập màu sắc cho hàng chẵn
+                gridView.Appearance.EvenRow.BackColor = System.Drawing.Color.FromArgb(168, 255, 253);
+
+                gridView.Appearance.EvenRow.ForeColor = System.Drawing.Color.Black; // Màu chữ cho hàng chẵn
+
+                // Thiết lập màu sắc cho hàng lẻ
+                gridView.Appearance.OddRow.BackColor = System.Drawing.Color.White; // Màu nền cho hàng lẻ
+                gridView.Appearance.OddRow.ForeColor = System.Drawing.Color.Black; // Màu chữ cho hàng lẻ
+                 
+
+            }
         }
         private void LoadData(int Maso)
         {
             string query = "";
             if (Maso != 0)
-            {
-                query= @" SELECT *  FROM Vattu where MaPhanLoai= ?";
-                var parameterss = new OleDbParameter[]
-                {
-                new OleDbParameter("?",Maso)
-                   };
-                var kq = ExecuteQuery(query, parameterss);
-                foreach (DataRow item in kq.Rows)
-                {
-                    item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
-                    item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
-                }
-                gridControl1.DataSource = kq;
+            {  
+                gridControl1.DataSource = frmMain.lstvt.Where(m=>m.MaPhanLoai==Maso);
+                GridStripRow(gridView1);
             }
             else
             {
-                query = @" SELECT *  FROM Vattu  "; 
-                var kq = ExecuteQuery(query, null);
-                foreach (DataRow item in kq.Rows)
-                {
-                    item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
-                    item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
-                }
-                gridControl1.DataSource = kq;
+                //query = @" SELECT *  FROM Vattu  "; 
+                //var kq = ExecuteQuery(query, null);
+                //foreach (DataRow item in kq.Rows)
+                //{
+                //    item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
+                //    item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
+                //}
+                gridControl1.DataSource = frmMain.lstvt;
+
+                GridStripRow(gridView1);
             }
         }
 
@@ -83,103 +88,11 @@ namespace SaovietTax
             }
             return base.ProcessCmdKey(ref msg, keyData); // Chuyển tiếp cho xử lý tiếp
         }
-        private bool firstload=true;
+        private bool firstload=true; 
         private void frmHangHoa_Load(object sender, EventArgs e)
         {
-            gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
-
-            string query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai"; 
-            var dt = ExecuteQuery(query, null);
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                comboBoxEdit1.Properties.Items.Clear(); // Xóa các mục cũ
-                comboBoxEdit1.Properties.Items.Add(new Item { Name = "Tất cả", Id = 0 });
-                foreach (DataRow row in dt.Rows)
-                {
-                    // Thêm từng mục vào ComboBoxEdit
-                    comboBoxEdit1.Properties.Items.Add(new Item
-                    {
-                        Name = Helpers.ConvertVniToUnicode(row["SoHieu"].ToString()) +" - "+ Helpers.ConvertVniToUnicode(row["TenPhanLoai"].ToString()),
-                        Id = Convert.ToInt32(row["MaSo"])
-                    });
-                }
-
-                comboBoxEdit1.Properties.NullText = "Chọn Tài khoản";
-                comboBoxEdit1.Properties.TextEditStyle = TextEditStyles.DisableTextEditor; // Ngăn người dùng nhập trực tiếp
-                int idsl = 0;
-                if (comboBoxEdit1.Properties.Items.Count > 0)
-                {
-                    foreach(Item item in comboBoxEdit1.Properties.Items)
-                    {
-                         if(item.Id== frmMain.currentselectId)
-                        {
-                            idsl = comboBoxEdit1.Properties.Items.IndexOf(item);
-                            break;
-                        }
-                    }
-                    comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
-                    var selectedItem = comboBoxEdit1.SelectedItem as Item;
-                    firstload = false;
-                    LoadData(selectedItem.Id);
-                }
-            }
-            else
-            {
-                comboBoxEdit1.Properties.Items.Clear(); // Xóa dữ liệu cũ
-                comboBoxEdit1.Properties.NullText = "Không có tài khoản nào";
-            }
-            //
-            //Load data vat tu
-            txtSohieu.Text = dtoVatTu.SoHieu;
-            txtTenvattu.Text = dtoVatTu.TenVattu;
-            txtDonvi.Text = dtoVatTu.DonVi;
-            //Kiểm tra xem là sp moi hay cũ
-            string queryCheckVatTu = @"SELECT * FROM Vattu WHERE LCase(SoHieu) = LCase(?) AND LCase(DonVi) = LCase(?)";
-          var  parameterss = new OleDbParameter[]
-          {
-                new OleDbParameter("?",dtoVatTu.SoHieu.ToLower()),
-                 new OleDbParameter("?",Helpers.ConvertUnicodeToVni(dtoVatTu.DonVi.ToLower()))
-             };
-           var kq = ExecuteQuery(queryCheckVatTu, parameterss);
-            if (kq.Rows.Count == 0)
-            {
-                txtMaSo.Text = "0";
-            }
-            else
-            {
-                txtMaSo.Text = kq.Rows[0]["MaSo"].ToString();
-                txtGhichu.Text = kq.Rows[0]["GhiChu"].ToString();
-                int mapl = int.Parse(kq.Rows[0]["MaPhanLoai"].ToString());
-                
-                //comboBoxEdit1.SelectedItem=
-                foreach (Item item in comboBoxEdit1.Properties.Items)
-                {
-                    if (item.Id == mapl)
-                    {
-                        comboBoxEdit1.EditValue = item; // Chọn mục theo ID
-                        break; // Thoát khỏi vòng lặp
-                    }
-                }
-            }
-
-            DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
-            for (int i = 0; i < view.RowCount; i++)
-            {
-                // Lấy giá trị của cột STT
-                if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
-                {
-                    this.BeginInvoke((MethodInvoker)delegate
-                    {
-                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
-                        {
-                            gridView1.FocusedRowHandle = i; // Đặt focus
-                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
-                            gridView1.SelectRow(i); // Chọn dòng
-                        }
-                    });
-                    return;
-                }
-            }
+             
+           
         }
 
         public class Item
@@ -451,7 +364,7 @@ namespace SaovietTax
                 try
                 {
                     TonKho tk = new TonKho();
-                    int cnt = 0;
+                    int cnt = 12;
                     while (kq.Rows[0]["Luong_" + cnt].ToString() == "0")
                     {
                         cnt += 1;
@@ -504,6 +417,104 @@ namespace SaovietTax
         private void gridView1_DataSourceChanged(object sender, EventArgs e)
         {
            
+        }
+
+        private void frmHangHoa_Load_1(object sender, EventArgs e)
+        {
+            gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
+
+            var query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai";
+            var dt = ExecuteQuery(query, null);
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                comboBoxEdit1.Properties.Items.Clear(); // Xóa các mục cũ
+                comboBoxEdit1.Properties.Items.Add(new Item { Name = "Tất cả", Id = 0 });
+                foreach (DataRow row in dt.Rows)
+                {
+                    // Thêm từng mục vào ComboBoxEdit
+                    comboBoxEdit1.Properties.Items.Add(new Item
+                    {
+                        Name = Helpers.ConvertVniToUnicode(row["SoHieu"].ToString()) + " - " + Helpers.ConvertVniToUnicode(row["TenPhanLoai"].ToString()),
+                        Id = Convert.ToInt32(row["MaSo"])
+                    });
+                }
+
+                comboBoxEdit1.Properties.NullText = "Chọn Tài khoản";
+                comboBoxEdit1.Properties.TextEditStyle = TextEditStyles.DisableTextEditor; // Ngăn người dùng nhập trực tiếp
+                int idsl = 0;
+                if (comboBoxEdit1.Properties.Items.Count > 0)
+                {
+                    foreach (Item item in comboBoxEdit1.Properties.Items)
+                    {
+                        if (item.Id == frmMain.currentselectId)
+                        {
+                            idsl = comboBoxEdit1.Properties.Items.IndexOf(item);
+                            break;
+                        }
+                    }
+                    comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
+                    var selectedItem = comboBoxEdit1.SelectedItem as Item;
+                    firstload = false;
+                    LoadData(selectedItem.Id);
+                }
+            }
+            else
+            {
+                comboBoxEdit1.Properties.Items.Clear(); // Xóa dữ liệu cũ
+                comboBoxEdit1.Properties.NullText = "Không có tài khoản nào";
+            }
+            //
+            //Load data vat tu
+            txtSohieu.Text = dtoVatTu.SoHieu;
+            txtTenvattu.Text = dtoVatTu.TenVattu;
+            txtDonvi.Text = dtoVatTu.DonVi;
+            //Kiểm tra xem là sp moi hay cũ
+            string queryCheckVatTu = @"SELECT * FROM Vattu WHERE LCase(SoHieu) = LCase(?) AND LCase(DonVi) = LCase(?)";
+            var parameterss = new OleDbParameter[]
+            {
+                new OleDbParameter("?",dtoVatTu.SoHieu.ToLower()),
+                 new OleDbParameter("?",Helpers.ConvertUnicodeToVni(dtoVatTu.DonVi.ToLower()))
+               };
+            var kq = ExecuteQuery(queryCheckVatTu, parameterss);
+            if (kq.Rows.Count == 0)
+            {
+                txtMaSo.Text = "0";
+            }
+            else
+            {
+                txtMaSo.Text = kq.Rows[0]["MaSo"].ToString();
+                txtGhichu.Text = kq.Rows[0]["GhiChu"].ToString();
+                int mapl = int.Parse(kq.Rows[0]["MaPhanLoai"].ToString());
+
+                //comboBoxEdit1.SelectedItem=
+                foreach (Item item in comboBoxEdit1.Properties.Items)
+                {
+                    if (item.Id == mapl)
+                    {
+                        comboBoxEdit1.EditValue = item; // Chọn mục theo ID
+                        break; // Thoát khỏi vòng lặp
+                    }
+                }
+            }
+
+            DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+            for (int i = 0; i < view.RowCount; i++)
+            {
+                // Lấy giá trị của cột STT
+                if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
+                {
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
+                        {
+                            gridView1.FocusedRowHandle = i; // Đặt focus
+                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
+                            gridView1.SelectRow(i); // Chọn dòng
+                        }
+                    });
+                    return;
+                }
+            }
         }
     }
 }

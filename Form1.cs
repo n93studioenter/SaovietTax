@@ -71,6 +71,8 @@ using System.Runtime.Remoting.Contexts;
 using AForge.Video.DirectShow;
 using AForge.Video;
 using static iText.IO.Codec.TiffWriter;
+using SaovietTax.DTO;
+using DocumentFormat.OpenXml.VariantTypes;
 
 namespace SaovietTax
 {
@@ -1043,38 +1045,17 @@ namespace SaovietTax
         {
             progressPanel2.Visible = false; // Ẩn ProgressPanel khi hoàn thành
         }
-       
-        private void frmMain_Load(object sender, EventArgs e)
+        public List<VatTu> lstvt = new List<VatTu>();
+        private async void frmMain_Load(object sender, EventArgs e)
         {
-            string text1 = "Rau thập cẩm kho quẹt";
-            string text2 = "Rau thập cẩm kho quẹt  (đĩa lớn)";
-
-            // So sánh không quan tâm thứ tự từ
-            double similarity1 = Helpers.StringWordSimilarity.CalculateSimilarity(text1, text2); 
-
             InitDB();
-
             InitData(); 
             SetVietnameseCulture();
             GetMST();
             string fileName = Path.GetFileName(dbPath.Trim());
-            
             CheckDB();
             ControlsSetup();
-
-          
-             
-
-            // Thiết lập ngôn ngữ cho Calendar
-            // dateEdit1.Properties.CalendarTimeProperties.Culture = new CultureInfo("vi-VN");
-            string newName = "Caù traém naáu meû";
-          string  query = @"SELECT * FROM Vattu 
-WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
-            string DVTinh = "Kg";
-
-            //int rs = (int)ExecuteQuery(query, new OleDbParameter("?", "SAdsd")).Rows[0][0];
-            var getdata = ExecuteQuery(query, new OleDbParameter("?", newName.ToLower()), new OleDbParameter("?", Helpers.ConvertUnicodeToVni(DVTinh).ToLower()));
-
+            lstvt = await  LoadDataVattuAsync();
         }
         #endregion
         #region Xử lý xml
@@ -1763,6 +1744,68 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             return ExecuteQuery(query, null);
         }
 
+        private async Task<List<VatTu>> LoadDataVattuAsync()
+        {
+            var query = @" SELECT * FROM Vattu ";
+            var ListVattu = await Task.Run(() => ExecuteQuery(query, null));
+            var lstVattu = new List<VatTu>();
+
+            foreach (DataRow item in ListVattu.Rows)
+            {
+                item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
+                item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
+            }
+
+            List<Task<VatTu>> vatTuTasks = new List<Task<VatTu>>();
+
+            foreach (DataRow item in ListVattu.Rows)
+            {
+                vatTuTasks.Add(Task.Run(() =>
+                {
+                    var VatTu = new VatTu
+                    {
+                        MaSo = int.Parse(item["MaSo"].ToString()),
+                        MaPhanLoai = int.Parse(item["MaPhanLoai"].ToString()),
+                        TenVattu = item["TenVattu"].ToString(),
+                        SoHieu = item["SoHieu"].ToString(),
+                        DonVi = item["DonVi"].ToString(),
+                        GhiChu = item["GhiChu"].ToString()
+                    };
+
+                    // Truy vấn số lượng và thành tiền
+                    int cnt = 12;
+                    var queryTonKho = @" SELECT * FROM TonKho WHERE MaVatTu= ? ";
+                    var parameters = new OleDbParameter[] { new OleDbParameter("?", VatTu.MaSo) };
+
+                    var kq = ExecuteQuery(queryTonKho, parameters);
+                    if (kq.Rows.Count > 0)
+                    {
+                        while (cnt > 0 && kq.Rows[0]["Luong_" + cnt].ToString() == "0")
+                        {
+                            cnt--;
+                        }
+
+                        var soluong = kq.Rows[0]["Luong_" + cnt] != DBNull.Value ? double.Parse(kq.Rows[0]["Luong_" + cnt].ToString()) : 0;
+                        VatTu.SoLuong = soluong;
+                        var thanhtien = kq.Rows[0]["Tien_" + cnt] != DBNull.Value ? double.Parse(kq.Rows[0]["Tien_" + cnt].ToString()) : 0;
+                        VatTu.ThanhTien = thanhtien;
+
+                        if (soluong != 0 && thanhtien != 0)
+                        {
+                            VatTu.Dongia = thanhtien / soluong;
+                        }
+                    }
+
+                    return VatTu;
+                }));
+            }
+
+            // Chờ cho tất cả các tác vụ hoàn thành
+            var vatTus = await Task.WhenAll(vatTuTasks);
+            lstVattu.AddRange(vatTus);
+
+            return lstVattu;
+        }
         private Dictionary<string, DataRow> LoadExistingKhachHang(string tableName, string keyColumn)
         {
             string query = $"SELECT * FROM {tableName}";
@@ -3025,7 +3068,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     IJavaScriptExecutor js = (IJavaScriptExecutor)Driver;
                     js.ExecuteScript("window.scrollTo(0, 0);");
                     Thread.Sleep(1000);
-                    var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+                    var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(100));
                     var closeButton = wait.Until(driver => driver.FindElement(By.XPath("//span[@class='ant-modal-close-x']")));
                     closeButton.Click();
                     //
@@ -3185,7 +3228,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
 
             Thread.Sleep(1000);
-            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(200));
             string targetUrl = "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don";
             Driver.Navigate().GoToUrl(targetUrl);
             Thread.Sleep(1000);
@@ -3200,7 +3243,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             waitLoading(wait);
             IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
             int rowCount = rows.Count;
-            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+            wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(200));
 
             var divElement = wait.Until(d => d.FindElements(By.XPath("//div[@class='ant-select-selection-selected-value' and @title='15']")));
 
@@ -3384,7 +3427,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             try
             {
-                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
                 var notificationButton = wait.Until(d => d.FindElement(By.XPath("//i[@aria-label='icon: bell']/parent::button")));
 
                 string targetUrl = "https://hoadondientu.gdt.gov.vn/tra-cuu/tra-cuu-hoa-don";
@@ -3394,6 +3437,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 var tab = wait.Until(d => d.FindElement(
                     By.XPath("//div[@role='tab' and .//span[contains(text(),'Tra cứu hóa đơn điện tử mua vào')]]")
                 ));
+                Thread.Sleep(200);
                 tab.Click();
 
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
@@ -3412,7 +3456,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 //IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
                 //int rowCount = rows.Count;
                 //Chọn 50 rows
-                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(100));
+                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(200));
 
 
                 var divElement = wait.Until(d => d.FindElements(By.XPath("//div[@class='ant-select-selection-selected-value' and @title='15']")));
@@ -3443,12 +3487,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     divElement[1].Click();
                     Console.WriteLine("Đã nhấp vào phần tử.");
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 var dropdownMenu = wait.Until(d => d.FindElement(By.ClassName("ant-select-dropdown-menu")));
 
                 // Tìm phần tử <li> có nội dung là "50" và nhấp vào nó
                 var option50 = wait.Until(d => dropdownMenu.FindElements(By.XPath(".//li[text()='50']")));
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 // Nhấp vào phần tử "50"
                 if (option50 != null)
                 {
@@ -3457,7 +3501,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 //Click download XML
                 //chờ loading tiếp
                 waitLoading(wait);
-
+                Thread.Sleep(500);
                 // Cách 1: Target vào thẻ <i> có aria-label
                 //   d.FindElement(By.CssSelector("button.ant-btn-icon-only i[aria-label='icon: user']")
                 bool isPhantrang = false;
@@ -3487,7 +3531,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         {
                             try
                             {
-                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(1));
+                                wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(2));
                                 // Tìm dòng hiện tại
                                 var row = wait.Until(d =>
                                 {
@@ -3503,34 +3547,26 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 });
                                 var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
                                 var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
-                                //Kiểm tra xem  trong folder đã có chưa
-                                cell22252 = Helpers.InsertZero(cell22252);
+                                                                                           //Kiểm tra xem  trong folder đã có chưa
                                 string pathkt = savedPath + "\\HDVao\\" + dtTungay.DateTime.Month + "\\HD__" + dtTungay.DateTime.Month + "_" + cell22252 + "_" + cellC25TYY + ".xml";
                                 if (File.Exists(pathkt))
                                 {
                                     currentRow++;
                                     hasdata++;
+                                    Thread.Sleep(200);
                                     continue;
                                 }
-
-                                string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-
-
-                                // Tạo mảng tham số với giá trị cho câu lệnh SQL
-                                OleDbParameter[] parameters = new OleDbParameter[]
-                                {
-            new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
-            new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
-                                };
-                                var kq = ExecuteQuery(query, parameters);
-                                var a = people;
-                                var check = a.Any(m => m.KHHDon == cellC25TYY && m.SHDon.Contains(cell22252));
-                                if (check || kq.Rows.Count != 0)
+                                cell22252 = Helpers.InsertZero(cell22252);
+                                pathkt = savedPath + "\\HDVao\\" + dtTungay.DateTime.Month + "\\HD__" + dtTungay.DateTime.Month + "_" + cell22252 + "_" + cellC25TYY + ".xml";
+                                if (File.Exists(pathkt))
                                 {
                                     currentRow++;
                                     hasdata++;
+                                    Thread.Sleep(200);
                                     continue;
                                 }
+                                // var a=
+                                string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
 
                                 // Click vào dòng
                                 row.Click();
@@ -3544,13 +3580,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 if (currentRow == 1)
                                     fp = savedPath + "\\HDVao\\" + "invoice.zip";
                                 else
-                                    fp = savedPath + "\\HDVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
-
+                                    // fp = savedPath + "\\HDVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
+                                    fp = savedPath + "\\HDVao\\" + "invoice.zip";
                                 try
                                 {
-                                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
+                                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(2));
                                     wait.Until(d => File.Exists(fp));
                                     lstHas.Add(fp);
+                                    GiaiNenhoadon(1);
                                 }
                                 catch (Exception ex)
                                 {
@@ -3577,7 +3614,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             //var getlastlist = lstHas.LastOrDefault();
                             //wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
                             //wait.Until(d => File.Exists(getlastlist));
-                            GiaiNenhoadon(1);
+                            //GiaiNenhoadon(1);
                         }
                         //Xử lý phần trang 
                         var buttonElement = Driver.FindElements(By.ClassName("ant-btn-primary"));
@@ -3600,7 +3637,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 {
                     throw ex;
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 Cucthuekhngnhanma(wait, fromdate, todate);
             }
             catch (Exception ex)
@@ -3992,23 +4029,6 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             //chờ loading
 
             waitLoading(wait);
-           // wait.Until(d => d.FindElements(By.CssSelector("tr.ant-table-row")).Count > 0);
-            //Thread.Sleep(1000);
-            //IReadOnlyCollection<IWebElement> rows = Driver.FindElements(By.CssSelector("tr.ant-table-row"));
-            //var clickableRows = rows.Where(row =>
-            //{
-            //    try
-            //    {
-            //        return row.Displayed && row.Enabled && row.FindElements(By.CssSelector("td")).Any(td => td.Displayed);
-            //    }
-            //    catch
-            //    {
-            //        return false;
-            //    }
-            //}).ToList();
-
-            //int rowCount = clickableRows.Count;
-            //Console.WriteLine($"Số dòng trong bảng: {rowCount}");
              
             int currentRow = 1;
             bool hasMoreRows = true;
@@ -4036,43 +4056,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     });
                     var cellC25TYY = row.FindElement(By.XPath("./td[3]/span")).Text; // C25TYY
                     var cell22252 = row.FindElement(By.XPath("./td[4]")).Text; // 22252
-
-                    string query = "SELECT * FROM HoaDon WHERE KyHieu = ? AND SoHD LIKE ?";
-
-
-                    // Tạo mảng tham số với giá trị cho câu lệnh SQL
-                    OleDbParameter[] parameters = new OleDbParameter[]
-                    {
-            new OleDbParameter("KyHieu", cellC25TYY),          // Sử dụng chỉ số mà không cần tên
-            new OleDbParameter("SoHD", "%" + cell22252 + "%")  // Thêm ký tự % cho LIKE
-                    };
-                    //var kq = ExecuteQuery(query, parameters);
-                    //var a = people;
-                    //var check = a.Any(m => m.KHHDon == cellC25TYY && m.SHDon.Contains(cell22252));
-                    //if (check || kq.Rows.Count != 0)
-                    //{
-                    //    //Xóa Excel
-                    //    var pp1 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDVao";
-                    //    var pp21 = "C:\\S.T.E 25\\S.T.E 25\\Hoadon\\HDVao\\" + DoTask;
-                    //    // Lấy tất cả các file XML từ các thư mục tháng từ fromMonth đến toMonth
-                    //    string[] excelFiles1 = Directory.GetFiles(pp1, "*.xlsx");
-                    //    string fileName1 = Path.GetFileName(excelFiles1[0]); // Lấy tên file
-                    //    string destFilePath1 = Path.Combine(pp21, fileName1); // Tạo đường dẫn đích
-
-                    //    // Di chuyển file
-                    //    try
-                    //    {
-                    //        File.Move(excelFiles1[0], destFilePath1);
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        File.Delete(excelFiles1[0]);
-                    //    }
-                    //    currentRow++;
-                    //    hasdata++;
-                    //    continue;
-                    //}
-
+                   
                     // Click vào dòng
                     row.Click();
                     button = wait.Until(d =>
@@ -4089,11 +4073,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     if (currentRow == 1)
                         fp = savedPath +"\\HDVao\\" + "invoice.zip";
                     else
-                        fp = savedPath +"\\HDVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
-
-                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
+                        // fp = savedPath +"\\HDVao\\" + "invoice (" + (currentRow - 1 - hasdata) + ").zip";
+                        fp = savedPath + "\\HDVao\\" + "invoice.zip";
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(3));
                     wait.Until(d => File.Exists(fp));
                     lstHas.Add(fp);
+                    GiaiNenhoadon(1);
                     currentRow++; // Chuyển sang dòng tiếp theo
                 }
                 catch (NoSuchElementException)
@@ -4121,20 +4106,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 var getlastlist = lstHas.LastOrDefault();
                 wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(120));
                 wait.Until(d => File.Exists(getlastlist));
-                // XulyxoaExcel();
-
-
-                // Di chuyển file
-
-
-                GiaiNenhoadon(1);
-                //  LoadXmlFiles(savedPath);
-
-                //End Xử lý hóa đơn từ máy tính tiền
+               
                 DoTask += 1;
             }
           
-            //Xulysaudangnhap();
         }
         private void XulyxoaExcel(DateTime fromdate,DateTime todate)
         {
@@ -4149,17 +4124,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 string destFilePath = System.IO.Path.Combine(pp2, fileName); // Tạo đường dẫn đích 
                 try
                 {
-                    File.Move(excelFiles[0], destFilePath);
-                   // var pp3 = savedPath + "\\HDVao\\" + (todate.Month);
-                   // string destFilePath2 = System.IO.Path.Combine(pp3, fileName); // Tạo đường dẫn đích
-                   // File.Copy(destFilePath, destFilePath2);
-                    //XulyfilEexcel(1, DoTask);
-                    //XulyfilEexcel(1, (DoTask + 1));
-                    //Đọc File excel
+                    if (!File.Exists(destFilePath))
+                        File.Move(excelFiles[0], destFilePath);
+                    else
+                         File.Delete(excelFiles[0]);
                 }
                 catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
+                { 
                     File.Delete(excelFiles[0]);
                 }
             }
@@ -6620,7 +6591,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             frmHangHoa frmHangHoa = new frmHangHoa();
                             frmHangHoa.frmMain = this;
 
-                            frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                             VatTu vatTu = new VatTu();
                             vatTu.SoHieu = cellValue.ToString();
                             //Kiểm tra xem có phải so hiệu tự tạo 
                             string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
@@ -6795,7 +6766,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             frmHangHoa frmHangHoa = new frmHangHoa();
                             frmHangHoa.frmMain = this;
 
-                            frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                           VatTu vatTu = new VatTu();
                             vatTu.SoHieu = cellValue.ToString();
 
                             string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
@@ -7533,8 +7504,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "SoHieu").ToString()),
             new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "Soluong").ToString()),
             new OleDbParameter("?",  gridView2.GetRowCellValue(rowIndex2, "Dongia").ToString()),
-            new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "DVT").ToString()),
-            new OleDbParameter("?",gridView2.GetRowCellValue(rowIndex2, "Ten").ToString()),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(gridView2.GetRowCellValue(rowIndex2, "DVT").ToString())),
+            new OleDbParameter("?",Helpers.ConvertUnicodeToVni(gridView2.GetRowCellValue(rowIndex2, "Ten").ToString())),
             new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "TKNo").ToString()),
              new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "TKCo").ToString()),
               new OleDbParameter("?",  gridView2.GetRowCellValue(rowIndex2, "TTien").ToString()),
@@ -7586,8 +7557,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "SoHieu").ToString()),
             new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "Soluong").ToString()),
             new OleDbParameter("?",  gridView2.GetRowCellValue(rowIndex2, "Dongia").ToString()),
-            new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "DVT").ToString()),
-            new OleDbParameter("?",gridView2.GetRowCellValue(rowIndex2, "Ten").ToString()),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(gridView2.GetRowCellValue(rowIndex2, "DVT").ToString())),
+            new OleDbParameter("?",Helpers.ConvertUnicodeToVni(gridView2.GetRowCellValue(rowIndex2, "Ten").ToString())),
             new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "TKNo").ToString()),
              new OleDbParameter("?", gridView2.GetRowCellValue(rowIndex2, "TKCo").ToString()),
               new OleDbParameter("?",  gridView2.GetRowCellValue(rowIndex2, "TTien").ToString()),
@@ -7637,7 +7608,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     frmHangHoa frmHangHoa = new frmHangHoa();
                     frmHangHoa.frmMain = this;
 
-                    frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                    VatTu vatTu = new VatTu();
                     vatTu.SoHieu = cellValue.ToString();
 
                     string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";
@@ -7657,7 +7628,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
                     }
 
-                    var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
+                    var tenvattu =gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
                     vatTu.TenVattu = tenvattu;
                     var dvt = gridView.GetRowCellValue(currentRowHandle, "DVT").ToString();
                     vatTu.DonVi = dvt;
@@ -7718,7 +7689,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     frmHangHoa frmHangHoa = new frmHangHoa();
                     frmHangHoa.frmMain = this;
 
-                    frmHangHoa.VatTu vatTu = new frmHangHoa.VatTu();
+                   VatTu vatTu = new VatTu();
                     vatTu.SoHieu = cellValue.ToString();
                     //Kiểm tra xem có phải so hiệu tự tạo 
                     string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu = ?";

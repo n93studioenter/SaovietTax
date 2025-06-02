@@ -34,6 +34,9 @@
             this.colTenVattu = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoHieu = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colDonvitinh = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.btnGhi = new DevExpress.XtraEditors.SimpleButton();
             this.btnThem = new DevExpress.XtraEditors.SimpleButton();
             this.txtGhichu = new DevExpress.XtraEditors.TextEdit();
@@ -73,7 +76,7 @@
             this.gridControl1.Location = new System.Drawing.Point(12, 45);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(724, 539);
+            this.gridControl1.Size = new System.Drawing.Size(1119, 539);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -84,7 +87,10 @@
             this.gridView1.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.colTenVattu,
             this.colSoHieu,
-            this.colDonvitinh});
+            this.colDonvitinh,
+            this.gridColumn2,
+            this.gridColumn1,
+            this.gridColumn3});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsView.ShowGroupPanel = false;
@@ -122,6 +128,42 @@
             this.colDonvitinh.Visible = true;
             this.colDonvitinh.VisibleIndex = 2;
             this.colDonvitinh.Width = 112;
+            // 
+            // gridColumn2
+            // 
+            this.gridColumn2.Caption = "Số lượng";
+            this.gridColumn2.DisplayFormat.FormatString = "N2";
+            this.gridColumn2.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.gridColumn2.FieldName = "SoLuong";
+            this.gridColumn2.MinWidth = 30;
+            this.gridColumn2.Name = "gridColumn2";
+            this.gridColumn2.Visible = true;
+            this.gridColumn2.VisibleIndex = 3;
+            this.gridColumn2.Width = 112;
+            // 
+            // gridColumn1
+            // 
+            this.gridColumn1.Caption = "Dongia";
+            this.gridColumn1.DisplayFormat.FormatString = "N2";
+            this.gridColumn1.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.gridColumn1.FieldName = "Dongia";
+            this.gridColumn1.MinWidth = 30;
+            this.gridColumn1.Name = "gridColumn1";
+            this.gridColumn1.Visible = true;
+            this.gridColumn1.VisibleIndex = 4;
+            this.gridColumn1.Width = 112;
+            // 
+            // gridColumn3
+            // 
+            this.gridColumn3.Caption = "Thành tiền";
+            this.gridColumn3.DisplayFormat.FormatString = "N2";
+            this.gridColumn3.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.gridColumn3.FieldName = "ThanhTien";
+            this.gridColumn3.MinWidth = 30;
+            this.gridColumn3.Name = "gridColumn3";
+            this.gridColumn3.Visible = true;
+            this.gridColumn3.VisibleIndex = 5;
+            this.gridColumn3.Width = 112;
             // 
             // btnGhi
             // 
@@ -223,7 +265,7 @@
             this.panelControl1.Controls.Add(this.label2);
             this.panelControl1.Controls.Add(this.txtSohieu);
             this.panelControl1.Controls.Add(this.label1);
-            this.panelControl1.Location = new System.Drawing.Point(742, 12);
+            this.panelControl1.Location = new System.Drawing.Point(1137, 12);
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(597, 572);
             this.panelControl1.TabIndex = 3;
@@ -237,6 +279,7 @@
             this.gridControl2.TabIndex = 16;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
+            this.gridControl2.Visible = false;
             // 
             // gridView2
             // 
@@ -321,7 +364,7 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(724, 27);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(1119, 27);
             this.comboBoxEdit1.TabIndex = 4;
             this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
             // 
@@ -329,7 +372,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1341, 595);
+            this.ClientSize = new System.Drawing.Size(1746, 595);
             this.Controls.Add(this.comboBoxEdit1);
             this.Controls.Add(this.gridControl1);
             this.Controls.Add(this.panelControl1);
@@ -337,7 +380,7 @@
             this.Name = "frmHangHoa";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "frmHangHoa";
-            this.Load += new System.EventHandler(this.frmHangHoa_Load);
+            this.Load += new System.EventHandler(this.frmHangHoa_Load_1);
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).EndInit();
@@ -382,5 +425,8 @@
         private DevExpress.XtraGrid.Columns.GridColumn colSoLuong;
         private DevExpress.XtraGrid.Columns.GridColumn colDongia;
         private DevExpress.XtraGrid.Columns.GridColumn colThanhTien;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn1;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn2;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn3;
     }
 }
