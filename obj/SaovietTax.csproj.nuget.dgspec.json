@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[10.0.19041.1, )"
             },
+            "Selenium.Support": {
+              "target": "Package",
+              "version": "[4.33.0, )"
+            },
             "Selenium.WebDriver.ChromeDriver": {
               "target": "Package",
               "version": "[137.0.7151.5500, )"

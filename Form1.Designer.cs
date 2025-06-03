@@ -510,10 +510,13 @@
             // 
             // colisHaschild
             // 
-            this.colisHaschild.Caption = "Có con";
+            this.colisHaschild.Caption = "Có chi tiết";
             this.colisHaschild.FieldName = "isHaschild";
             this.colisHaschild.MinWidth = 30;
             this.colisHaschild.Name = "colisHaschild";
+            this.colisHaschild.OptionsColumn.AllowEdit = false;
+            this.colisHaschild.Visible = true;
+            this.colisHaschild.VisibleIndex = 9;
             this.colisHaschild.Width = 112;
             // 
             // colMST
@@ -643,7 +646,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1610, 141);
+            this.gridControl2.Size = new System.Drawing.Size(1652, 248);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -830,6 +833,8 @@
             this.colisHaschild2.MinWidth = 30;
             this.colisHaschild2.Name = "colisHaschild2";
             this.colisHaschild2.OptionsColumn.AllowEdit = false;
+            this.colisHaschild2.Visible = true;
+            this.colisHaschild2.VisibleIndex = 9;
             this.colisHaschild2.Width = 112;
             // 
             // xtraTabControl1
@@ -1015,7 +1020,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1610, 141);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1652, 248);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -1040,7 +1045,7 @@
             // 
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1610, 141);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1652, 248);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
             // gridControl3
@@ -1050,7 +1055,7 @@
             this.gridControl3.Location = new System.Drawing.Point(0, 0);
             this.gridControl3.MainView = this.gridView5;
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1610, 141);
+            this.gridControl3.Size = new System.Drawing.Size(1652, 248);
             this.gridControl3.TabIndex = 0;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView5});
