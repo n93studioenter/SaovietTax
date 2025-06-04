@@ -49,14 +49,11 @@
             this.txtDiengiai = new DevExpress.XtraEditors.TextEdit();
             this.txtTukhoa = new DevExpress.XtraEditors.TextEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
-            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
-            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
+            this.checkEdit2 = new DevExpress.XtraEditors.CheckEdit();
+            this.checkEdit1 = new DevExpress.XtraEditors.CheckEdit();
             this.labelControl8 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl7 = new DevExpress.XtraEditors.LabelControl();
             this.behaviorManager1 = new DevExpress.Utils.Behaviors.BehaviorManager(this.components);
-            this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
-            this.checkEdit2 = new DevExpress.XtraEditors.CheckEdit();
-            this.checkEdit1 = new DevExpress.XtraEditors.CheckEdit();
             ((System.ComponentModel.ISupportInitialize)(this.gcDinhdanh)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtTKThue.Properties)).BeginInit();
@@ -66,12 +63,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtTukhoa.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
-            this.panelControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit2.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).BeginInit();
             this.SuspendLayout();
             // 
             // gcDinhdanh
@@ -79,10 +73,10 @@
             this.gcDinhdanh.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gcDinhdanh.Location = new System.Drawing.Point(3, 162);
+            this.gcDinhdanh.Location = new System.Drawing.Point(3, 178);
             this.gcDinhdanh.MainView = this.gridView2;
             this.gcDinhdanh.Name = "gcDinhdanh";
-            this.gcDinhdanh.Size = new System.Drawing.Size(1589, 458);
+            this.gcDinhdanh.Size = new System.Drawing.Size(1036, 389);
             this.gcDinhdanh.TabIndex = 11;
             this.gcDinhdanh.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -174,7 +168,7 @@
             // btnLuudinhdanh
             // 
             this.btnLuudinhdanh.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnLuudinhdanh.ImageOptions.Image")));
-            this.btnLuudinhdanh.Location = new System.Drawing.Point(1215, 100);
+            this.btnLuudinhdanh.Location = new System.Drawing.Point(899, 110);
             this.btnLuudinhdanh.Name = "btnLuudinhdanh";
             this.btnLuudinhdanh.Size = new System.Drawing.Size(112, 34);
             this.btnLuudinhdanh.TabIndex = 20;
@@ -184,14 +178,14 @@
             // txtTKThue
             // 
             this.txtTKThue.EditValue = "1331";
-            this.txtTKThue.Location = new System.Drawing.Point(685, 107);
+            this.txtTKThue.Location = new System.Drawing.Point(103, 117);
             this.txtTKThue.Name = "txtTKThue";
-            this.txtTKThue.Size = new System.Drawing.Size(347, 27);
+            this.txtTKThue.Size = new System.Drawing.Size(231, 27);
             this.txtTKThue.TabIndex = 19;
             // 
             // labelControl11
             // 
-            this.labelControl11.Location = new System.Drawing.Point(687, 82);
+            this.labelControl11.Location = new System.Drawing.Point(22, 119);
             this.labelControl11.Name = "labelControl11";
             this.labelControl11.Size = new System.Drawing.Size(60, 19);
             this.labelControl11.TabIndex = 18;
@@ -200,14 +194,14 @@
             // txtTKCo
             // 
             this.txtTKCo.EditValue = "1111";
-            this.txtTKCo.Location = new System.Drawing.Point(281, 107);
+            this.txtTKCo.Location = new System.Drawing.Point(103, 83);
             this.txtTKCo.Name = "txtTKCo";
-            this.txtTKCo.Size = new System.Drawing.Size(372, 27);
+            this.txtTKCo.Size = new System.Drawing.Size(231, 27);
             this.txtTKCo.TabIndex = 17;
             // 
             // labelControl10
             // 
-            this.labelControl10.Location = new System.Drawing.Point(281, 82);
+            this.labelControl10.Location = new System.Drawing.Point(22, 85);
             this.labelControl10.Name = "labelControl10";
             this.labelControl10.Size = new System.Drawing.Size(43, 19);
             this.labelControl10.TabIndex = 16;
@@ -216,7 +210,7 @@
             // txtTKNo
             // 
             this.txtTKNo.EditValue = "152";
-            this.txtTKNo.Location = new System.Drawing.Point(18, 107);
+            this.txtTKNo.Location = new System.Drawing.Point(103, 49);
             this.txtTKNo.Name = "txtTKNo";
             this.txtTKNo.Size = new System.Drawing.Size(231, 27);
             this.txtTKNo.TabIndex = 15;
@@ -224,7 +218,7 @@
             // 
             // labelControl9
             // 
-            this.labelControl9.Location = new System.Drawing.Point(22, 82);
+            this.labelControl9.Location = new System.Drawing.Point(21, 52);
             this.labelControl9.Name = "labelControl9";
             this.labelControl9.Size = new System.Drawing.Size(44, 19);
             this.labelControl9.TabIndex = 14;
@@ -234,25 +228,25 @@
             // 
             this.txtDiengiai.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDiengiai.Location = new System.Drawing.Point(685, 37);
+            this.txtDiengiai.Location = new System.Drawing.Point(433, 14);
             this.txtDiengiai.Name = "txtDiengiai";
-            this.txtDiengiai.Size = new System.Drawing.Size(640, 27);
+            this.txtDiengiai.Size = new System.Drawing.Size(578, 27);
             this.txtDiengiai.TabIndex = 13;
             // 
             // txtTukhoa
             // 
             this.txtTukhoa.EditValue = "Ten=\"123\"";
-            this.txtTukhoa.Location = new System.Drawing.Point(18, 37);
+            this.txtTukhoa.Location = new System.Drawing.Point(103, 14);
             this.txtTukhoa.Name = "txtTukhoa";
-            this.txtTukhoa.Size = new System.Drawing.Size(635, 27);
+            this.txtTukhoa.Size = new System.Drawing.Size(231, 27);
             this.txtTukhoa.TabIndex = 12;
             // 
             // panelControl1
             // 
             this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelControl1.Controls.Add(this.comboBoxEdit1);
-            this.panelControl1.Controls.Add(this.labelControl1);
+            this.panelControl1.Controls.Add(this.checkEdit2);
+            this.panelControl1.Controls.Add(this.checkEdit1);
             this.panelControl1.Controls.Add(this.labelControl8);
             this.panelControl1.Controls.Add(this.labelControl7);
             this.panelControl1.Controls.Add(this.txtDiengiai);
@@ -266,31 +260,34 @@
             this.panelControl1.Controls.Add(this.txtTKCo);
             this.panelControl1.Location = new System.Drawing.Point(3, 12);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1340, 144);
+            this.panelControl1.Size = new System.Drawing.Size(1036, 160);
             this.panelControl1.TabIndex = 21;
             // 
-            // comboBoxEdit1
+            // checkEdit2
             // 
-            this.comboBoxEdit1.Location = new System.Drawing.Point(1059, 107);
-            this.comboBoxEdit1.Name = "comboBoxEdit1";
-            this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(150, 27);
-            this.comboBoxEdit1.TabIndex = 24;
+            this.checkEdit2.Location = new System.Drawing.Point(363, 113);
+            this.checkEdit2.Name = "checkEdit2";
+            this.checkEdit2.Properties.Caption = "Không phân biệt đơn vị tính";
+            this.checkEdit2.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
+            this.checkEdit2.Size = new System.Drawing.Size(246, 31);
+            this.checkEdit2.TabIndex = 1;
+            this.checkEdit2.CheckedChanged += new System.EventHandler(this.checkEdit2_CheckedChanged);
             // 
-            // labelControl1
+            // checkEdit1
             // 
-            this.labelControl1.Location = new System.Drawing.Point(1059, 80);
-            this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(60, 19);
-            this.labelControl1.TabIndex = 23;
-            this.labelControl1.Text = "TK Thuế";
+            this.checkEdit1.Location = new System.Drawing.Point(363, 63);
+            this.checkEdit1.Name = "checkEdit1";
+            this.checkEdit1.Properties.Caption = "Chọn tên hàng hóa gần giống";
+            this.checkEdit1.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
+            this.checkEdit1.Size = new System.Drawing.Size(264, 31);
+            this.checkEdit1.TabIndex = 0;
+            this.checkEdit1.CheckedChanged += new System.EventHandler(this.checkEdit1_CheckedChanged);
             // 
             // labelControl8
             // 
             this.labelControl8.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl8.Location = new System.Drawing.Point(685, 5);
+            this.labelControl8.Location = new System.Drawing.Point(363, 17);
             this.labelControl8.Name = "labelControl8";
             this.labelControl8.Size = new System.Drawing.Size(62, 19);
             this.labelControl8.TabIndex = 22;
@@ -298,47 +295,17 @@
             // 
             // labelControl7
             // 
-            this.labelControl7.Location = new System.Drawing.Point(18, 5);
+            this.labelControl7.Location = new System.Drawing.Point(23, 17);
             this.labelControl7.Name = "labelControl7";
             this.labelControl7.Size = new System.Drawing.Size(59, 19);
             this.labelControl7.TabIndex = 21;
             this.labelControl7.Text = "Từ khóa";
             // 
-            // panelControl2
-            // 
-            this.panelControl2.Controls.Add(this.checkEdit2);
-            this.panelControl2.Controls.Add(this.checkEdit1);
-            this.panelControl2.Location = new System.Drawing.Point(1352, 12);
-            this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(242, 144);
-            this.panelControl2.TabIndex = 22;
-            // 
-            // checkEdit2
-            // 
-            this.checkEdit2.Location = new System.Drawing.Point(19, 63);
-            this.checkEdit2.Name = "checkEdit2";
-            this.checkEdit2.Properties.Caption = "Kèm đơn vị tính";
-            this.checkEdit2.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
-            this.checkEdit2.Size = new System.Drawing.Size(217, 31);
-            this.checkEdit2.TabIndex = 1;
-            this.checkEdit2.CheckedChanged += new System.EventHandler(this.checkEdit2_CheckedChanged);
-            // 
-            // checkEdit1
-            // 
-            this.checkEdit1.Location = new System.Drawing.Point(19, 15);
-            this.checkEdit1.Name = "checkEdit1";
-            this.checkEdit1.Properties.Caption = "Tên gần giống";
-            this.checkEdit1.Properties.CheckBoxOptions.Style = DevExpress.XtraEditors.Controls.CheckBoxStyle.SvgCheckBox1;
-            this.checkEdit1.Size = new System.Drawing.Size(217, 31);
-            this.checkEdit1.TabIndex = 0;
-            this.checkEdit1.CheckedChanged += new System.EventHandler(this.checkEdit1_CheckedChanged);
-            // 
             // frmDinhdanh
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1604, 632);
-            this.Controls.Add(this.panelControl2);
+            this.ClientSize = new System.Drawing.Size(1051, 632);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.gcDinhdanh);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -356,12 +323,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             this.panelControl1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
-            this.panelControl2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit2.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.behaviorManager1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -390,9 +354,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn colType;
         private DevExpress.Utils.Behaviors.BehaviorManager behaviorManager1;
         private DevExpress.XtraGrid.Columns.GridColumn colDelete;
-        private DevExpress.XtraEditors.ComboBoxEdit comboBoxEdit1;
-        private DevExpress.XtraEditors.LabelControl labelControl1;
-        private DevExpress.XtraEditors.PanelControl panelControl2;
         private DevExpress.XtraEditors.CheckEdit checkEdit2;
         private DevExpress.XtraEditors.CheckEdit checkEdit1;
     }

@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static ClosedXML.Excel.XLPredefinedFormat;
 
 namespace SaovietTax
 {
     public static class Helpers
     {
+      
         public static class StringWordSimilarity
         {
+
             public static double CalculateSimilarity(string product1, string product2)
             {
                 // Kiểm tra chuỗi rỗng/null

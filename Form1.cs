@@ -477,7 +477,23 @@ namespace SaovietTax
                 command.ExecuteNonQuery();
             }
         }
+        static void CreateTableDinhDanhNganhang(OleDbConnection connection, string tableName)
+        {
+            string createTableQuery = $@"
+        CREATE TABLE {tableName} (
+            ID AUTOINCREMENT PRIMARY KEY, 
+            KeyValue TEXT,
+            TKNo TEXT,  
+            TKCo TEXT,
+            TKThue TEXT,
+            Noidung TEXT
+        );";
 
+            using (OleDbCommand command = new OleDbCommand(createTableQuery, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
         static void CreateTable(OleDbConnection connection, string tableName)
         {
             string createTableQuery = $@"
@@ -583,6 +599,7 @@ namespace SaovietTax
                 string tableName = "tbimport";
                 string tableNamedetail = "tbimportdetail";
                 string tableDinhdanh = "tbDinhdanhtaikhoan";
+                string tableDinhdanhNganhang = "tbDinhdanhNganhang";
                 string tableNganhang = "tbNganhang";
                 // Kiểm tra xem bảng đã tồn tại hay không
                 if (!TableExists(connection, tableNganhang))
@@ -590,6 +607,12 @@ namespace SaovietTax
                     // Tạo bảng nếu chưa tồn tại
                     CreateTableNganhang(connection, tableNganhang);
                     Console.WriteLine($"Bảng '{tableNganhang}' đã được tạo thành công.");
+                }
+                if (!TableExists(connection, tableDinhdanhNganhang))
+                {
+                    // Tạo bảng nếu chưa tồn tại
+                    CreateTableDinhDanhNganhang(connection, tableDinhdanhNganhang);
+                    Console.WriteLine($"Bảng '{tableDinhdanhNganhang}' đã được tạo thành công.");
                 }
                 if (!TableExists(connection, tableDinhdanh))
                 {
@@ -7814,7 +7837,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void btnMatdinhnganhang_Click(object sender, EventArgs e)
         {
-
+            frmMatdinhNganHang frmMatdinhNganHang = new frmMatdinhNganHang();
+            frmMatdinhNganHang.Show();
         }
 
         private void btnImportChungtunganhang_Click(object sender, EventArgs e)

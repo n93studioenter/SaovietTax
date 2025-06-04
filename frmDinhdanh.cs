@@ -57,15 +57,15 @@ namespace SaovietTax
         private void frmDinhdanh_Load(object sender, EventArgs e)
         {
             dbPath = ConfigurationManager.AppSettings["dbpath"];
-            comboBoxEdit1.Properties.Buttons[0].Kind = DevExpress.XtraEditors.Controls.ButtonPredefines.Combo;
+         //   comboBoxEdit1.Properties.Buttons[0].Kind = DevExpress.XtraEditors.Controls.ButtonPredefines.Combo;
 
-            comboBoxEdit1.Properties.Items.AddRange(new string[]
-         {
-            "Thấp",
-            "Cao" 
-         });
-            comboBoxEdit1.SelectedIndex = 0;
-            comboBoxEdit1.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+         //   comboBoxEdit1.Properties.Items.AddRange(new string[]
+         //{
+         //   "Thấp",
+         //   "Cao" 
+         //});
+         //   comboBoxEdit1.SelectedIndex = 0;
+         //   comboBoxEdit1.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
 
             InitDB();
             LoadDataDinhDanh();
