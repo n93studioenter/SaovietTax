@@ -11,6 +11,8 @@ using DevExpress.XtraEditors;
 using System.Data.OleDb;
 using System.Reflection;
 using System.IO;
+using DevExpress.XtraTreeList.Nodes;
+using DevExpress.XtraTreeList;
 
 namespace SaovietTax
 {
@@ -22,18 +24,36 @@ namespace SaovietTax
 		}
         private List<Item> CreateData()
         {
-            return new List<Item>
-    {
-        new Item { Id = 1, Name = "Root 1", ParentId = 0 },
-        new Item { Id = 2, Name = "Child 1.1", ParentId = 1 },
-        new Item { Id = 3, Name = "Child 1.1.1", ParentId = 2 }, // Con của Child 1.1
-        new Item { Id = 4, Name = "Child 1.1.2", ParentId = 2 }, // Con của Child 1.1
-        new Item { Id = 5, Name = "Child 1.2", ParentId = 1 },
-        new Item { Id = 6, Name = "Root 2", ParentId = 0 },
-        new Item { Id = 7, Name = "Child 2.1", ParentId = 6 },
-        new Item { Id = 8, Name = "Child 2.1.1", ParentId = 7 } // Con của Child 2.1
-    };
-        }
+            List<Item> dsTk = new List<Item>();
+            string query = $"SELECT * FROM HeThongTK ";
+            var parameterss = new OleDbParameter[]
+         {
+                    new OleDbParameter("?","1"),
+            };
+            var kq = ExecuteQuery(query, parameterss);
+            if (kq.Rows.Count > 0)
+            {
+                foreach(DataRow item in kq.Rows)
+                {
+                    if (item["SoHieu"].ToString().StartsWith("112"))
+                    {
+                        dsTk.Add(new Item { Id = (int)item["MaSo"], Name = (string)item["SoHieu"] + " " + Helpers.ConvertVniToUnicode((string)item["Ten"]), ParentId = (int)item["TKCha0"] });
+                    }
+                }
+            }
+            return dsTk;
+    //        return new List<Item>
+    //{
+    //    new Item { Id = 1, Name = "Root 1", ParentId = 0 },
+    //    new Item { Id = 2, Name = "Child 1.1", ParentId = 1 },
+    //    new Item { Id = 3, Name = "Child 1.1.1", ParentId = 2 }, // Con của Child 1.1
+    //    new Item { Id = 4, Name = "Child 1.1.2", ParentId = 2 }, // Con của Child 1.1
+    //    new Item { Id = 5, Name = "Child 1.2", ParentId = 1 },
+    //    new Item { Id = 6, Name = "Root 2", ParentId = 0 },
+    //    new Item { Id = 7, Name = "Child 2.1", ParentId = 6 },
+    //    new Item { Id = 8, Name = "Child 2.1.1", ParentId = 7 } // Con của Child 2.1
+    //};
+      }
         public class Item
         {
             public int Id { get; set; }
@@ -46,16 +66,13 @@ namespace SaovietTax
             treeList1.DataSource = data;
             treeList1.ParentFieldName = "ParentId"; // Thiết lập mối quan hệ cha-con
             treeList1.KeyFieldName = "Id"; // Thuộc tính khóa
-            LoadList();
+            treeList1.ExpandAll();
+
+            //LoadList();
         }
         private void LoadList()
         {
-            string query = $"SELECT SoHieu  " +
-                  "FROM HeThongTK " +
-                  "WHERE LEFT(SoHieu, 1) <> '#' AND Loai = ? " +
-                  "AND Cap > 0 AND MaNT <= 0 " +
-                  "GROUP BY HeThongTK.SoHieu, HeThongTK.MaNT " +
-                  "ORDER BY HeThongTK.SoHieu, HeThongTK.MaNT";
+            string query = $"SELECT SoHieu FROM HeThongTK  ";
                 var parameterss = new OleDbParameter[]
              {
                     new OleDbParameter("?","1"), 
@@ -144,6 +161,48 @@ namespace SaovietTax
             }
 
             return -1;
+        }
+
+        private void treeList1_AfterExpand(object sender, DevExpress.XtraTreeList.NodeEventArgs e)
+        {
+          
+        }
+
+        private void treeList1_FocusedNodeChanged(object sender, DevExpress.XtraTreeList.FocusedNodeChangedEventArgs e)
+        {
+            TreeList treeList = sender as TreeList;
+            if (treeList == null) return;
+
+            // Lấy node hiện tại đang được focus
+            TreeListNode focusedNode = treeList.FocusedNode;
+            if (focusedNode != null)
+            {
+                // Lấy giá trị của thuộc tính "Id" từ node
+                // Bạn cần ép kiểu về kiểu dữ liệu của Id (ví dụ: int)
+                int nodeId = (int)focusedNode.GetValue("Id");
+                string nodeName = focusedNode.GetValue("Name")?.ToString();
+                textEdit1.Text = nodeName;
+            }
+        }
+
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnGhi_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnXoa_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnThoat_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

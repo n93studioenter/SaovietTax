@@ -37,13 +37,11 @@ namespace SaovietTax
         }
         private void btnLuudinhdanh_Click(object sender, EventArgs e)
         {
-            var query = @"INSERT INTO tbDinhdanhNganhang (Noidung, TKNo, TKCo, TKThue) VALUES (?, ?, ?, ?)";
+            var query = @"INSERT INTO tbDinhdanhNganhang (Noidung,TK) VALUES (?, ?)";
             var parameters = new OleDbParameter[]
             {
-            new OleDbParameter("?", txtDiengiai.Text),
-            new OleDbParameter("?", txtTKNo.Text),
-            new OleDbParameter("?",  txtTKCo.Text),
-            new OleDbParameter("?", txtTKThue.Text)
+            new OleDbParameter("?", txtDiengiai.Text), 
+            new OleDbParameter("?", textEdit1.Text)
             };
             int rowsAffected = ExecuteQueryResult(query, parameters);
             LoadData();
@@ -155,6 +153,26 @@ namespace SaovietTax
                 new OleDbParameter("?",ID)
  };
             int resl = ExecuteQueryResult(sql, parameters);
+        }
+
+        private void gridView2_RowCellClick(object sender, RowCellClickEventArgs e)
+        {
+            var getNAmecol = e.Column;
+            if (getNAmecol.ToString() == "Xóa")
+            {
+                if (XtraMessageBox.Show("Bạn có chắc chắn muốn xóa hàng này?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    var getID = gridView2.GetRowCellValue(e.RowHandle, "ID");
+                    string sql = "DELETE FROM tbDinhdanhNganhang WHERE ID = ?";
+                    OleDbParameter[] parameters = new OleDbParameter[]
+                {
+        new OleDbParameter("?", getID),
+                };
+                    int resl = ExecuteQueryResult(sql, parameters);
+                    LoadData();
+                }
+               
+            }
         }
     }
 }

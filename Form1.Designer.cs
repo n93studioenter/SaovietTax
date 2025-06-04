@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraGrid.GridLevelNode gridLevelNode3 = new DevExpress.XtraGrid.GridLevelNode();
             DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode2 = new DevExpress.XtraGrid.GridLevelNode();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen2 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -102,6 +102,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.lblSofiles2 = new System.Windows.Forms.Label();
             this.xtraTabPage2 = new DevExpress.XtraTab.XtraTabPage();
+            this.txtTKNganhang = new DevExpress.XtraEditors.TextEdit();
+            this.btnChontknganhang = new DevExpress.XtraEditors.SimpleButton();
             this.gridControl3 = new DevExpress.XtraGrid.GridControl();
             this.nganhangBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView5 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -159,6 +161,7 @@
             this.xtraTabPage3.SuspendLayout();
             this.xtraTabPage4.SuspendLayout();
             this.xtraTabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtTKNganhang.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).BeginInit();
@@ -303,10 +306,10 @@
             // 
             this.gridControl1.DataSource = this.fileImportBindingSource;
             this.gridControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            gridLevelNode3.LevelTemplate = this.gridView2;
-            gridLevelNode3.RelationName = "Detail";
+            gridLevelNode1.LevelTemplate = this.gridView2;
+            gridLevelNode1.RelationName = "Detail";
             this.gridControl1.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode3});
+            gridLevelNode1});
             this.gridControl1.Location = new System.Drawing.Point(0, 0);
             this.gridControl1.LookAndFeel.SkinName = "Office 2019 Colorful";
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -638,10 +641,10 @@
             // 
             this.gridControl2.DataSource = this.fileImportBindingSource;
             this.gridControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            gridLevelNode1.LevelTemplate = this.gridView4;
-            gridLevelNode1.RelationName = "Detail";
+            gridLevelNode2.LevelTemplate = this.gridView4;
+            gridLevelNode2.RelationName = "Detail";
             this.gridControl2.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
-            gridLevelNode1});
+            gridLevelNode2});
             this.gridControl2.Location = new System.Drawing.Point(0, 0);
             this.gridControl2.LookAndFeel.SkinName = "Office 2016 Colorful";
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -1044,19 +1047,42 @@
             // 
             // xtraTabPage2
             // 
+            this.xtraTabPage2.Controls.Add(this.txtTKNganhang);
+            this.xtraTabPage2.Controls.Add(this.btnChontknganhang);
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
             this.xtraTabPage2.Size = new System.Drawing.Size(1647, 243);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
+            // txtTKNganhang
+            // 
+            this.txtTKNganhang.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtTKNganhang.Enabled = false;
+            this.txtTKNganhang.Location = new System.Drawing.Point(1292, 13);
+            this.txtTKNganhang.Name = "txtTKNganhang";
+            this.txtTKNganhang.Size = new System.Drawing.Size(352, 27);
+            this.txtTKNganhang.TabIndex = 2;
+            // 
+            // btnChontknganhang
+            // 
+            this.btnChontknganhang.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnChontknganhang.Location = new System.Drawing.Point(1072, 10);
+            this.btnChontknganhang.Name = "btnChontknganhang";
+            this.btnChontknganhang.Size = new System.Drawing.Size(214, 34);
+            this.btnChontknganhang.TabIndex = 1;
+            this.btnChontknganhang.Text = "Chọn tài khoản ngân hàng";
+            this.btnChontknganhang.Click += new System.EventHandler(this.btnChontknganhang_Click);
+            // 
             // gridControl3
             // 
+            this.gridControl3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gridControl3.DataSource = this.nganhangBindingSource;
-            this.gridControl3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gridControl3.Location = new System.Drawing.Point(0, 0);
+            this.gridControl3.Location = new System.Drawing.Point(0, 50);
             this.gridControl3.MainView = this.gridView5;
             this.gridControl3.Name = "gridControl3";
-            this.gridControl3.Size = new System.Drawing.Size(1647, 243);
+            this.gridControl3.Size = new System.Drawing.Size(1647, 193);
             this.gridControl3.TabIndex = 0;
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView5});
@@ -1458,6 +1484,7 @@
             this.xtraTabPage4.ResumeLayout(false);
             this.xtraTabPage4.PerformLayout();
             this.xtraTabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.txtTKNganhang.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).EndInit();
@@ -1591,5 +1618,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private DevExpress.XtraEditors.SimpleButton btnMatdinhnganhang;
         private DevExpress.XtraEditors.SimpleButton btnImportChungtunganhang;
+        private DevExpress.XtraEditors.SimpleButton btnChontknganhang;
+        private DevExpress.XtraEditors.TextEdit txtTKNganhang;
     }
 }

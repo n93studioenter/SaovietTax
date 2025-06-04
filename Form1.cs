@@ -481,12 +481,9 @@ namespace SaovietTax
         {
             string createTableQuery = $@"
         CREATE TABLE {tableName} (
-            ID AUTOINCREMENT PRIMARY KEY, 
-            KeyValue TEXT,
-            TKNo TEXT,  
-            TKCo TEXT,
-            TKThue TEXT,
-            Noidung TEXT
+            ID AUTOINCREMENT PRIMARY KEY,  
+            Noidung TEXT,
+            TK TEXT 
         );";
 
             using (OleDbCommand command = new OleDbCommand(createTableQuery, connection))
@@ -7863,6 +7860,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 this.Close();
             }
 
+        }
+
+        private void btnChontknganhang_Click(object sender, EventArgs e)
+        {
+            frmTaikhoan frmTaikhoan = new frmTaikhoan();
+            frmTaikhoan.ShowDialog();
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)
