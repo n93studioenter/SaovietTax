@@ -5117,26 +5117,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void btnimport_Click(object sender, EventArgs e)
         {
             progressPanel1.Visible = true;
-            if (xtraTabControl2.SelectedTabPageIndex == 2)
-            {
-                foreach(var item in lstNganhan)
-                {
-                   var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo) VALUES (?, ?, ?, ?, ?,?,?)";
-                 var   parameters = new OleDbParameter[]
-                    {
-            new OleDbParameter("?", item.Maso),
-            new OleDbParameter("?", item.NgayGD),
-            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(item.Diengiai)),
-            new OleDbParameter("?", item.ThanhTien),
-               new OleDbParameter("?", item.ThanhTien2),
-            new OleDbParameter("?", item.TKNo),
-            new OleDbParameter("?", item.TKCo),
-                    };
-                    int rowsAffected = ExecuteQueryResult(query, parameters);
-                }
-                this.Close();
-            }
-          
+           
           
             if (chkDauvao.Checked)
             {
@@ -5337,69 +5318,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             //Nếu isHAschild
 
             isClick = true;
-            this.Close();
-                return;
-           
-            //Cập nhật cho đầu vào
-            if (chkDauvao.Checked)
-            {
-                foreach(var item in lstImportVao)
-                {
-                   
-                }
-            } 
-            if (chkDauvao.Checked)
-            {
-                foreach (var it in people)
-                {
-                    string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
-                    var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", it.TKNo + "%"));
-                    if (resultkm.Rows.Count > 1)
-                    {
-                        XtraMessageBox.Show("Tài khoản " + it.TKNo + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    if (it.isAcess == false)
-                    {
-                        XtraMessageBox.Show("Có file có Mã số thuế không đúng", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                }
-                progressPanel1.Visible = true;
-                Application.DoEvents();
-                try
-                {
-                    ImportHD(people, "HDVao");
-                }
-                catch(Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-              
-            }
-            if (chkDaura.Checked)
-            {
-                //Kiểm tra lại tài khoản trước
-                foreach(var it in people2)
-                {
-                    string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
-                    var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", it.TKCo + "%"));
-                    if (resultkm.Rows.Count >1)
-                    {
-                        XtraMessageBox.Show("Tài khoản "+it.TKCo + " có tài khoản con, vui lòng kiểm tra lại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    if (it.isAcess == false)
-                    {
-                        XtraMessageBox.Show("Có file có Mã số thuế không đúng", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                }
-                progressPanel1.Visible = true;
-                Application.DoEvents();
-                ImportHD(people2, "HDRa");
-            }
-          
+            this.Close(); 
         }
         private void ImportHD(BindingList<FileImport> data, string type)
         {
@@ -7895,6 +7814,30 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void btnMatdinhnganhang_Click(object sender, EventArgs e)
         {
+
+        }
+
+        private void btnImportChungtunganhang_Click(object sender, EventArgs e)
+        {
+            if (xtraTabControl2.SelectedTabPageIndex == 2)
+            {
+                foreach (var item in lstNganhan)
+                {
+                    var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo) VALUES (?, ?, ?, ?, ?,?,?)";
+                    var parameters = new OleDbParameter[]
+                       {
+            new OleDbParameter("?", item.Maso),
+            new OleDbParameter("?", item.NgayGD),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(item.Diengiai)),
+            new OleDbParameter("?", item.ThanhTien),
+               new OleDbParameter("?", item.ThanhTien2),
+            new OleDbParameter("?", item.TKNo),
+            new OleDbParameter("?", item.TKCo),
+                       };
+                    int rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+                this.Close();
+            }
 
         }
 

@@ -139,6 +139,7 @@
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
             this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.btnImportChungtunganhang = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -1319,6 +1320,7 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.btnImportChungtunganhang);
             this.panelControl1.Controls.Add(this.btnMatdinhnganhang);
             this.panelControl1.Controls.Add(this.btnReadPDF);
             this.panelControl1.Controls.Add(this.btnimport);
@@ -1409,6 +1411,16 @@
             // radialMenu1
             // 
             this.radialMenu1.Name = "radialMenu1";
+            // 
+            // btnImportChungtunganhang
+            // 
+            this.btnImportChungtunganhang.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("simpleButton3.ImageOptions.Image")));
+            this.btnImportChungtunganhang.Location = new System.Drawing.Point(372, 98);
+            this.btnImportChungtunganhang.Name = "btnImportChungtunganhang";
+            this.btnImportChungtunganhang.Size = new System.Drawing.Size(276, 34);
+            this.btnImportChungtunganhang.TabIndex = 12;
+            this.btnImportChungtunganhang.Text = "Import chứng từ ngân hàng";
+            this.btnImportChungtunganhang.Click += new System.EventHandler(this.btnImportChungtunganhang_Click);
             // 
             // frmMain
             // 
@@ -1578,5 +1590,6 @@
         private DevExpress.XtraWaitForm.ProgressPanel progressPanel2;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private DevExpress.XtraEditors.SimpleButton btnMatdinhnganhang;
+        private DevExpress.XtraEditors.SimpleButton btnImportChungtunganhang;
     }
 }

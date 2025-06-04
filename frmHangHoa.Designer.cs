@@ -73,6 +73,8 @@
             // 
             // gridControl1
             // 
+            this.gridControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.gridControl1.Location = new System.Drawing.Point(12, 45);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
@@ -251,6 +253,8 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelControl1.Controls.Add(this.gridControl2);
             this.panelControl1.Controls.Add(this.txtMaSo);
             this.panelControl1.Controls.Add(this.btnThoat);
