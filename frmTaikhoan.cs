@@ -22,6 +22,7 @@ namespace SaovietTax
 		{
             InitializeComponent();
 		}
+        public frmMain frmMain { get; set; }
         private List<Item> CreateData()
         {
             List<Item> dsTk = new List<Item>();
@@ -35,9 +36,9 @@ namespace SaovietTax
             {
                 foreach(DataRow item in kq.Rows)
                 {
-                    if (item["SoHieu"].ToString().StartsWith("112"))
+                    if (item["SoHieu"].ToString().StartsWith("1121"))
                     {
-                        dsTk.Add(new Item { Id = (int)item["MaSo"], Name = (string)item["SoHieu"] + " " + Helpers.ConvertVniToUnicode((string)item["Ten"]), ParentId = (int)item["TKCha0"] });
+                        dsTk.Add(new Item { Id = (int)item["MaSo"], Name = (string)item["SoHieu"] + "|" + Helpers.ConvertVniToUnicode((string)item["Ten"]), ParentId = (int)item["TKCha0"] });
                     }
                 }
             }
@@ -181,18 +182,30 @@ namespace SaovietTax
                 // Bạn cần ép kiểu về kiểu dữ liệu của Id (ví dụ: int)
                 int nodeId = (int)focusedNode.GetValue("Id");
                 string nodeName = focusedNode.GetValue("Name")?.ToString();
-                textEdit1.Text = nodeName;
+                textEdit1.Text = nodeName.Split('|')[0];
+                textEdit2.Text = nodeName.Split('|')[1];
+                txtID.Text = nodeId.ToString();
             }
         }
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-
+            textEdit1.Text="";
+            textEdit2.Text="";
+            txtID.Text = "";
         }
 
         private void btnGhi_Click(object sender, EventArgs e)
         {
-
+            //var query = @"INSERT INTO Vattu (MaPhanLoai, SoHieu, TenVattu, DonVi, GhiChu) VALUES (?, ?, ?, ?, ?)";
+            //var parameters = new OleDbParameter[]
+            //{
+            //new OleDbParameter("?", selectedId),
+            //new OleDbParameter("?", txtSohieu.Text),
+            //new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtTenvattu.Text)),
+            //new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtDonvi.Text)),
+            //new OleDbParameter("?", string.IsNullOrEmpty(txtGhichu.Text)?"...":txtGhichu.Text)
+            //};
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
@@ -203,6 +216,12 @@ namespace SaovietTax
         private void btnThoat_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void treeList1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            frmMain.tknh = textEdit1.Text+"-"+textEdit2.Text;
+            this.Close();
         }
     }
 }

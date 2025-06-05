@@ -140,16 +140,12 @@ namespace SaovietTax
             //Lấy current data row
             int ID = int.Parse(gridView.GetRowCellValue(rowHandle, gridView.Columns["ID"]).ToString());
             string Noidung = gridView.GetRowCellValue(rowHandle, gridView.Columns["Noidung"]).ToString();
-            string TKNo = gridView.GetRowCellValue(rowHandle, gridView.Columns["TKNo"]).ToString();
-            string TKCo = gridView.GetRowCellValue(rowHandle, gridView.Columns["TKCo"]).ToString();
-            string TKThue = gridView.GetRowCellValue(rowHandle, gridView.Columns["TKThue"]).ToString();
-            string sql = "UPDATE tbDinhdanhNganhang SET Noidung = ?, TKNo = ?, TKCo = ?, TKThue = ? WHERE ID = ?";
+            string TK = gridView.GetRowCellValue(rowHandle, gridView.Columns["TK"]).ToString();  
+            string sql = "UPDATE tbDinhdanhNganhang SET Noidung = ?, TK = ?  WHERE ID = ?";
             OleDbParameter[] parameters = new OleDbParameter[]
  { 
            new OleDbParameter("?",Noidung),
-                 new OleDbParameter("?",TKNo),
-             new OleDbParameter("?",TKCo),
-              new OleDbParameter("?",TKThue),
+                 new OleDbParameter("?",TK), 
                 new OleDbParameter("?",ID)
  };
             int resl = ExecuteQueryResult(sql, parameters);

@@ -79,6 +79,7 @@ namespace SaovietTax
     public partial class frmMain : DevExpress.XtraEditors.XtraForm
     {
         #region  Khai báo
+        public string tknh { get; set; }
         string savedPath = "";
         string dbPath = "";
         public static int Id = 1;
@@ -619,6 +620,11 @@ namespace SaovietTax
                 }
                 else
                 {
+                    if (!ColumnExists(connection, "tbNganhang", "Status"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbNganhang", "Status", "NUMBER"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbNganhang", "TongTien2"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -6445,7 +6451,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             if (e.KeyCode == System.Windows.Forms.Keys.Escape)
             {
                 frmTaikhoan frmTaikhoan = new frmTaikhoan();
+                frmTaikhoan.frmMain = this;
                 frmTaikhoan.ShowDialog();
+              
             }
                 if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
@@ -7482,18 +7490,33 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         double.TryParse(row.Cell(indexTKNo).GetString().Replace(",", "").Replace(".", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
 
                         // Logic xác định ThanhTien, TKCo, TKNo dựa trên số tiền rút hoặc gửi
+                        string tknganhan = lblTKNganhang.Text.Split('-')[0].ToString();
+                        //Kiểm tra mật định
+                        string tkDoiung = "1111";
+                        if (dtMatdinhnganhang.Rows.Count > 0)
+                        {
+                            foreach(DataRow dtRow in dtMatdinhnganhang.Rows)
+                            {
+                                string getNoidung = RemoveVietnameseDiacritics(dtRow["Noidung"].ToString().ToLower());
+                                //Kiểm tra có chứa mặc định không
+                                if (RemoveVietnameseDiacritics(nganhang.Diengiai).Contains(getNoidung))
+                                {
+                                    tkDoiung = dtRow["TK"].ToString();
+                                }
+                            }
+                        }
                         if (tkco != 0)
                         {
                             nganhang.ThanhTien = tkco;
-                            nganhang.TKCo = "11211";  // Tài khoản Có mẫu
-                            nganhang.TKNo = "1111"; // Tài khoản Nợ mẫu
+                            nganhang.TKCo = tknganhan;  // Tài khoản Có mẫu
+                            nganhang.TKNo = tkDoiung; // Tài khoản Nợ mẫu
                         }
                         else if (tkno != 0) // Dùng else if để tránh trường hợp cả hai đều có giá trị (nếu có lỗi dữ liệu)
                         {
                             nganhang.ThanhTien2 = tkno;
                           
-                            nganhang.TKCo = "1111"; // Tài khoản Có mẫu
-                            nganhang.TKNo = "11211";  // Tài khoản Nợ mẫu
+                            nganhang.TKCo = tkDoiung; // Tài khoản Có mẫu
+                            nganhang.TKNo = tknganhan;  // Tài khoản Nợ mẫu
                         }
                         else
                         {
@@ -7527,11 +7550,26 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     xtraTabControl2.SelectedTabPageIndex = 3;
                 }
             }
-        } 
+        }
 
+        System.Data.DataTable dtMatdinhnganhang = new System.Data.DataTable();
         private void btnReadPDF_Click(object sender, EventArgs e)
         {
-          //  ConvertImageTOexcel();
+            if (lblTKNganhang.Text == "...")
+            {
+                XtraMessageBox.Show("Vui lòng chọn tài khoản ngân hàng!");
+                return;
+            }
+            if (dtMatdinhnganhang.Rows.Count == 0)
+            {
+                string queryCheckVatTu = @"SELECT * FROM tbDinhdanhNganhang ";
+                var parameterss = new OleDbParameter[]
+                {
+                 new OleDbParameter("?",null)
+                   };
+                dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
+            }
+           // ConvertImageTOexcel();
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
         }
@@ -7844,7 +7882,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 foreach (var item in lstNganhan)
                 {
-                    var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo) VALUES (?, ?, ?, ?, ?,?,?)";
+                    var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status) VALUES (?, ?, ?, ?, ?,?,?,?)";
                     var parameters = new OleDbParameter[]
                        {
             new OleDbParameter("?", item.Maso),
@@ -7854,6 +7892,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                new OleDbParameter("?", item.ThanhTien2),
             new OleDbParameter("?", item.TKNo),
             new OleDbParameter("?", item.TKCo),
+              new OleDbParameter("?","0"),
                        };
                     int rowsAffected = ExecuteQueryResult(query, parameters);
                 }
@@ -7865,7 +7904,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void btnChontknganhang_Click(object sender, EventArgs e)
         {
             frmTaikhoan frmTaikhoan = new frmTaikhoan();
+            frmTaikhoan.frmMain = this;
             frmTaikhoan.ShowDialog();
+            lblTKNganhang.Text = tknh;
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)

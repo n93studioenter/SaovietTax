@@ -78,7 +78,7 @@
             this.gridControl1.Location = new System.Drawing.Point(12, 45);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1119, 539);
+            this.gridControl1.Size = new System.Drawing.Size(1119, 526);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -269,9 +269,9 @@
             this.panelControl1.Controls.Add(this.label2);
             this.panelControl1.Controls.Add(this.txtSohieu);
             this.panelControl1.Controls.Add(this.label1);
-            this.panelControl1.Location = new System.Drawing.Point(1137, 12);
+            this.panelControl1.Location = new System.Drawing.Point(1131, 12);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(597, 572);
+            this.panelControl1.Size = new System.Drawing.Size(597, 559);
             this.panelControl1.TabIndex = 3;
             // 
             // gridControl2
@@ -376,7 +376,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1746, 595);
+            this.ClientSize = new System.Drawing.Size(1740, 582);
             this.Controls.Add(this.comboBoxEdit1);
             this.Controls.Add(this.gridControl1);
             this.Controls.Add(this.panelControl1);
