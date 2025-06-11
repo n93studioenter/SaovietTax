@@ -30,11 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmKhachhang));
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
-            this.gridControl2 = new DevExpress.XtraGrid.GridControl();
-            this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.colSoLuong = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colDongia = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colThanhTien = new DevExpress.XtraGrid.Columns.GridColumn();
             this.txtMaSo = new DevExpress.XtraEditors.TextEdit();
             this.btnThoat = new DevExpress.XtraEditors.SimpleButton();
             this.btnXoa = new DevExpress.XtraEditors.SimpleButton();
@@ -55,8 +50,6 @@
             this.colSoHieu = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).BeginInit();
@@ -69,7 +62,6 @@
             // 
             // panelControl1
             // 
-            this.panelControl1.Controls.Add(this.gridControl2);
             this.panelControl1.Controls.Add(this.txtMaSo);
             this.panelControl1.Controls.Add(this.btnThoat);
             this.panelControl1.Controls.Add(this.btnXoa);
@@ -88,68 +80,9 @@
             this.panelControl1.Size = new System.Drawing.Size(597, 572);
             this.panelControl1.TabIndex = 6;
             // 
-            // gridControl2
-            // 
-            this.gridControl2.Location = new System.Drawing.Point(29, 267);
-            this.gridControl2.MainView = this.gridView2;
-            this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(549, 187);
-            this.gridControl2.TabIndex = 16;
-            this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView2});
-            // 
-            // gridView2
-            // 
-            this.gridView2.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.colSoLuong,
-            this.colDongia,
-            this.colThanhTien});
-            this.gridView2.GridControl = this.gridControl2;
-            this.gridView2.Name = "gridView2";
-            this.gridView2.OptionsView.ShowGroupPanel = false;
-            // 
-            // colSoLuong
-            // 
-            this.colSoLuong.Caption = "Số lượng";
-            this.colSoLuong.DisplayFormat.FormatString = "N2";
-            this.colSoLuong.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colSoLuong.FieldName = "SoLuong";
-            this.colSoLuong.MinWidth = 30;
-            this.colSoLuong.Name = "colSoLuong";
-            this.colSoLuong.OptionsColumn.AllowEdit = false;
-            this.colSoLuong.Visible = true;
-            this.colSoLuong.VisibleIndex = 0;
-            this.colSoLuong.Width = 112;
-            // 
-            // colDongia
-            // 
-            this.colDongia.Caption = "Đơn giá";
-            this.colDongia.DisplayFormat.FormatString = "N2";
-            this.colDongia.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colDongia.FieldName = "DonGia";
-            this.colDongia.MinWidth = 30;
-            this.colDongia.Name = "colDongia";
-            this.colDongia.OptionsColumn.AllowEdit = false;
-            this.colDongia.Visible = true;
-            this.colDongia.VisibleIndex = 1;
-            this.colDongia.Width = 112;
-            // 
-            // colThanhTien
-            // 
-            this.colThanhTien.Caption = "Thành tiền";
-            this.colThanhTien.DisplayFormat.FormatString = "N2";
-            this.colThanhTien.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colThanhTien.FieldName = "ThanhTien";
-            this.colThanhTien.MinWidth = 30;
-            this.colThanhTien.Name = "colThanhTien";
-            this.colThanhTien.OptionsColumn.AllowEdit = false;
-            this.colThanhTien.Visible = true;
-            this.colThanhTien.VisibleIndex = 2;
-            this.colThanhTien.Width = 112;
-            // 
             // txtMaSo
             // 
-            this.txtMaSo.Location = new System.Drawing.Point(29, 540);
+            this.txtMaSo.Location = new System.Drawing.Point(29, 294);
             this.txtMaSo.Name = "txtMaSo";
             this.txtMaSo.Size = new System.Drawing.Size(549, 27);
             this.txtMaSo.TabIndex = 15;
@@ -203,9 +136,9 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(25, 185);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(63, 19);
+            this.label4.Size = new System.Drawing.Size(57, 19);
             this.label4.TabIndex = 6;
-            this.label4.Text = "Ghi chú";
+            this.label4.Text = "Địa chỉ";
             // 
             // txtDonvi
             // 
@@ -219,9 +152,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(25, 129);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(55, 19);
+            this.label3.Size = new System.Drawing.Size(40, 19);
             this.label3.TabIndex = 4;
-            this.label3.Text = "Đơn vị";
+            this.label3.Text = "MST";
             // 
             // txtTenvattu
             // 
@@ -320,8 +253,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             this.panelControl1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridControl2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtGhichu.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDonvi.Properties)).EndInit();
@@ -337,11 +268,6 @@
         #endregion
 
         private DevExpress.XtraEditors.PanelControl panelControl1;
-        private DevExpress.XtraGrid.GridControl gridControl2;
-        private DevExpress.XtraGrid.Views.Grid.GridView gridView2;
-        private DevExpress.XtraGrid.Columns.GridColumn colSoLuong;
-        private DevExpress.XtraGrid.Columns.GridColumn colDongia;
-        private DevExpress.XtraGrid.Columns.GridColumn colThanhTien;
         private DevExpress.XtraEditors.TextEdit txtMaSo;
         private DevExpress.XtraEditors.SimpleButton btnThoat;
         private DevExpress.XtraEditors.SimpleButton btnXoa;

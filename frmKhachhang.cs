@@ -162,7 +162,7 @@ namespace SaovietTax
             txtSohieu.Text = dtoVatTu.SoHieu;
             txtTenvattu.Text = dtoVatTu.Ten; 
             //Kiểm tra xem là sp moi hay cũ
-            string queryCheckVatTu = @"SELECT * FROM KhachHang WHERE  MST = ? ";
+            string queryCheckVatTu = @"SELECT * FROM KhachHang WHERE  SoHieu = ? ";
             var parameterss = new OleDbParameter[]
             {
                 new OleDbParameter("?",dtoVatTu.Mst), 
@@ -175,7 +175,10 @@ namespace SaovietTax
             else
             {
                 txtMaSo.Text = kq.Rows[0]["MaSo"].ToString();
-                txtTenvattu.Text = kq.Rows[0]["Ten"].ToString();
+                txtTenvattu.Text = Helpers.ConvertVniToUnicode(kq.Rows[0]["Ten"].ToString());
+                txtSohieu.Text = kq.Rows[0]["SoHieu"].ToString();
+                txtDonvi.Text= kq.Rows[0]["MST"].ToString();
+                txtGhichu.Text = Helpers.ConvertVniToUnicode(kq.Rows[0]["DiaChi"].ToString());
                 int mapl = int.Parse(kq.Rows[0]["MaPhanLoai"].ToString());
 
 
@@ -196,9 +199,16 @@ namespace SaovietTax
                 // Lấy giá trị của cột STT
                 if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
                 {
-                    view.FocusedRowHandle = i; // Chọn dòng
-                    view.SelectRow(i); // Chọn dòng
-                    return; // Thoát sau khi tìm thấy
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
+                        {
+                            gridView1.FocusedRowHandle = i; // Đặt focus
+                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
+                            gridView1.SelectRow(i); // Chọn dòng
+                        }
+                    });
+                    return;
                 }
             }
         }
