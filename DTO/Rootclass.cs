@@ -55,7 +55,7 @@ namespace SaovietTax.DTO
         public string hsgcma { get; set; }
         public string hsgoc { get; set; }
         public int hthdon { get; set; }
-        public int htttoan { get; set; }
+        public int ? htttoan { get; set; }
         public string id { get; set; }
         public object idtbao { get; set; }
         public object khdon { get; set; }
@@ -78,10 +78,10 @@ namespace SaovietTax.DTO
         public string nbtnhang { get; set; }
         public object nbtnvchuyen { get; set; }
         public List<Nbttkhac> nbttkhac { get; set; }
-        public DateTime ncma { get; set; }
+        public DateTime ?ncma { get; set; }
         public DateTime ncnhat { get; set; }
         public string ngcnhat { get; set; }
-        public DateTime nky { get; set; }
+        public DateTime ? nky { get; set; }
         public string nmdchi { get; set; }
         public string nmmst { get; set; }
         public object nmstkhoan { get; set; }
@@ -92,11 +92,11 @@ namespace SaovietTax.DTO
         public DateTime ntao { get; set; }
         public DateTime ntnhan { get; set; }
         public string pban { get; set; }
-        public int ptgui { get; set; }
+        public int?  ptgui { get; set; }
         public object shdgoc { get; set; }
         public int tchat { get; set; }
         public DateTime tdlap { get; set; }
-        public double tgia { get; set; }
+        public double ? tgia { get; set; }
         public double? tgtcthue { get; set; }
         public double? tgtthue { get; set; }
         public string tgtttbchu { get; set; }
@@ -109,12 +109,12 @@ namespace SaovietTax.DTO
         public double? ttcktmai { get; set; }
         public int tthai { get; set; }
         public List<Cttkhac> ttkhac { get; set; }
-        public int tttbao { get; set; }
+        public int ? tttbao { get; set; }
         public List<Ttttkhac> ttttkhac { get; set; }
         public int ttxly { get; set; }
         public string tvandnkntt { get; set; }
         public object mhso { get; set; }
-        public int ladhddt { get; set; }
+        public int ? ladhddt { get; set; }
         public string mkhang { get; set; }
         public string nbsdthoai { get; set; }
         public object nbdctdtu { get; set; }
@@ -125,7 +125,7 @@ namespace SaovietTax.DTO
         public object nmdctdtu { get; set; }
         public object nmcmnd { get; set; }
         public object nmcks { get; set; }
-        public int bhphap { get; set; }
+        public int ? bhphap { get; set; }
         public object hddunlap { get; set; }
         public object gchdgoc { get; set; }
         public object tbhgtngay { get; set; }

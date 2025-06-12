@@ -186,6 +186,8 @@ namespace SaovietTax
         }
         static string RemoveLeadingSpecialCharacters(string input)
         {
+            if (input == null)
+                return "";
             // Sử dụng LINQ để lấy các ký tự không phải là ký tự đặc biệt
             return new string(input.SkipWhile(c => !char.IsLetterOrDigit(c)).ToArray());
         }

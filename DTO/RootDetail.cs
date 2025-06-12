@@ -14,13 +14,13 @@ namespace SaovietTax.DTO
         public string Nbmst { get; set; }
 
         [JsonPropertyName("khmshdon")]
-        public int Khmshdon { get; set; }
+        public int ? Khmshdon { get; set; }
 
         [JsonPropertyName("khhdon")]
         public string Khhdon { get; set; }
 
         [JsonPropertyName("shdon")]
-        public int Shdon { get; set; }
+        public int ? Shdon { get; set; }
 
         [JsonPropertyName("cqt")]
         public string Cqt { get; set; }
@@ -41,10 +41,10 @@ namespace SaovietTax.DTO
         public string Hsgoc { get; set; }
 
         [JsonPropertyName("hthdon")]
-        public int Hthdon { get; set; }
+        public int ? Hthdon { get; set; }
 
         [JsonPropertyName("htttoan")]
-        public int Httoan { get; set; }
+        public int ? Httoan { get; set; }
 
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -113,7 +113,7 @@ namespace SaovietTax.DTO
         public List<object> Nbttkhac { get; set; } = new List<object>(); // Khởi tạo để tránh null
 
         [JsonPropertyName("ncma")]
-        public DateTime Ncma { get; set; }
+        public DateTime ? Ncma { get; set; }
 
         [JsonPropertyName("ncnhat")]
         public DateTime Ncnhat { get; set; }
@@ -157,37 +157,37 @@ namespace SaovietTax.DTO
         public string Pban { get; set; }
 
         [JsonPropertyName("ptgui")]
-        public int Ptgui { get; set; }
+        public int ? Ptgui { get; set; }
 
         [JsonPropertyName("shdgoc")]
         public object Shdgoc { get; set; } // Nullable object
 
         [JsonPropertyName("tchat")]
-        public int Tchat { get; set; }
+        public int ? Tchat { get; set; }
 
         [JsonPropertyName("tdlap")]
         public DateTime Tdlap { get; set; }
 
         [JsonPropertyName("tgia")]
-        public double Tgia { get; set; }
+        public double ? Tgia { get; set; }
 
         [JsonPropertyName("tgtcthue")]
-        public double Tgtcthue { get; set; }
+        public double ? Tgtcthue { get; set; }
 
         [JsonPropertyName("tgtthue")]
-        public double Tgtthue { get; set; }
+        public double ? Tgtthue { get; set; }
 
         [JsonPropertyName("tgtttbchu")]
         public string Tgtttbchu { get; set; }
 
         [JsonPropertyName("tgtttbso")]
-        public double Tgtttbso { get; set; }
+        public double ? Tgtttbso { get; set; }
 
         [JsonPropertyName("thdon")]
         public string Thdon { get; set; }
 
         [JsonPropertyName("thlap")]
-        public int Thlap { get; set; }
+        public int ? Thlap { get; set; }
 
         [JsonPropertyName("thttlphi")]
         public List<object> Thttlphi { get; set; } = new List<object>(); // Khởi tạo để tránh null
@@ -208,13 +208,13 @@ namespace SaovietTax.DTO
         public List<CustomField> Ttkhac { get; set; } = new List<CustomField>(); // Khởi tạo để tránh null
 
         [JsonPropertyName("tttbao")]
-        public int Tttbao { get; set; }
+        public int ? Tttbao { get; set; }
 
         [JsonPropertyName("ttttkhac")]
         public List<object> Ttttkhac { get; set; } = new List<object>(); // Khởi tạo để tránh null
 
         [JsonPropertyName("ttxly")]
-        public int Ttxly { get; set; }
+        public int ? Ttxly { get; set; }
 
         [JsonPropertyName("tvandnkntt")]
         public string Tvandnkntt { get; set; }
@@ -223,7 +223,7 @@ namespace SaovietTax.DTO
         public object Mhso { get; set; } // Nullable object
 
         [JsonPropertyName("ladhddt")]
-        public int Ladhddt { get; set; }
+        public int ? Ladhddt { get; set; }
 
         [JsonPropertyName("mkhang")]
         public string Mkhang { get; set; }
@@ -429,10 +429,10 @@ namespace SaovietTax.DTO
         public string Tsuat { get; set; }
 
         [JsonPropertyName("thtien")]
-        public double Thtien { get; set; }
+        public double ? Thtien { get; set; }
 
         [JsonPropertyName("tthue")]
-        public double Tthue { get; set; }
+        public double ? Tthue { get; set; }
 
         [JsonPropertyName("gttsuat")]
         public object Gttsuat { get; set; } // Nullable object
@@ -448,7 +448,7 @@ namespace SaovietTax.DTO
         public string Id { get; set; }
 
         [JsonPropertyName("dgia")]
-        public double Dgia { get; set; }
+        public double ? Dgia { get; set; }
 
         [JsonPropertyName("dvtinh")]
         public string Dvtinh { get; set; }
@@ -457,7 +457,7 @@ namespace SaovietTax.DTO
         public string Ltsuat { get; set; }
 
         [JsonPropertyName("sluong")]
-        public double Sluong { get; set; }
+        public double ? Sluong { get; set; }
 
         [JsonPropertyName("stbchu")]
         public object Stbchu { get; set; } // Nullable object
@@ -466,10 +466,10 @@ namespace SaovietTax.DTO
         public object Stckhau { get; set; } // Nullable object
 
         [JsonPropertyName("stt")]
-        public int Stt { get; set; }
+        public int ? Stt { get; set; }
 
         [JsonPropertyName("tchat")]
-        public int Tchat { get; set; }
+        public int ?  Tchat { get; set; }
 
         [JsonPropertyName("ten")]
         public string Ten { get; set; }
@@ -478,19 +478,19 @@ namespace SaovietTax.DTO
         public object Thtcthue { get; set; } // Nullable object
 
         [JsonPropertyName("thtien")]
-        public double Thtien { get; set; }
+        public double ?Thtien { get; set; }
 
         [JsonPropertyName("tlckhau")]
         public object Tlckhau { get; set; } // Nullable object
 
         [JsonPropertyName("tsuat")]
-        public double Tsuat { get; set; }
+        public double ? Tsuat { get; set; }
 
         [JsonPropertyName("tthue")]
         public object Tthue { get; set; } // Nullable object
 
         [JsonPropertyName("sxep")]
-        public int Sxep { get; set; }
+        public int ? Sxep { get; set; }
 
         [JsonPropertyName("ttkhac")]
         public List<CustomField> Ttkhac { get; set; } = new List<CustomField>(); // Khởi tạo để tránh null

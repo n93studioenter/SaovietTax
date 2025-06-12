@@ -247,7 +247,7 @@ namespace SaovietTax
                         kq = kq.Clone(); // Tạo một DataTable rỗng với cấu trúc giống như kq
                     }
                 }
-
+                int i = 1;
                 if (kq.Rows.Count > 0)
                 {
                     lblSofiles.Text = kq.Rows.Count.ToString();
@@ -266,8 +266,10 @@ namespace SaovietTax
                             FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()), haschild);
                         //add detail
                         fileImport.ID = int.Parse(item["ID"].ToString());
-                        
-                         queryCheckVatTu = @"SELECT * FROM tbimportdetail WHERE   ParentId= ?";
+                        progressPanel1.Caption = "Đang xử lý hóa đơn thứ " + i + "/ " + kq.Rows.Count.ToString();
+                        i += 1;
+                        Application.DoEvents();
+                        queryCheckVatTu = @"SELECT * FROM tbimportdetail WHERE   ParentId= ?";
                          parameterss = new OleDbParameter[]
                          {
                             new OleDbParameter("?",int.Parse(item["ID"].ToString())) 
@@ -279,6 +281,21 @@ namespace SaovietTax
                             {
                                 FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString(), CultureInfo.InvariantCulture), double.Parse(itemDetail["DonGia"].ToString()),Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
                                 fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString()); 
+                                fileImport.fileImportDetails.Add(fileImportDetail);
+                            }
+                        }
+                        else
+                        {
+                            GetdetailXML2(item["Mst"].ToString(), item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()));
+                            var parame = new OleDbParameter[]
+                        {
+    new OleDbParameter("?",int.Parse(item["ID"].ToString()))
+                        };
+                            var kq3 = ExecuteQuery(queryCheckVatTu, parame);
+                            foreach (DataRow itemDetail in kq3.Rows)
+                            {
+                                FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString());
                                 fileImport.fileImportDetails.Add(fileImportDetail);
                             }
                         }
@@ -301,6 +318,7 @@ namespace SaovietTax
                 }
                 bindingSource.DataSource = lstImportVao;
                 gridControl1.DataSource = bindingSource;
+                gridControl1.RefreshDataSource();
                 //gridView1.Columns.Add(new DevExpress.XtraGrid.Columns.GridColumn
                 //{
                 //    Caption = "STT",
@@ -2819,9 +2837,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
          public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType)
         {
             string url = "";
-            if(invoiceType==4)
+            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst=0302712571&khhdon=C25TMB&shdon=48267&khmshdon=1
+
+            if (invoiceType==4 || invoiceType==6  || invoiceType == 8)
             url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
-            if (invoiceType == 5)
+            if (invoiceType == 5 || invoiceType == 10)
                 url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
             using (var client = new HttpClient())
             {

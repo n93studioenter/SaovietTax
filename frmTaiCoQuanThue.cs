@@ -208,7 +208,6 @@ namespace SaovietTax
 
                     Console.WriteLine("Response Body:");
                     Console.WriteLine(responseBody);
-                    frmMain.tokken = tokken;
                    
                 }
                 catch (HttpRequestException e)
@@ -285,22 +284,102 @@ namespace SaovietTax
                 }
             }
         }
-        public async Task Main(string tokken)
+        public async Task Xulydauvao1(string tokken,int type)
         {
             using (var client = new HttpClient())
             {
                 // Đặt URL
-                string formattedDate1 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
+                string formattedDate1 = frmMain.dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
                 string formattedDate2 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
                 string url = "";
-                if(frmMain.type==1)
+                int ttxly = 0;
+                if(type==6)
                 {
-                    url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5";
+                    ttxly = 5;
                 }
-                if (frmMain.type == 2)
+                if (type == 8)
                 {
-                    url = @"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&search=tdlap=ge=22/05/2025T00:00:00;tdlap=le=11/06/2025T23:59:59";
+                    ttxly = 6;
                 }
+                url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly=="+ttxly;
+                // Thêm Bearer token vào Header
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                try
+                {
+                    // Gửi yêu cầu GET
+                    HttpResponseMessage response;
+                    try
+                    {
+                        response = await client.GetAsync(url);
+                    }
+                    catch(Exception ex)
+                    {
+                        response = await client.GetAsync(url);
+                    }
+
+                    // Đảm bảo phản hồi thành công
+                    response.EnsureSuccessStatusCode();
+
+                    // Đọc nội dung phản hồi
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    RootObject rootObject;
+                    try
+                    {
+                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                    }
+                    catch(Exception ex)
+                    {
+                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                    }
+
+                    XulyDataXML(rootObject, tokken, type);
+                    while (!string.IsNullOrEmpty(rootObject.state))
+                    {
+                        url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&state=" + rootObject.state + "&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5";
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        try
+                        {
+                            response = await client.GetAsync(url);
+
+                            // Đảm bảo phản hồi thành công
+                            response.EnsureSuccessStatusCode();
+
+                            // Đọc nội dung phản hồi
+                            responseBody = await response.Content.ReadAsStringAsync();
+                            rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                            //XulyDataXML(rootObject, tokken);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                    Console.WriteLine("Response Body:");
+                    Console.WriteLine(responseBody); 
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine($"Request error: {e.Message}");
+                }
+            }
+        }
+        public async Task Xulydauvaomaytinhtien(string tokken, int type)
+        {
+            using (var client = new HttpClient())
+            {
+                // Đặt URL
+                string formattedDate1 = frmMain.dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
+                string formattedDate2 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
+                string url = "";
+                int ttxly = 0;
+                if (type == 10)
+                {
+                    ttxly = 8;
+                }
+                url = @"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==" + ttxly;
                 // Thêm Bearer token vào Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -315,42 +394,43 @@ namespace SaovietTax
 
                     // Đọc nội dung phản hồi
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    InvoiceRa2 rootObject;
+                    RootObject rootObject;
                     try
                     {
-                        rootObject = JsonConvert.DeserializeObject<InvoiceRa2>(responseBody);
+                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        rootObject = JsonConvert.DeserializeObject<InvoiceRa2>(responseBody);
+                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
                     }
 
-                    //XulyDataXML(rootObject, tokken);
-                    //while (!string.IsNullOrEmpty(rootObject.state))
-                    //{
-                    //    url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&state=" + rootObject.state + "&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5";
-                    //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
-                    //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    //    try
-                    //    {
-                    //        response = await client.GetAsync(url);
+                    XulyDataXML(rootObject, tokken, type);
+                    while (!string.IsNullOrEmpty(rootObject.state))
+                    {
+                        url = @"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&state=" + rootObject.state + "&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5";
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        try
+                        {
+                            response = await client.GetAsync(url);
 
-                    //        // Đảm bảo phản hồi thành công
-                    //        response.EnsureSuccessStatusCode();
+                            // Đảm bảo phản hồi thành công
+                            response.EnsureSuccessStatusCode();
 
-                    //        // Đọc nội dung phản hồi
-                    //        responseBody = await response.Content.ReadAsStringAsync();
-                    //        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
-                    //        XulyDataXML(rootObject, tokken);
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
+                            // Đọc nội dung phản hồi
+                            responseBody = await response.Content.ReadAsStringAsync();
+                            rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                            XulyDataXML(rootObject, tokken, type);
+                        }
+                        catch (Exception ex)
+                        {
 
-                    //    }
-                    //}
+                        }
+                    }
                     Console.WriteLine("Response Body:");
-                    Console.WriteLine(responseBody);
+                    Console.WriteLine(responseBody); 
                     Driver.Close();
+                    this.Close();
                 }
                 catch (HttpRequestException e)
                 {
@@ -600,11 +680,12 @@ namespace SaovietTax
 
             return -1;
         }
-        public  void XulyDataXML(RootObject rootObject,string tokken)
+        public  void XulyDataXML(RootObject rootObject,string tokken,int invoceType)
         {
             foreach(var item in rootObject.datas)
             {
-                GetdetailXML(item.nbmst, item.khhdon, item.shdon.ToString(),tokken);
+                InsertTbImport(item, invoceType);
+                // GetdetailXML(item.nbmst, item.khhdon, item.shdon.ToString(),tokken);
             }
         }
         public void XulyRa2ML(InvoiceRa2 rootObject, string tokken,int invoceType)
@@ -617,6 +698,7 @@ namespace SaovietTax
         }
         public void InsertTbImport2(InvoiceRa2List item,string tokken,int invoceType)
         {
+
             int type = frmMain.type;
             string query = @"
             INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType)
@@ -634,8 +716,14 @@ namespace SaovietTax
                     newTen = Helpers.ConvertUnicodeToVni(item.nmtnmua);
                 }
             }
-
-                string newNoidung = Helpers.ConvertUnicodeToVni("");
+            //Insert khach hàng
+            if (CheckExistKH(item.nmmst, newTen) == false)
+            {
+                int maphanloai = 0;
+                maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
+            }
+            string newNoidung = Helpers.ConvertUnicodeToVni("");
             //Lấy tài khoản từ mất định
             string tkno = "";
             string tkco = "";
@@ -672,18 +760,22 @@ namespace SaovietTax
             }
 
             string tgtkcthue = "";
+            string dateTimeString = item.ntao;
+            DateTime dateTime = DateTime.Parse(dateTimeString);
+            string formattedDate = dateTime.ToShortDateString();
 
+            Console.WriteLine(formattedDate); // Kết quả: 2025-05-22
             OleDbParameter[] parameters = new OleDbParameter[]
             {
                 new OleDbParameter("?", item.shdon),
                 new OleDbParameter("?", item.khhdon),
-                new OleDbParameter("?", item.ntao),
+                new OleDbParameter("?", formattedDate),
                 new OleDbParameter("?", newTen),
                 new OleDbParameter("?", newNoidung),
                 new OleDbParameter("?",tkno),
                 new OleDbParameter("?",tkco),
                 new OleDbParameter("?",tkthue),
-                new OleDbParameter("?", item.nmmst!=null?item.nmmst:""),
+                new OleDbParameter("?", item.nmmst!=null?item.nmmst:csohieu),
                 new OleDbParameter("?", "0"),
                 new OleDbParameter("?", DateTime.Now.ToShortDateString()),
                 new OleDbParameter("?", item.tgtttbso),
@@ -700,13 +792,10 @@ namespace SaovietTax
             {
                 int a = ExecuteQueryResult(query, parameters);
                 //Xu lý khách hàng
-                if(CheckExistKH(item.nmmst, newTen)==false)
-                {
-                    int maphanloai = 0;
-                    maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
-                    InitCustomer(maphanloai, item.khhdon, newTen, item.nbdchi, item.nmmst);
-                }
-            
+               
+                //Update lại MST cho tbimport 
+              
+
                 //  GetdetailXML2(item.nbmst, item.khhdon, item.shdon.ToString(), tokken);
             }
             catch (Exception ex)
@@ -735,6 +824,7 @@ namespace SaovietTax
             return false;
         }
         DataTable existingKhachHang = new DataTable();
+        string csohieu = "";
         public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst)
         {
             int randNumber = 0;
@@ -751,6 +841,7 @@ namespace SaovietTax
                     Sohieu = Sohieu.ToUpper().Substring(0, 3);
                  randNumber = random.Next(101,999);
                 Sohieu = Sohieu + randNumber.ToString();
+                csohieu = Sohieu;
                 Mst = "00"; 
             }
             else
@@ -788,15 +879,16 @@ namespace SaovietTax
             // Thực thi truy vấn và lấy kết quả
             int a = ExecuteQueryResult(query, parameters);
         }
-        public void InsertTbImport(Data item)
+        public void InsertTbImport(Data item,int invoceType)
         {
+             
             int type = frmMain.type;
             string query = @"
-            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)";
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
 
             string newTen = Helpers.ConvertUnicodeToVni(item.nbten);
-            string newNoidung = Helpers.ConvertUnicodeToVni("item.Noidung");
+            string newNoidung = "";
             //Lấy tài khoản từ mất định
             string tkno = "";
             string tkco = "";
@@ -833,12 +925,57 @@ namespace SaovietTax
             }
 
             string tgtkcthue = "";
-
-            OleDbParameter[] parameters = new OleDbParameter[]
+            if(item.tgtcthue != null)
             {
+                tgtkcthue = item.tgtcthue.ToString();
+            }
+            else
+            {
+                if (item.tgtkcthue != null)
+                {
+                    tgtkcthue = item.tgtkcthue.ToString();
+                }
+                else
+                {
+                    if (item.tgtkcthue != null)
+                    {
+                        tgtkcthue = item.tgtkcthue.ToString();
+                    }
+                    else
+                    {
+                        tgtkcthue = "0";
+                    }
+                }
+            }
+            DateTime nl = new DateTime();
+            if(item.shdon == 39519)
+            {
+                int a = 10;
+            }
+            if (invoceType == 8)
+            {
+                if (item.ntao.Month != DateTime.Now.Month)
+                {
+
+                    nl = item.ntao;
+                }
+                else
+                {
+                    nl = item.tdlap.AddDays(1);
+                }
+            }
+            else
+            {
+                nl = item.ntao;
+            }
+            string dateTimeString = nl.ToString();
+            DateTime dateTime = DateTime.Parse(dateTimeString);
+            string formattedDate = dateTime.ToShortDateString();
+            OleDbParameter[] parameters = new OleDbParameter[]
+                {
                 new OleDbParameter("?", item.shdon),
                 new OleDbParameter("?", item.khhdon),
-                new OleDbParameter("?", item.ntao),
+                new OleDbParameter("?", formattedDate),
                 new OleDbParameter("?", newTen),
                 new OleDbParameter("?", newNoidung),
                 new OleDbParameter("?",tkno),
@@ -851,10 +988,11 @@ namespace SaovietTax
                 new OleDbParameter("?", "0"),
                 new OleDbParameter("?",""),
                 new OleDbParameter("?", "0"),
-                new OleDbParameter("?", item.tgtkcthue!=null?item.tgtkcthue.ToString():"0"),
-                new OleDbParameter("?", item.tgtthue.ToString()),
+                new OleDbParameter("?",tgtkcthue!=null?tgtkcthue:item.tgtttbso.ToString()),
+                new OleDbParameter("?",item.tgtthue!=null? item.tgtthue.ToString():"0"),
                 new OleDbParameter("?", type),
-            };
+                new OleDbParameter("?", invoceType)
+                };
 
             try
             {
@@ -989,7 +1127,15 @@ namespace SaovietTax
                         { 
                             new OleDbParameter("?", cookie.Value),
                         };
+
+                        frmMain.tokken = cookie.Value;
                         ExecuteQueryResult(query, parametersss);
+                        if(frmMain.type==1)
+                        {
+                            Xulydauvao1(cookie.Value, 6);
+                            Xulydauvao1(cookie.Value, 8);
+                            Xulydauvaomaytinhtien(cookie.Value, 10);
+                        }
                         if (frmMain.type == 2)
                         {
                             Xulydaura1(cookie.Value);
