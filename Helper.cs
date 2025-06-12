@@ -15,7 +15,56 @@ namespace SaovietTax
 {
     public static class Helpers
     {
-      
+       
+        public static string RemoveVietnameseDiacritics(string str)
+        {
+            // Mảng chứa ký tự có dấu
+            str = str.ToLower();
+            str = Regex.Replace(str, "[àáạảãâầấậẩẫăằắặẳẵ]", "a");
+            str = Regex.Replace(str, "[èéẹẻẽêềếệểễ]", "e");
+            str = Regex.Replace(str, "[ìíịỉĩ]", "i");
+            str = Regex.Replace(str, "[òóọỏõôồốộổỗơờớợởỡ]", "o");
+            str = Regex.Replace(str, "[ùúụủũưừứựửữ]", "u");
+            str = Regex.Replace(str, "[ỳýỵỷỹ]", "y");
+            str = Regex.Replace(str, "đ", "d");
+
+            // Thay thế khoảng trắng bằng dấu gạch ngang
+            str = Regex.Replace(str, " ", "-");
+            str = str.Replace(",", "");
+            str = str.Replace(".", "");
+
+            // Thay thế tất cả các âm "o" có dấu thành "o" không dấu
+            str = str.Replace("ó", "o");
+            str = str.Replace("ò", "o");
+            str = str.Replace("õ", "o");
+            str = str.Replace("ọ", "o");
+            str = str.Replace("ỏ", "o");
+            str = str.Replace("ô", "o");
+            str = str.Replace("ơ", "o");
+            str = str.Replace("'", "");
+            return str;
+        }
+        public static string GetLastFourDigits(string input)
+        {
+            // Tìm vị trí của dấu '-'
+            int dashIndex = input.IndexOf('-');
+
+            // Nếu có dấu '-' trong chuỗi, lấy phần trước đó
+            if (dashIndex != -1)
+            {
+                input = input.Substring(0, dashIndex);
+            }
+
+            // Lấy 4 ký tự cuối cùng
+            if (input.Length >= 4)
+            {
+                return input.Substring(input.Length - 4);
+            }
+            else
+            {
+                return input; // Trả về toàn bộ chuỗi nếu độ dài nhỏ hơn 4
+            }
+        }
         public static class StringWordSimilarity
         {
 

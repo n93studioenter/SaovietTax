@@ -77,6 +77,9 @@ using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Net.Http;
 using DevExpress.XtraWaitForm;
+using DevExpress.XtraVerticalGrid;
+using DataTable = System.Data.DataTable;
+using DevExpress.Xpo;
 
 namespace SaovietTax
 {
@@ -375,7 +378,7 @@ namespace SaovietTax
                         }
                         else
                         {
-                            GetdetailXML2(mstcty, item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken);
+                            GetdetailXML2(mstcty, item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()));
                             var parame = new OleDbParameter[]
                         {
                             new OleDbParameter("?",int.Parse(item["ID"].ToString()))
@@ -393,7 +396,7 @@ namespace SaovietTax
                 }
                 bindingSource.DataSource = lstImportRa;
                 gridControl2.DataSource = bindingSource;
-
+                gridControl2.RefreshDataSource();
                 gridView3.OptionsDetail.EnableMasterViewMode = true;
                 progressPanel1.Visible = false; // Ẩn progressPanel
             }
@@ -926,32 +929,11 @@ namespace SaovietTax
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("vi-VN");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN");
-            var files = Directory.EnumerateFiles(savedPath + @"\HDVao", "*.xml", SearchOption.AllDirectories).ToList();
+           // var files = Directory.EnumerateFiles(savedPath + @"\HDVao", "*.xml", SearchOption.AllDirectories).ToList();
 
-            try
-            {
-                if (files.Count > 0)
-                {
-                    string[] parts = files.FirstOrDefault().Split('\\');
-                    int number = int.Parse(parts[parts.Length - 2]);
-                    dtTungay.DateTime = new DateTime(DateTime.Now.Year, number, 1);
-                    // Thiết lập ngày kết thúc là ngày cuối cùng của tháng
-                    int lastDay = DateTime.DaysInMonth(DateTime.Now.Year, number);
-                    dtDenngay.DateTime = new DateTime(DateTime.Now.Year, number, lastDay);
-                }
-                else
-                {
-                    dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                    dtDenngay.DateTime = DateTime.Now;
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                dtDenngay.DateTime = DateTime.Now;
-            }
-           
+            dtTungay.DateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            dtDenngay.DateTime = DateTime.Now;
+
             progressPanel1.Caption = "Đang xử lý...";
             progressPanel1.Description = "Vui lòng chờ...";
         }
@@ -1159,6 +1141,8 @@ namespace SaovietTax
             CheckDB();
             ControlsSetup();
             lstvt = await  LoadDataVattuAsync();
+            var query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            tbKhachhang = ExecuteQuery(query);
         }
         #endregion
         #region Xử lý xml
@@ -2832,11 +2816,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
         }
-         public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken)
+         public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType)
         {
-            string url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
-            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst=3501743883&khhdon=C25TVT&shdon=728&khmshdon=1
-
+            string url = "";
+            if(invoiceType==4)
+            url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
+            if (invoiceType == 5)
+                url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
@@ -6627,38 +6613,38 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 xtraTabControl2.SelectedTabPageIndex = 1;
             }
             int getthang = 0;
-            try
-            {
-                string path = savedPath + @"\HDRa";
-                var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories).FirstOrDefault();
-                if (files != null)
-                {
-                    var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
+            //try
+            //{
+            //    string path = savedPath + @"\HDRa";
+            //    var files = Directory.EnumerateFiles(path, "*.xml", SearchOption.AllDirectories).FirstOrDefault();
+            //    if (files != null)
+            //    {
+            //        var getsplit = files.Split(new string[] { "\\" }, StringSplitOptions.None);
                    
-                    try
-                    {
-                        getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
-                        DateTime now = DateTime.Now; // Ngày hiện tại
-                        int year = now.Year; // Năm hiện tại 
+            //        try
+            //        {
+            //            getthang = int.Parse(getsplit[getsplit.Length - 2].ToString());
+            //            DateTime now = DateTime.Now; // Ngày hiện tại
+            //            int year = now.Year; // Năm hiện tại 
 
-                        DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
-                        dtTungay.DateTime = new DateTime(year, getthang, 1);
-                        dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
-                    }
-                    catch(Exception ex)
-                    {
+            //            DateTime lastDayOfMonth = new DateTime(year, getthang, DateTime.DaysInMonth(year, getthang));
+            //            dtTungay.DateTime = new DateTime(year, getthang, 1);
+            //            dtDenngay.DateTime = new DateTime(year, getthang, lastDayOfMonth.Day);
+            //        }
+            //        catch(Exception ex)
+            //        {
 
-                    }
-                }
-                else
-                {
+            //        }
+            //    }
+            //    else
+            //    {
 
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message + "   " + getthang.ToString());
-            }
+            //    }
+            //}
+            //catch(Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message + "   " + getthang.ToString());
+            //}
         }
 
         private void chkDauvao_CheckedChanged(object sender, EventArgs e)
@@ -6881,16 +6867,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
                 if (currentColumnName == "Ten")
                 {
-                    frmKhachhang frmKhachhang = new frmKhachhang();
-                    frmKhachhang.frmMain = this;
-
-                    frmKhachhang.Khachhang vatTu = new frmKhachhang.Khachhang();
-                    vatTu.SoHieu = cellValue.ToString();
-                    var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
-                    vatTu.Mst = gridView.GetRowCellValue(currentRowHandle, "Mst").ToString();
-                    vatTu.Ten = tenvattu; 
-                    frmKhachhang.dtoVatTu = vatTu;
-                    frmKhachhang.ShowDialog();
+                     TooogleKH(gridView, cellValue.ToString(), currentRowHandle, gridView.GetRowCellValue(currentRowHandle, "Mst").ToString(), gridView.GetRowCellValue(currentRowHandle, "Ten").ToString());
                 }
               
             }
@@ -7304,7 +7281,34 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             }
         }
+        public DataTable tbKhachhang = new DataTable();
+        private void TooogleKH(DevExpress.XtraGrid.Views.Grid.GridView gridView,string cellValue,int currentRowHandle,string mst,string ten)
+        {
+            frmKhachhang frmKhachhang = new frmKhachhang();
+            frmKhachhang.frmMain = this;
 
+            frmKhachhang.Khachhang vatTu = new frmKhachhang.Khachhang();
+            DataRow kh =null ;
+            if (!string.IsNullOrEmpty(mst))
+            {
+                 kh = tbKhachhang.AsEnumerable().Where(row => row.Field<string>("MST") == mst).FirstOrDefault();
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(ten))
+                {
+                    ten = Helpers.ConvertUnicodeToVni(ten);
+                    kh = tbKhachhang.AsEnumerable().Where(row => Helpers.RemoveVietnameseDiacritics(row.Field<string>("Ten").ToLower()) == Helpers.RemoveVietnameseDiacritics(ten.ToLower())).FirstOrDefault();
+                }
+            }
+            vatTu.Ten = Helpers.ConvertVniToUnicode(ten);
+            vatTu.Mst = kh["MST"].ToString();
+            vatTu.DiaChi = kh["DiaChi"].ToString();
+            vatTu.SoHieu= kh["SoHieu"].ToString();
+            vatTu.MaPhanLoai= int.Parse(kh["MaPhanLoai"].ToString());
+            frmKhachhang.dtoVatTu = vatTu;
+            frmKhachhang.ShowDialog();
+        }
         private void gridView3_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == System.Windows.Forms.Keys.Enter)
@@ -7345,16 +7349,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                     if (currentColumnName == "Ten")
                     {
-                        frmKhachhang frmKhachhang = new frmKhachhang();
-                        frmKhachhang.frmMain = this;
-
-                        frmKhachhang.Khachhang vatTu = new frmKhachhang.Khachhang();
-                        vatTu.SoHieu = cellValue.ToString();
-                        var tenvattu = gridView.GetRowCellValue(currentRowHandle, "Ten").ToString();
-                        vatTu.Mst = gridView.GetRowCellValue(currentRowHandle, "Mst").ToString();
-                        vatTu.Ten = tenvattu;
-                        frmKhachhang.dtoVatTu = vatTu;
-                        frmKhachhang.ShowDialog();
+                        TooogleKH(gridView, cellValue.ToString(), currentRowHandle, gridView.GetRowCellValue(currentRowHandle, "Mst").ToString(), gridView.GetRowCellValue(currentRowHandle, "Ten").ToString());
                     }
                 }
 

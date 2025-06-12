@@ -120,6 +120,8 @@ namespace SaovietTax.DTO
 
         [JsonPropertyName("ngcnhat")]
         public string Ngcnhat { get; set; }
+        public object nky { get; set; }
+
 
         [JsonPropertyName("nky")]
         public DateTime Nky { get; set; }

@@ -82,7 +82,7 @@
             // 
             // txtMaSo
             // 
-            this.txtMaSo.Location = new System.Drawing.Point(29, 294);
+            this.txtMaSo.Location = new System.Drawing.Point(29, 255);
             this.txtMaSo.Name = "txtMaSo";
             this.txtMaSo.Size = new System.Drawing.Size(549, 27);
             this.txtMaSo.TabIndex = 15;
@@ -243,12 +243,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1386, 715);
+            this.ClientSize = new System.Drawing.Size(1386, 605);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.comboBoxEdit1);
             this.Controls.Add(this.gridControl1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmKhachhang";
-            this.Text = "frmKhachhang";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Danh sách khách hàng";
             this.Load += new System.EventHandler(this.frmKhachhang_Load);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);

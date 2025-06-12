@@ -28,6 +28,7 @@ namespace SaovietTax
             public string SoHieu { get; set; }
             public string Ten { get; set; }
             public string Mst { get; set; }
+            public string DiaChi { get; set; }  
         }
         public Khachhang dtoVatTu { get; set; }
         public frmMain frmMain;
@@ -165,7 +166,7 @@ namespace SaovietTax
             string queryCheckVatTu = @"SELECT * FROM KhachHang WHERE  SoHieu = ? ";
             var parameterss = new OleDbParameter[]
             {
-                new OleDbParameter("?",dtoVatTu.Mst), 
+                new OleDbParameter("?",dtoVatTu.SoHieu), 
                };
             var kq = ExecuteQuery(queryCheckVatTu, parameterss);
             if (kq.Rows.Count == 0)

@@ -35,6 +35,7 @@ using Windows.Media.Protection.PlayReady;
 using DevExpress.XtraSpreadsheet;
 using DevExpress.Spreadsheet;
 using System.Data.OleDb;
+using DocumentFormat.OpenXml.VariantTypes;
 namespace SaovietTax
 {
     public partial class frmTaiCoQuanThue : DevExpress.XtraEditors.XtraForm
@@ -698,13 +699,94 @@ namespace SaovietTax
             try
             {
                 int a = ExecuteQueryResult(query, parameters);
-              //  GetdetailXML2(item.nbmst, item.khhdon, item.shdon.ToString(), tokken);
+                //Xu lý khách hàng
+                if(CheckExistKH(item.nmmst, newTen)==false)
+                {
+                    int maphanloai = 0;
+                    maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
+                    InitCustomer(maphanloai, item.khhdon, newTen, item.nbdchi, item.nmmst);
+                }
+            
+                //  GetdetailXML2(item.nbmst, item.khhdon, item.shdon.ToString(), tokken);
             }
             catch (Exception ex)
             {
                 var a = ex.Message;
             }
 
+        } 
+        private bool CheckExistKH(string mst, string ten)
+        {
+            if (!string.IsNullOrEmpty(mst))
+            {
+                if (existingKhachHang.AsEnumerable().Any(row => row.Field<string>("MST") == mst))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (existingKhachHang.AsEnumerable().Any(row => Helpers.RemoveVietnameseDiacritics(row.Field<string>("Ten").ToLower()) == Helpers.RemoveVietnameseDiacritics(ten.ToLower())))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        DataTable existingKhachHang = new DataTable();
+        public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst)
+        {
+            int randNumber = 0;
+            Random random = new Random();
+
+            //Xử lý địa chỉ
+            string diachiKHVni = !string.IsNullOrEmpty(Diachi) ? Helpers.ConvertUnicodeToVni(Diachi) : Helpers.ConvertUnicodeToVni("Bổ sung địa chỉ");
+
+            if (string.IsNullOrEmpty(Mst))
+            {
+                Sohieu = Helpers.RemoveVietnameseDiacritics(Ten.Split(' ').LastOrDefault());
+                //Sohieu = CapitalizeFirstLetter(Sohieu);
+                if (Sohieu.Length >= 3)
+                    Sohieu = Sohieu.ToUpper().Substring(0, 3);
+                 randNumber = random.Next(101,999);
+                Sohieu = Sohieu + randNumber.ToString();
+                Mst = "00"; 
+            }
+            else
+            {
+                Sohieu = Helpers.GetLastFourDigits(Mst.Replace("-", ""));
+
+                string tenKHVni = Helpers.ConvertUnicodeToVni(Ten);
+                 
+                //Xử lý khi số hiệu bị trùng
+                if (existingKhachHang.AsEnumerable().Any(row => row.Field<string>("SoHieu") == Sohieu))
+                {
+                    Sohieu = "0" + Sohieu;
+                }
+                if (existingKhachHang.AsEnumerable().Any(row => row.Field<string>("SoHieu") == Sohieu))
+                {
+                    Sohieu = "00" + Sohieu;
+                }
+            }
+             
+            string query = @"
+        INSERT INTO KhachHang (MaPhanLoai,SoHieu,Ten,DiaChi,MST)
+        VALUES (?,?,?,?,?)";
+
+
+            // Khai báo mảng tham số với đủ 10 tham số
+            OleDbParameter[] parameters = new OleDbParameter[]
+            {
+        new OleDbParameter("?", Maphanloai),
+          new OleDbParameter("?", Sohieu),
+        new OleDbParameter("?", Ten),
+        new OleDbParameter("?", diachiKHVni),
+        new OleDbParameter("?", Mst)
+            };
+
+            // Thực thi truy vấn và lấy kết quả
+            int a = ExecuteQueryResult(query, parameters);
         }
         public void InsertTbImport(Data item)
         {
@@ -788,6 +870,8 @@ namespace SaovietTax
         {
             var query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
+            query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            existingKhachHang = ExecuteQuery(query);
             // XulyFileExcel();
             // return;
             Driver = null;
@@ -906,7 +990,12 @@ namespace SaovietTax
                             new OleDbParameter("?", cookie.Value),
                         };
                         ExecuteQueryResult(query, parametersss);
-                        Xulydaura2(cookie.Value);
+                        if (frmMain.type == 2)
+                        {
+                            Xulydaura1(cookie.Value);
+                            Xulydaura2(cookie.Value);
+                        }
+                     
                     }
  
                 }
