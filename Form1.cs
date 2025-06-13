@@ -286,7 +286,7 @@ namespace SaovietTax
                         }
                         else
                         {
-                            GetdetailXML2(item["Mst"].ToString(), item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()));
+                            GetdetailXML2(item["Mst"].ToString(), item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()), fileImport);
                             var parame = new OleDbParameter[]
                         {
     new OleDbParameter("?",int.Parse(item["ID"].ToString()))
@@ -396,7 +396,7 @@ namespace SaovietTax
                         }
                         else
                         {
-                            GetdetailXML2(mstcty, item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()));
+                            GetdetailXML2(mstcty, item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()), fileImport);
                             var parame = new OleDbParameter[]
                         {
                             new OleDbParameter("?",int.Parse(item["ID"].ToString()))
@@ -868,9 +868,8 @@ namespace SaovietTax
         }
         private void InitData()
         {
-            savedPath = ConfigurationManager.AppSettings["LastFilePath"];
+       
             string query = "SELECT * FROM tbRegister";
-
             // Tạo mảng tham số với giá trị cho câu lệnh SQL
 
             var kq = ExecuteQuery(query, null);
@@ -2872,7 +2871,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
         }
-         public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType)
+         public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType,FileImport fileImport)
         {
             string url = "";
             //https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst=0302712571&khhdon=C25TMB&shdon=48267&khmshdon=1
@@ -2907,8 +2906,32 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                     // Đọc nội dung phản hồi đồng bộ
                     string responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                  
                     var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
+                    if (rootObject == null)
+                    {
+                        if (invoiceType == 4 || invoiceType == 6 || invoiceType == 8)
+                            url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=2";
+                        if (invoiceType == 5 || invoiceType == 10)
+                            url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=2";
+                        response = new HttpResponseMessage();
+                        // Gửi yêu cầu GET đồng bộ 
+                        try
+                        {
+                            Thread.Sleep(400);
+                            response = client.GetAsync(url).GetAwaiter().GetResult();
 
+                            // Đảm bảo phản hồi thành công
+                            response.EnsureSuccessStatusCode();
+                             responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                             rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
+                        }
+                        catch(Exception ex)
+                        {
+
+                        }
+                    }
                     // Tìm ID Cha mới nhất
                     string query = "SELECT * FROM tbimport WHERE SHDon=? AND KHHDon=?";
                     var parameterss = new OleDbParameter[]
@@ -2924,9 +2947,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         // Xử lý tên
 
                         bool hasVattu = false;
-
+                        double ttrcthue = 0; 
                         foreach (var it in rootObject.Hdhhdvu)
                         {
+                            ttrcthue+= it.Thtien != null ? it.Thtien.Value : 0;
                             foreach (var dtr in lstvt)
                             {
                                 
@@ -2940,6 +2964,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     }
                                 }
                             }
+                            
                             if (!hasVattu)
                             {
                                 // Update nội dung cho Parent
@@ -2951,8 +2976,9 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 };
                                 ExecuteQueryResult(query, parametersss);
                                 hasVattu = true;
+                                fileImport.Noidung = it.Ten;
                             }
-
+                            //
                             // Chèn chi tiết hóa đơn
                             query = @"
                     INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo, TTien)
@@ -2980,6 +3006,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 var aa = ex.Message;
                             }
 
+                        }
+                        //
+                        if (kq2.Rows[0]["TgTCThue"].ToString() == "0")
+                        {
+                            // Cập nhật trạng thái là đã lấy dữ liệu
+                            query = "UPDATE tbimport SET TgTCThue=? WHERE ID=?";
+                            var parametersss = new OleDbParameter[]
+                            {
+                                new OleDbParameter("?", ttrcthue),
+                                new OleDbParameter("?", kq2.Rows[0]["ID"]),
+                            };
+                            ExecuteQueryResult(query, parametersss);
+                            fileImport.TgTCThue = ttrcthue;
                         }
                     }
                 }
