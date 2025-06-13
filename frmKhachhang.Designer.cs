@@ -46,8 +46,10 @@
             this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.colMaso = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTenVattu = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoHieu = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colMST = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtMaSo.Properties)).BeginInit();
@@ -62,6 +64,8 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelControl1.Controls.Add(this.txtMaSo);
             this.panelControl1.Controls.Add(this.btnThoat);
             this.panelControl1.Controls.Add(this.btnXoa);
@@ -75,14 +79,14 @@
             this.panelControl1.Controls.Add(this.label2);
             this.panelControl1.Controls.Add(this.txtSohieu);
             this.panelControl1.Controls.Add(this.label1);
-            this.panelControl1.Location = new System.Drawing.Point(742, 23);
+            this.panelControl1.Location = new System.Drawing.Point(772, 23);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(597, 572);
+            this.panelControl1.Size = new System.Drawing.Size(602, 572);
             this.panelControl1.TabIndex = 6;
             // 
             // txtMaSo
             // 
-            this.txtMaSo.Location = new System.Drawing.Point(29, 255);
+            this.txtMaSo.Location = new System.Drawing.Point(29, 291);
             this.txtMaSo.Name = "txtMaSo";
             this.txtMaSo.Size = new System.Drawing.Size(549, 27);
             this.txtMaSo.TabIndex = 15;
@@ -96,6 +100,7 @@
             this.btnThoat.Size = new System.Drawing.Size(131, 34);
             this.btnThoat.TabIndex = 11;
             this.btnThoat.Text = "Thoát";
+            this.btnThoat.Click += new System.EventHandler(this.btnThoat_Click);
             // 
             // btnXoa
             // 
@@ -114,6 +119,7 @@
             this.btnGhi.Size = new System.Drawing.Size(119, 34);
             this.btnGhi.TabIndex = 9;
             this.btnGhi.Text = "&Ghi";
+            this.btnGhi.Click += new System.EventHandler(this.btnGhi_Click);
             // 
             // btnThem
             // 
@@ -123,6 +129,7 @@
             this.btnThem.Size = new System.Drawing.Size(121, 34);
             this.btnThem.TabIndex = 8;
             this.btnThem.Text = "Thêm";
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
             // 
             // txtGhichu
             // 
@@ -190,6 +197,8 @@
             // 
             // comboBoxEdit1
             // 
+            this.comboBoxEdit1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.comboBoxEdit1.Location = new System.Drawing.Point(12, 23);
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -200,22 +209,39 @@
             // 
             // gridControl1
             // 
+            this.gridControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.gridControl1.Location = new System.Drawing.Point(12, 56);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(724, 539);
+            this.gridControl1.Size = new System.Drawing.Size(754, 539);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
+            this.gridControl1.DoubleClick += new System.EventHandler(this.gridControl1_DoubleClick);
             // 
             // gridView1
             // 
             this.gridView1.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.colMaso,
             this.colTenVattu,
-            this.colSoHieu});
+            this.colSoHieu,
+            this.colMST});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsView.ShowGroupPanel = false;
+            this.gridView1.RowCellClick += new DevExpress.XtraGrid.Views.Grid.RowCellClickEventHandler(this.gridView1_RowCellClick);
+            // 
+            // colMaso
+            // 
+            this.colMaso.Caption = "Mã số";
+            this.colMaso.FieldName = "MaSo";
+            this.colMaso.MinWidth = 30;
+            this.colMaso.Name = "colMaso";
+            this.colMaso.OptionsColumn.AllowEdit = false;
+            this.colMaso.Visible = true;
+            this.colMaso.VisibleIndex = 0;
+            this.colMaso.Width = 78;
             // 
             // colTenVattu
             // 
@@ -225,8 +251,8 @@
             this.colTenVattu.Name = "colTenVattu";
             this.colTenVattu.OptionsColumn.AllowEdit = false;
             this.colTenVattu.Visible = true;
-            this.colTenVattu.VisibleIndex = 0;
-            this.colTenVattu.Width = 412;
+            this.colTenVattu.VisibleIndex = 1;
+            this.colTenVattu.Width = 335;
             // 
             // colSoHieu
             // 
@@ -236,8 +262,18 @@
             this.colSoHieu.Name = "colSoHieu";
             this.colSoHieu.OptionsColumn.AllowEdit = false;
             this.colSoHieu.Visible = true;
-            this.colSoHieu.VisibleIndex = 1;
-            this.colSoHieu.Width = 90;
+            this.colSoHieu.VisibleIndex = 2;
+            this.colSoHieu.Width = 121;
+            // 
+            // colMST
+            // 
+            this.colMST.Caption = "MST";
+            this.colMST.FieldName = "MST";
+            this.colMST.MinWidth = 30;
+            this.colMST.Name = "colMST";
+            this.colMST.Visible = true;
+            this.colMST.VisibleIndex = 3;
+            this.colMST.Width = 165;
             // 
             // frmKhachhang
             // 
@@ -288,5 +324,7 @@
         private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
         private DevExpress.XtraGrid.Columns.GridColumn colTenVattu;
         private DevExpress.XtraGrid.Columns.GridColumn colSoHieu;
+        private DevExpress.XtraGrid.Columns.GridColumn colMaso;
+        private DevExpress.XtraGrid.Columns.GridColumn colMST;
     }
 }

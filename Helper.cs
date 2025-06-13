@@ -18,6 +18,8 @@ namespace SaovietTax
        
         public static string RemoveVietnameseDiacritics(string str)
         {
+            if(str == null)
+                return "";
             // Mảng chứa ký tự có dấu
             str = str.ToLower();
             str = Regex.Replace(str, "[àáạảãâầấậẩẫăằắặẳẵ]", "a");

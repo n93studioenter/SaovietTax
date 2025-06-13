@@ -284,7 +284,7 @@ namespace SaovietTax
                 }
             }
         }
-        public async Task Xulydauvao1(string tokken,int type)
+        public void Xulydauvao1(string tokken, int type)
         {
             using (var client = new HttpClient())
             {
@@ -293,7 +293,8 @@ namespace SaovietTax
                 string formattedDate2 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
                 string url = "";
                 int ttxly = 0;
-                if(type==6)
+
+                if (type == 6)
                 {
                     ttxly = 5;
                 }
@@ -301,7 +302,9 @@ namespace SaovietTax
                 {
                     ttxly = 6;
                 }
-                url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly=="+ttxly;
+
+                url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==" + ttxly;
+
                 // Thêm Bearer token vào Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -309,56 +312,35 @@ namespace SaovietTax
                 try
                 {
                     // Gửi yêu cầu GET
-                    HttpResponseMessage response;
-                    try
-                    {
-                        response = await client.GetAsync(url);
-                    }
-                    catch(Exception ex)
-                    {
-                        response = await client.GetAsync(url);
-                    }
+                    HttpResponseMessage response = client.GetAsync(url).Result;
 
                     // Đảm bảo phản hồi thành công
                     response.EnsureSuccessStatusCode();
 
                     // Đọc nội dung phản hồi
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    RootObject rootObject;
-                    try
-                    {
-                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
-                    }
-                    catch(Exception ex)
-                    {
-                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
-                    }
+                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    RootObject rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
 
                     XulyDataXML(rootObject, tokken, type);
+
                     while (!string.IsNullOrEmpty(rootObject.state))
                     {
                         url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&state=" + rootObject.state + "&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5";
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        try
-                        {
-                            response = await client.GetAsync(url);
 
-                            // Đảm bảo phản hồi thành công
-                            response.EnsureSuccessStatusCode();
+                        response = client.GetAsync(url).Result;
 
-                            // Đọc nội dung phản hồi
-                            responseBody = await response.Content.ReadAsStringAsync();
-                            rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
-                            //XulyDataXML(rootObject, tokken);
-                        }
-                        catch (Exception ex)
-                        {
+                        // Đảm bảo phản hồi thành công
+                        response.EnsureSuccessStatusCode();
 
-                        }
+                        // Đọc nội dung phản hồi
+                        responseBody = response.Content.ReadAsStringAsync().Result;
+                        rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
                     }
+
                     Console.WriteLine("Response Body:");
-                    Console.WriteLine(responseBody); 
+                    Console.WriteLine(responseBody);
                 }
                 catch (HttpRequestException e)
                 {
@@ -696,114 +678,7 @@ namespace SaovietTax
                
             }
         }
-        public void InsertTbImport2(InvoiceRa2List item,string tokken,int invoceType)
-        {
-
-            int type = frmMain.type;
-            string query = @"
-            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
-
-            string newTen = "";
-            if (!string.IsNullOrEmpty(item.nmten))
-            {
-                newTen = Helpers.ConvertUnicodeToVni(item.nmten);
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(item.nmtnmua))
-                {
-                    newTen = Helpers.ConvertUnicodeToVni(item.nmtnmua);
-                }
-            }
-            //Insert khach hàng
-            if (CheckExistKH(item.nmmst, newTen) == false)
-            {
-                int maphanloai = 0;
-                maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
-                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
-            }
-            string newNoidung = Helpers.ConvertUnicodeToVni("");
-            //Lấy tài khoản từ mất định
-            string tkno = "";
-            string tkco = "";
-            string tkthue = "";
-            string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-
-            var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
-            if (result.Rows.Count > 0)
-            {
-                foreach (DataRow row in result.Rows)
-                {
-                    if (type == 1)
-                    {
-                        if (row["KeyValue"].ToString().Contains("Ưu tiên vào"))
-                        {
-                            tkno = row["TKNo"].ToString();
-                            tkco = row["TKCo"].ToString();
-                            tkthue = row["TKThue"].ToString();
-                            break;
-                        }
-                    }
-                    if (type == 2)
-                    {
-                        if (row["KeyValue"].ToString().Contains("Ưu tiên ra"))
-                        {
-                            tkno = row["TKNo"].ToString();
-                            tkco = row["TKCo"].ToString();
-                            tkthue = row["TKThue"].ToString();
-                            break;
-                        }
-                    }
-
-                }
-            }
-
-            string tgtkcthue = "";
-            string dateTimeString = item.ntao;
-            DateTime dateTime = DateTime.Parse(dateTimeString);
-            string formattedDate = dateTime.ToShortDateString();
-
-            Console.WriteLine(formattedDate); // Kết quả: 2025-05-22
-            OleDbParameter[] parameters = new OleDbParameter[]
-            {
-                new OleDbParameter("?", item.shdon),
-                new OleDbParameter("?", item.khhdon),
-                new OleDbParameter("?", formattedDate),
-                new OleDbParameter("?", newTen),
-                new OleDbParameter("?", newNoidung),
-                new OleDbParameter("?",tkno),
-                new OleDbParameter("?",tkco),
-                new OleDbParameter("?",tkthue),
-                new OleDbParameter("?", item.nmmst!=null?item.nmmst:csohieu),
-                new OleDbParameter("?", "0"),
-                new OleDbParameter("?", DateTime.Now.ToShortDateString()),
-                new OleDbParameter("?", item.tgtttbso),
-                new OleDbParameter("?", "0"),
-                new OleDbParameter("?",""),
-                new OleDbParameter("?", "0"),
-                new OleDbParameter("?", item.tgtcthue!=null?item.tgtcthue.ToString():"0"),
-                new OleDbParameter("?", item.tgtthue.ToString()),
-                new OleDbParameter("?", type),
-                  new OleDbParameter("?", invoceType)
-            };
-
-            try
-            {
-                int a = ExecuteQueryResult(query, parameters);
-                //Xu lý khách hàng
-               
-                //Update lại MST cho tbimport 
-              
-
-                //  GetdetailXML2(item.nbmst, item.khhdon, item.shdon.ToString(), tokken);
-            }
-            catch (Exception ex)
-            {
-                var a = ex.Message;
-            }
-
-        } 
+       
         private bool CheckExistKH(string mst, string ten)
         {
             if (!string.IsNullOrEmpty(mst))
@@ -824,6 +699,7 @@ namespace SaovietTax
             return false;
         }
         DataTable existingKhachHang = new DataTable();
+        DataTable existingTbImport = new DataTable();
         string csohieu = "";
         public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst)
         {
@@ -881,11 +757,15 @@ namespace SaovietTax
         }
         public void InsertTbImport(Data item,int invoceType)
         {
-             
+            if (existingTbImport.AsEnumerable().Any(row => row.Field<string>("SHDon").ToString() == item.shdon.ToString() && row.Field<string>("KHHDon").ToString() == item.khhdon.ToString()))
+            {
+                return;
+            }
+
             int type = frmMain.type;
             string query = @"
-            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
 
             string newTen = Helpers.ConvertUnicodeToVni(item.nbten);
             string newNoidung = "";
@@ -894,8 +774,16 @@ namespace SaovietTax
             string tkco = "";
             string tkthue = "";
             string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-
+            if (CheckExistKH(item.nmmst, newTen) == false)
+            {
+                int maphanloai = 0;
+                maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
+            }
             var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+
+
+
             if (result.Rows.Count > 0)
             {
                 foreach (DataRow row in result.Rows)
@@ -968,6 +856,21 @@ namespace SaovietTax
             {
                 nl = item.ntao;
             }
+            string getMST = "";
+            if (item.nmmst != null)
+            {
+                getMST = item.nmmst;
+            }
+            else
+            {
+                //Lấy ma số thuế từ số hiệu khách hàng
+                querykh = @" SELECT *  FROM KhachHang where Ten=?"; // Sử dụng ? thay cho @mst trong OleDb
+                result = ExecuteQuery(querykh, new OleDbParameter("?", newTen));
+                if (result.Rows.Count > 0)
+                {
+                    getMST = result.Rows[0]["SoHieu"].ToString();
+                }
+            }
             string dateTimeString = nl.ToString();
             DateTime dateTime = DateTime.Parse(dateTimeString);
             string formattedDate = dateTime.ToShortDateString();
@@ -991,7 +894,8 @@ namespace SaovietTax
                 new OleDbParameter("?",tgtkcthue!=null?tgtkcthue:item.tgtttbso.ToString()),
                 new OleDbParameter("?",item.tgtthue!=null? item.tgtthue.ToString():"0"),
                 new OleDbParameter("?", type),
-                new OleDbParameter("?", invoceType)
+                new OleDbParameter("?", invoceType),
+                 new OleDbParameter("?","1")
                 };
 
             try
@@ -1004,12 +908,142 @@ namespace SaovietTax
             }
 
         }
+        public void InsertTbImport2(InvoiceRa2List item, string tokken, int invoceType)
+        {
+            //Kiểm tra tồn tại trước khi thêm mới
+            if (existingTbImport.AsEnumerable().Any(row => row.Field<string>("SHDon").ToString() == item.shdon.ToString() && row.Field<string>("KHHDon").ToString() == item.khhdon.ToString()))
+            {
+                return;
+            }
+            int type = frmMain.type;
+            string query = @"
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
+
+            string newTen = "";
+            if (!string.IsNullOrEmpty(item.nmten))
+            {
+                newTen = Helpers.ConvertUnicodeToVni(item.nmten);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(item.nmtnmua))
+                {
+                    newTen = Helpers.ConvertUnicodeToVni(item.nmtnmua);
+                }
+            }
+            //Insert khach hàng
+            if (CheckExistKH(item.nmmst, newTen) == false)
+            {
+                int maphanloai = 0;
+                maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
+            }
+            string newNoidung = Helpers.ConvertUnicodeToVni("");
+            //Lấy tài khoản từ mất định
+            string tkno = "";
+            string tkco = "";
+            string tkthue = "";
+            string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
+
+            var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+            if (result.Rows.Count > 0)
+            {
+                foreach (DataRow row in result.Rows)
+                {
+                    if (type == 1)
+                    {
+                        if (row["KeyValue"].ToString().Contains("Ưu tiên vào"))
+                        {
+                            tkno = row["TKNo"].ToString();
+                            tkco = row["TKCo"].ToString();
+                            tkthue = row["TKThue"].ToString();
+                            break;
+                        }
+                    }
+                    if (type == 2)
+                    {
+                        if (row["KeyValue"].ToString().Contains("Ưu tiên ra"))
+                        {
+                            tkno = row["TKNo"].ToString();
+                            tkco = row["TKCo"].ToString();
+                            tkthue = row["TKThue"].ToString();
+                            break;
+                        }
+                    }
+
+                }
+            }
+
+            string tgtkcthue = "";
+            string dateTimeString = item.ntao;
+            DateTime dateTime = DateTime.Parse(dateTimeString);
+            string formattedDate = dateTime.ToShortDateString();
+            string getMST = "";
+            if (item.nmmst != null)
+            {
+                getMST = item.nmmst;
+            }
+            else
+            {
+                //Lấy ma số thuế từ số hiệu khách hàng
+                querykh = @" SELECT *  FROM KhachHang where Ten=?"; // Sử dụng ? thay cho @mst trong OleDb
+                result = ExecuteQuery(querykh, new OleDbParameter("?", newTen));
+                if (result.Rows.Count > 0)
+                {
+                    getMST = result.Rows[0]["SoHieu"].ToString();
+                }
+            }
+            Console.WriteLine(formattedDate); // Kết quả: 2025-05-22
+            OleDbParameter[] parameters = new OleDbParameter[]
+            {
+                new OleDbParameter("?", item.shdon),
+                new OleDbParameter("?", item.khhdon),
+                new OleDbParameter("?", formattedDate),
+                new OleDbParameter("?", newTen),
+                new OleDbParameter("?", newNoidung),
+                new OleDbParameter("?",tkno),
+                new OleDbParameter("?",tkco),
+                new OleDbParameter("?",tkthue),
+                new OleDbParameter("?",getMST),
+                new OleDbParameter("?", "0"),
+                new OleDbParameter("?", DateTime.Now.ToShortDateString()),
+                new OleDbParameter("?", item.tgtttbso),
+                new OleDbParameter("?", "0"),
+                new OleDbParameter("?",""),
+                new OleDbParameter("?", "0"),
+                new OleDbParameter("?", item.tgtcthue!=null?item.tgtcthue.ToString():"0"),
+                new OleDbParameter("?", item.tgtthue.ToString()),
+                new OleDbParameter("?", type),
+                new OleDbParameter("?", invoceType),
+               new OleDbParameter("?", "1")
+            };
+
+            try
+            {
+                int a = ExecuteQueryResult(query, parameters);
+                //Xu lý khách hàng
+
+                //Update lại MST cho tbimport 
+
+
+                //  GetdetailXML2(item.nbmst, item.khhdon, item.shdon.ToString(), tokken);
+            }
+            catch (Exception ex)
+            {
+                var a = ex.Message;
+            }
+
+        }
         private void frmTaiCoQuanThue_Load(object sender, EventArgs e)
         {
             var query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
             query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             existingKhachHang = ExecuteQuery(query);
+            //existingTbImport
+            query = "SELECT * FROM tbimport"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            existingTbImport = ExecuteQuery(query);
             // XulyFileExcel();
             // return;
             Driver = null;

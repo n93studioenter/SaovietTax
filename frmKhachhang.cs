@@ -12,6 +12,7 @@ using DevExpress.XtraEditors.Controls;
 using System.Data.OleDb;
 using System.Reflection;
 using System.IO;
+using static SaovietTax.frmKhachhang;
 
 namespace SaovietTax
 {
@@ -244,6 +245,145 @@ namespace SaovietTax
             }
             gridControl1.DataSource = kq;
 
+        }
+
+        private void gridView1_RowCellClick(object sender, DevExpress.XtraGrid.Views.Grid.RowCellClickEventArgs e)
+        {
+            int rowHandle = e.RowHandle;
+            int ID = int.Parse(gridView1.GetRowCellValue(rowHandle, "MaSo").ToString());
+            // Lấy dữ liệu từ hàng
+            var value = gridView1.GetRowCellValue(rowHandle, "SoHieu").ToString();
+            // tbKhachhang.AsEnumerable().Where(row => row.Field<string>("MST") == mst).FirstOrDefault();
+            var getKhachhang =frmMain.tbKhachhang.AsEnumerable().Where(row => row.Field<Int32>("MaSo") == ID).FirstOrDefault();
+            // Lấy chỉ số hàng đã click
+            
+            txtSohieu.Text = getKhachhang["SoHieu"].ToString();
+            txtTenvattu.Text = Helpers.ConvertVniToUnicode(getKhachhang["Ten"].ToString());
+            txtMaSo.Text = getKhachhang["MST"].ToString();
+            txtGhichu.Text = Helpers.ConvertVniToUnicode(getKhachhang["DiaChi"].ToString());
+            txtMaSo.Text = getKhachhang["MaSo"].ToString();
+        }
+        private void RefreshData()
+        {
+            txtMaSo.Text = "";
+            txtSohieu.Text = "";
+            txtTenvattu.Text = "";
+            txtGhichu.Text = "";
+            txtDonvi.Text = ""; 
+        }
+        private void btnGhi_Click(object sender, EventArgs e)
+        {
+            int selectedId = 0;
+            var selectedItem = comboBoxEdit1.SelectedItem as Item;
+            if (selectedItem.Id == 0)
+            {
+                XtraMessageBox.Show("Vui lòng chọn danh mục");
+                return;
+            }
+            if (selectedItem != null)
+            {
+                selectedId = selectedItem.Id; // Lấy giá trị Id  
+            }
+
+            // Xác định xem đây là thêm mới hay cập nhật
+            bool isInsert = txtMaSo.Text == "";
+            string query;
+            OleDbParameter[] parameters;
+
+            if (isInsert)
+            {
+                query = @"INSERT INTO KhachHang (MaPhanLoai, SoHieu, Ten, DiaChi, MST) VALUES (?, ?, ?, ?, ?)";
+                parameters = new OleDbParameter[]
+                {
+            new OleDbParameter("?", selectedId),
+            new OleDbParameter("?", txtSohieu.Text),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtTenvattu.Text)),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtGhichu.Text)),
+            new OleDbParameter("?", txtDonvi.Text)
+                };
+            }
+            else
+            {
+                query = @"UPDATE KhachHang SET MaPhanLoai=?, SoHieu=?, Ten=?, DiaChi=?, MST=? WHERE MaSo=?";
+                parameters = new OleDbParameter[]
+                {
+            new OleDbParameter("?", selectedId),
+            new OleDbParameter("?", txtSohieu.Text),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtTenvattu.Text)),
+            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtGhichu.Text)),
+            new OleDbParameter("?", txtDonvi.Text),
+            new OleDbParameter("?", txtMaSo.Text)
+                };
+            }
+
+            // Thực hiện truy vấn
+            int rowsAffected = ExecuteQueryResult(query, parameters);
+            query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            frmMain.tbKhachhang = ExecuteQuery(query);
+            // [Optional] Xử lý kết quả trả về (ví dụ: thông báo thành công/thất bại)
+            if (rowsAffected > 0)
+            {
+
+                //var hiddenValue = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["SoHieu"]);
+                //var hiddenValue2 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["DonVi"]);
+                //var hiddenValue3 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["TenVattu"]);
+                frmMain.hiddenValue = txtSohieu.Text;
+                frmMain.hiddenValue2 = txtDonvi.Text;
+                frmMain.hiddenValue3 = txtTenvattu.Text;
+                //this.Close();
+
+                LoadData(selectedItem.Id);
+              //  RefreshData();
+                DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView; // Lấy GridView
+                for (int i = 0; i < view.RowCount; i++)
+                {
+                    // Lấy giá trị của cột STT
+                    if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
+                    {
+                        view.FocusedRowHandle = i; // Chọn dòng
+                        view.SelectRow(i); // Chọn dòng
+                        view.MakeRowVisible(i); // Cuộn tới dòng đã chọn
+                        return; // Thoát sau khi tìm thấy
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show(isInsert ? "Thêm mới thất bại!" : "Cập nhật thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+            RefreshData();
+        }
+
+        private void btnThoat_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void gridControl1_DoubleClick(object sender, EventArgs e)
+        {
+            DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+            var hitInfo = gridView.CalcHitInfo(gridView.GridControl.PointToClient(MousePosition));
+
+
+            // Kiểm tra nếu nhấp vào một ô
+            if (hitInfo.InRowCell)
+            {
+                int columnIndex = hitInfo.Column.VisibleIndex; // Chỉ số cột
+
+                // Lấy giá trị trong ô đã nhấp
+                var hiddenValue = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["Ten"]);
+                var hiddenValue2 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["SoHieu"]);
+                var hiddenValue3 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["MST"]);
+                frmMain.hiddenValue = hiddenValue.ToString();
+                frmMain.hiddenValue2 = hiddenValue2.ToString();
+                frmMain.hiddenValue3 = hiddenValue3.ToString(); 
+
+                this.Close();
+            }
         }
     }
 }
