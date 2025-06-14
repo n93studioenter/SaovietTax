@@ -369,7 +369,22 @@ namespace SaovietTax
                 try
                 {
                     // Gửi yêu cầu GET
-                    HttpResponseMessage response = await client.GetAsync(url);
+                    HttpResponseMessage response=null;
+
+                    try
+                    {
+                        response = await client.GetAsync(url);
+                        if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                        {
+                            XtraMessageBox.Show("Lỗi máy chủ, vui lòng thử lại sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Driver.Close();
+                            this.Close();   
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                       
+                    }
 
                     // Đảm bảo phản hồi thành công
                     response.EnsureSuccessStatusCode();

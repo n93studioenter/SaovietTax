@@ -1149,7 +1149,6 @@ namespace SaovietTax
         public List<VatTu> lstvt = new List<VatTu>();
         private async void frmMain_Load(object sender, EventArgs e)
         {
-           
             InitDB();
             InitData(); 
             SetVietnameseCulture();
@@ -1159,7 +1158,7 @@ namespace SaovietTax
             ControlsSetup();
             lstvt = await  LoadDataVattuAsync();
             var query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
-            tbKhachhang = ExecuteQuery(query);
+            tbKhachhang = await Task.Run(() =>  ExecuteQuery(query));
         }
         #endregion
         #region Xử lý xml
