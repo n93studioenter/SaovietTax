@@ -257,6 +257,25 @@ namespace SaovietTax
 
         private void simpleButton2_Click(object sender, EventArgs e)
         {
+            if(txtTenvattu.Text == "")
+            {
+                XtraMessageBox.Show("Vui lòng nhập tên vật tư");
+                return;
+            }   
+            if (txtSohieu.Text == "")
+            {
+                XtraMessageBox.Show("Vui lòng nhập số hiệu");
+                return;
+            }
+            if (txtDonvi.Text=="")
+            {
+                XtraMessageBox.Show("Vui lòng nhập đơn vị");
+                return;
+            }
+            if(txtGhichu.Text == "")
+            {
+                txtGhichu.Text = "aaa";
+            }
             if (txtId.Text == "0")
             {
                 double matk = 0;

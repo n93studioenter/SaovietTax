@@ -2883,6 +2883,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.Timeout = TimeSpan.FromSeconds(5);
 
                 try
                 {
@@ -7136,7 +7137,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         // Thực hiện hành động mong muốn khi nhấn phím Tab
                         frmCongtrinh frmCongtrinh = new frmCongtrinh();
                         frmCongtrinh.frmMain = this;
-                        frmCongtrinh.ShowDialog();
+                        frmCongtrinh.VatTu vatTu = new frmCongtrinh.VatTu();
+                        vatTu.SoHieu = cellValue.ToString();
+                        frmCongtrinh.dtoVatTu = vatTu;
+                        frmCongtrinh.ShowDialog(); 
                         if (cellValue.ToString().Contains("|"))
                             cellValue = cellValue.ToString().Split('|')[0];
                         if (cellValue.ToString().Contains("154"))

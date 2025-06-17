@@ -281,6 +281,8 @@ namespace SaovietTax
                 catch (HttpRequestException e)
                 {
                     Console.WriteLine($"Request error: {e.Message}");
+                    Driver.Close();
+                    this.Close();
                 }
             }
         }
@@ -337,6 +339,7 @@ namespace SaovietTax
                         // Đọc nội dung phản hồi
                         responseBody = response.Content.ReadAsStringAsync().Result;
                         rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                        XulyDataXML(rootObject, tokken, type);
                     }
 
                     Console.WriteLine("Response Body:");
@@ -696,6 +699,10 @@ namespace SaovietTax
        
         private bool CheckExistKH(string mst, string ten)
         {
+            if (mst == "0300447173")
+            {
+                int a = 10;
+            }
             if (!string.IsNullOrEmpty(mst))
             {
                 if (existingKhachHang.AsEnumerable().Any(row => row.Field<string>("MST") == mst))
@@ -772,6 +779,10 @@ namespace SaovietTax
         }
         public void InsertTbImport(Data item,int invoceType)
         {
+            if(item.shdon== 1933)
+            {
+                int ass = 10;
+            }
             if (existingTbImport.AsEnumerable().Any(row => row.Field<string>("SHDon").ToString() == item.shdon.ToString() && row.Field<string>("KHHDon").ToString() == item.khhdon.ToString()))
             {
                 return;
@@ -789,11 +800,11 @@ namespace SaovietTax
             string tkco = "";
             string tkthue = "";
             string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-            if (CheckExistKH(item.nmmst, newTen) == false)
+            if (CheckExistKH(item.nbmst, newTen) == false)
             {
                 int maphanloai = 0;
                 maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
-                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nbmst);
             }
             var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
 
@@ -889,8 +900,21 @@ namespace SaovietTax
             string dateTimeString = nl.ToString();
             DateTime dateTime = DateTime.Parse(dateTimeString);
             string formattedDate = dateTime.ToShortDateString();
-            OleDbParameter[] parameters = new OleDbParameter[]
-                {
+            string vat = "0";
+            double TienTrcthue = 0;
+            double TienThue = 0;
+            TienTrcthue = !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.tgtttbso;
+            TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
+            if (item.thttltsuat.Count() > 0 )
+            {
+                vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+            }
+            else
+            {
+                vat = Math.Round((TienThue / TienTrcthue) * 100).ToString(); 
+            }
+                OleDbParameter[] parameters = new OleDbParameter[]
+                    {
                 new OleDbParameter("?", item.shdon),
                 new OleDbParameter("?", item.khhdon),
                 new OleDbParameter("?", formattedDate),
@@ -903,15 +927,18 @@ namespace SaovietTax
                 new OleDbParameter("?", "0"),
                 new OleDbParameter("?", DateTime.Now.ToShortDateString()),
                 new OleDbParameter("?", item.tgtttbso),
-                new OleDbParameter("?", "0"),
+                new OleDbParameter("?",vat),
                 new OleDbParameter("?",""),
                 new OleDbParameter("?", "0"),
-                new OleDbParameter("?",tgtkcthue!=null?tgtkcthue:item.tgtttbso.ToString()),
-                new OleDbParameter("?",item.tgtthue!=null? item.tgtthue.ToString():"0"),
+                new OleDbParameter("?",TienTrcthue),
+                new OleDbParameter("?",TienThue),
+                //  new OleDbParameter("?",item.thttltsuat[0].thtien.ToString()),
+                //new OleDbParameter("?",item.thttltsuat[0].tthue.ToString()),
                 new OleDbParameter("?", type),
                 new OleDbParameter("?", invoceType),
                  new OleDbParameter("?","1")
-                };
+
+                    };
 
             try
             {
@@ -919,7 +946,7 @@ namespace SaovietTax
             }
             catch (Exception ex)
             {
-
+                var results = ex.Message;
             }
 
         }
@@ -1009,7 +1036,24 @@ namespace SaovietTax
                     getMST = result.Rows[0]["SoHieu"].ToString();
                 }
             }
-            Console.WriteLine(formattedDate); // Kết quả: 2025-05-22
+
+            string vat = "0";
+            double TienTrcthue = 0;
+            double TienThue = 0;
+            TienTrcthue =  !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.thttltsuat !=null? item.thttltsuat[0].thtien: item.tgtttbso;
+            TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
+            if (item.thttltsuat.Count() > 0)
+            {
+                vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+            }
+            else
+            {
+                vat = Math.Round((TienTrcthue / TienThue)).ToString(); 
+
+                if(int.Parse(vat)>10)
+                    vat = "10"; // Giới hạn thuế GTGT không vượt quá 10%
+            }
+
             OleDbParameter[] parameters = new OleDbParameter[]
             {
                 new OleDbParameter("?", item.shdon),
@@ -1024,11 +1068,11 @@ namespace SaovietTax
                 new OleDbParameter("?", "0"),
                 new OleDbParameter("?", DateTime.Now.ToShortDateString()),
                 new OleDbParameter("?", item.tgtttbso),
-                new OleDbParameter("?", "0"),
+                new OleDbParameter("?", vat),
                 new OleDbParameter("?",""),
                 new OleDbParameter("?", "0"),
-                new OleDbParameter("?", item.tgtcthue!=null?item.tgtcthue.ToString():"0"),
-                new OleDbParameter("?", item.tgtthue.ToString()),
+                new OleDbParameter("?", TienTrcthue),
+                new OleDbParameter("?", TienThue),
                 new OleDbParameter("?", type),
                 new OleDbParameter("?", invoceType),
                new OleDbParameter("?", "1")
