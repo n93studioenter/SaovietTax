@@ -171,7 +171,15 @@ namespace SaovietTax
                     response.EnsureSuccessStatusCode();
 
                     // Đọc nội dung phản hồi
-                    string responseBody = response.Content.ReadAsStringAsync().Result;
+                    string responseBody = "";
+                    try
+                    {
+                        responseBody= response.Content.ReadAsStringAsync().Result;
+                    }
+                    catch(Exception ex)
+                    {
+                        XtraMessageBox.Show(ex.Message);
+                    }
                     InvoiceRa2 rootObject;
                     try
                     {
@@ -227,7 +235,7 @@ namespace SaovietTax
                 // Thêm Bearer token vào Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+                client.Timeout = TimeSpan.FromSeconds(20); // Thêm timeout để tránh treo ứng dụng
                 try
                 {
                     // Gửi yêu cầu GET
@@ -280,9 +288,9 @@ namespace SaovietTax
                 }
                 catch (HttpRequestException e)
                 {
-                    Console.WriteLine($"Request error: {e.Message}");
+                    XtraMessageBox.Show(e.Message);
                     Driver.Close();
-                    this.Close();
+                    //this.Close();
                 }
             }
         }
@@ -368,7 +376,7 @@ namespace SaovietTax
                 // Thêm Bearer token vào Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+                client.Timeout = TimeSpan.FromSeconds(10);
                 try
                 {
                     // Gửi yêu cầu GET
@@ -386,7 +394,9 @@ namespace SaovietTax
                     }
                     catch(Exception ex)
                     {
-                       
+                        XtraMessageBox.Show("Lỗi máy chủ, vui lòng thử tải hóa đơn máy tính tiền lại sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Driver.Close();
+                        this.Close();
                     }
 
                     // Đảm bảo phản hồi thành công
@@ -699,7 +709,7 @@ namespace SaovietTax
        
         private bool CheckExistKH(string mst, string ten)
         {
-            if (mst == "0300447173")
+            if (mst == "0100109106")
             {
                 int a = 10;
             }
@@ -712,7 +722,7 @@ namespace SaovietTax
             }
             else
             {
-                if (existingKhachHang.AsEnumerable().Any(row => Helpers.RemoveVietnameseDiacritics(row.Field<string>("Ten").ToLower()) == Helpers.RemoveVietnameseDiacritics(ten.ToLower())))
+                if (existingKhachHang.AsEnumerable().Any(row => Helpers.RemoveVietnameseDiacritics(row.Field<string>("Ten")).ToLower() == Helpers.RemoveVietnameseDiacritics(ten).ToLower()))
                 {
                     return true;
                 }
@@ -775,7 +785,16 @@ namespace SaovietTax
             };
 
             // Thực thi truy vấn và lấy kết quả
-            int a = ExecuteQueryResult(query, parameters);
+            try
+            {
+                int a = ExecuteQueryResult(query, parameters);
+                query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+                existingKhachHang = ExecuteQuery(query);
+            }
+            catch(Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message +"    "+ Ten);
+            }
         }
         public void InsertTbImport(Data item,int invoceType)
         {
@@ -804,7 +823,7 @@ namespace SaovietTax
             {
                 int maphanloai = 0;
                 maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
-                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nbmst);
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nbdchi, item.nbmst);
             }
             var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
 
@@ -816,12 +835,25 @@ namespace SaovietTax
                 {
                     if (type == 1)
                     {
-                        if (row["KeyValue"].ToString().Contains("Ưu tiên vào"))
+                        if (invoceType == 8)
                         {
-                            tkno = row["TKNo"].ToString();
-                            tkco = row["TKCo"].ToString();
-                            tkthue = row["TKThue"].ToString();
-                            break;
+                            if (row["KeyValue"].ToString().Contains("Ưu tiên vào"))
+                            {
+                                tkno = "6422";
+                                tkco = row["TKCo"].ToString();
+                                tkthue = row["TKThue"].ToString();
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (row["KeyValue"].ToString().Contains("Ưu tiên vào"))
+                            {
+                                tkno = row["TKNo"].ToString();
+                                tkco = row["TKCo"].ToString();
+                                tkthue = row["TKThue"].ToString();
+                                break;
+                            }
                         }
                     }
                     if (type == 2)
@@ -1040,7 +1072,7 @@ namespace SaovietTax
             string vat = "0";
             double TienTrcthue = 0;
             double TienThue = 0;
-            TienTrcthue =  !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.thttltsuat !=null? item.thttltsuat[0].thtien: item.tgtttbso;
+            TienTrcthue =  !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.thttltsuat !=null? item.thttltsuat[0].thtien.Value: item.tgtttbso.Value;
             TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
             if (item.thttltsuat.Count() > 0)
             {
@@ -1241,12 +1273,26 @@ namespace SaovietTax
                 catch (Exception ex)
                 { 
                     Driver.Close();
+                    this.Close();
                     // MessageBox.Show($"Lỗi: {ex.Message}");
                 }
             }
              
             // Thêm cột với tiêu đề 
-           
+           XtraMessageBox.Show("Đã tải xong dữ liệu hóa đơn, vui lòng kiểm tra lại dữ liệu trong phần mềm kế toán.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if(Driver!=null)
+            {
+                try
+                {
+                    Driver.Close();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("Lỗi khi đóng trình duyệt: " + ex.Message);
+                }
+            } 
+            this.Close(); 
+
         }
 
         private void spreadsheetControl1_KeyDown(object sender, KeyEventArgs e)

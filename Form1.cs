@@ -80,6 +80,9 @@ using DevExpress.XtraWaitForm;
 using DevExpress.XtraVerticalGrid;
 using DataTable = System.Data.DataTable;
 using DevExpress.Xpo;
+using DevExpress.CodeParser;
+using XmlNode = System.Xml.XmlNode;
+using Color = System.Drawing.Color;
 
 namespace SaovietTax
 {
@@ -157,10 +160,10 @@ namespace SaovietTax
             public int Type { get; set; }
             public bool isAcess { get; set; }
             public bool isHaschild { get; set; }
-
+            public int InvoiceType { get; set; }
             public string SoHieuTP { get; set; }
             public List<FileImportDetail> fileImportDetails;
-            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP,bool isacess, double tPhi, double tgTCThue, double tgTThue, bool _isHaschild)
+            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP,bool isacess, double tPhi, double tgTCThue, double tgTThue, bool _isHaschild,int _InvoiceType)
             {
                 ID = Id;
                 SHDon = shdon;
@@ -185,6 +188,7 @@ namespace SaovietTax
                 TgTCThue = tgTCThue;
                 TgTThue = tgTThue;
                 isHaschild = _isHaschild;
+                InvoiceType = _InvoiceType;
             }
 
         }
@@ -263,7 +267,7 @@ namespace SaovietTax
                             haschild = false;
 
                         }
-                            FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()), haschild);
+                            FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()), haschild, int.Parse(item["InvoiceType"].ToString()));
                         //add detail
                         fileImport.ID = int.Parse(item["ID"].ToString());
                         progressPanel1.Caption = "Đang xử lý hóa đơn thứ " + i + "/ " + kq.Rows.Count.ToString();
@@ -372,7 +376,7 @@ namespace SaovietTax
                             haschild = false;
 
                         }
-                        FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()), haschild);
+                        FileImport fileImport = new FileImport(item["Path"].ToString(), item["SHDon"].ToString(), item["KHHDon"].ToString(), DateTime.Parse(item["NLap"].ToString()), Helpers.ConvertVniToUnicode(item["Ten"].ToString()), Helpers.ConvertVniToUnicode(item["Noidung"].ToString()), item["TKNo"].ToString(), item["TKCo"].ToString(), int.Parse(item["TKThue"].ToString()), item["Mst"].ToString(), double.Parse(item["TongTien"].ToString()), int.Parse(item["Vat"].ToString()), int.Parse(item["Type"].ToString()), item["SohieuTP"].ToString(), true, double.Parse(item["TPHi"].ToString()), double.Parse(item["TgTCThue"].ToString()), double.Parse(item["TgTThue"].ToString()), haschild, int.Parse(item["InvoiceType"].ToString()));
                         //add detail
                          fileImport.ID = int.Parse(item["ID"].ToString());
 
@@ -1147,8 +1151,67 @@ namespace SaovietTax
             progressPanel2.Visible = false; // Ẩn ProgressPanel khi hoàn thành
         }
         public List<VatTu> lstvt = new List<VatTu>();
+        private int Getversion(string path)
+        {
+            int currentVersion = 0;
+            try
+            {
+                // Đọc tất cả nội dung của file
+                string content = File.ReadAllText(path);
+                if (int.TryParse(content, out currentVersion))
+                {
+                    Console.WriteLine("Phiên bản hiện tại: " + currentVersion);
+                    return currentVersion;
+                }
+                else
+                {
+                    Console.WriteLine("Nội dung không phải là số nguyên hợp lệ.");
+                    return -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Có lỗi xảy ra: {ex.Message}");
+                return -1;
+            }
+        }
+        private void Kiemtraphienban()
+        {
+            int currentVersion = 0;
+            string filePath = @"\\192.168.1.90\Ke toan 2025 New\1 Copi vao dung\Tools\Debug\version.txt"; // Thay đổi đường dẫn tới file của bạn
+            string executablePath = AppDomain.CurrentDomain.BaseDirectory;
+
+            string currentFilepath = Path.Combine(executablePath, "version.txt");
+             if(Getversion(filePath) != Getversion(currentFilepath))
+            {
+                XtraMessageBox.Show("Đã có phiên bản mới, vui lòng cập nhật!");
+
+                this.Close();
+                //this.Close();
+                //string[] files = Directory.GetFiles(executablePath, fileName, SearchOption.AllDirectories);
+                //Process.Start("taskkill", "/F /IM SaovietTax.exe");
+                //Thread.Sleep(2000); // Chờ một chút để ứng dụng tắt hoàn toàn
+
+                //string updatePath = @"\\192.168.1.90\Ke toan 2025 New\1 Copi vao dung\Update\Debug"; // Thay đổi đường dẫn tới file của bạn
+                //string fileName = "SaoVietUpdate.exe";
+                //string[] files = Directory.GetFiles(updatePath, fileName, SearchOption.AllDirectories);
+                //foreach (var file in files)
+                //{
+                //    Console.WriteLine(file);
+
+                //    // Chạy file .exe
+                //    Process.Start(file);
+                //    this.Close();
+                //}
+              
+                return;
+            }
+          
+        }
         private async void frmMain_Load(object sender, EventArgs e)
         {
+
+            Kiemtraphienban();
             InitDB();
             InitData(); 
             SetVietnameseCulture();
@@ -1560,7 +1623,7 @@ WHERE kh.SoHieu = ?";
                         aa = CapitalizeFirstLetter(aa);
                         mst = ConvertToTenDigitNumber(aa).ToString();
                     }
-                        peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "",isAcess, TPhi, TgTCThue, TgTThue,true));
+                        peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "",isAcess, TPhi, TgTCThue, TgTThue,true,1));
                 }
 
                 lblThongbao.Text = "Thêm danh sách sản phẩm con";
@@ -2583,7 +2646,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 else
                     newxmlFile = xmlFile.Replace("HDRa", "HDRaChonLoc").ToString();
 
-                FileImport newFileImport = new FileImport(newxmlFile, sHDon, kHHDon, nLap, ten ?? "Khách vãng lai", diengiai, tkNo.ToString(), tkCo.ToString(), tkThue, mst == "00" ? sohieuKH : mst, thanhtien, vat, type, "", isAcess, tPhi, tgTCThue, tgTThue,true);
+                FileImport newFileImport = new FileImport(newxmlFile, sHDon, kHHDon, nLap, ten ?? "Khách vãng lai", diengiai, tkNo.ToString(), tkCo.ToString(), tkThue, mst == "00" ? sohieuKH : mst, thanhtien, vat, type, "", isAcess, tPhi, tgTCThue, tgTThue,true,1);
                 peopleTemp.Add(newFileImport);
 
                 // Thêm chi tiết hóa đơn
@@ -2870,8 +2933,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
         }
+        List<Dictionary<string, string>> lstCheckname = new List<Dictionary<string, string>>();
          public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType,FileImport fileImport)
         {
+            if (shdon == "129")
+            {
+                int asd = 10;
+            }
             string url = "";
             //https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst=0302712571&khhdon=C25TMB&shdon=48267&khmshdon=1
 
@@ -2961,11 +3029,46 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     if (getTen.Contains(getTen2) || getTen2.Contains(getTen))
                                     {
                                         getcode = dtr.SoHieu.ToString();
+                                        var newDict = new Dictionary<string, string>
+{
+    { it.Ten, getcode } // Thêm key và value vào từ điển
+};
+                                        lstCheckname.Add(newDict);
+
                                     }
+                                    //else
+                                    //{
+                                    //    getcode = GenerateResultString(NormalizeVietnameseString(it.Ten.Trim()));
+                                    //    FileImportDetail dt = fileImport.fileImportDetails.Where(m => m.Ten == it.Ten).FirstOrDefault();
+                                    //    if (dt != null)
+                                    //    {
+                                    //        dt.SoHieu = getcode;
+                                    //    }
+                                    //}
                                 }
+                                 
                             }
-                            
-                            if (!hasVattu)
+                            if(string.IsNullOrEmpty(getcode))
+                            {
+                                foreach (var dict in lstCheckname)
+                                {
+                                    if (dict.ContainsKey(it.Ten))
+                                    {
+                                         getcode= dict[it.Ten].ToString();
+                                        break; // Dừng vòng lặp nếu tìm thấy key
+                                    }
+                                    
+                                }
+
+                                getcode = GenerateResultString(NormalizeVietnameseString(it.Ten.Trim()));
+                                var newDict = new Dictionary<string, string>
+{
+    { it.Ten, getcode } // Thêm key và value vào từ điển
+};
+                                lstCheckname.Add(newDict);
+                            }
+                          
+                                if (!hasVattu)
                             {
                                 // Update nội dung cho Parent
                                 query = "UPDATE tbimport SET Noidung=? WHERE ID=?";
@@ -2977,10 +3080,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 ExecuteQueryResult(query, parametersss);
                                 hasVattu = true;
                                 fileImport.Noidung = it.Ten;
-                            }
-                            //
-                            // Chèn chi tiết hóa đơn
-                            query = @"
+                            } 
+                                //
+                                // Chèn chi tiết hóa đơn
+                                query = @"
                     INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo, TTien)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -3000,6 +3103,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             try
                             {
                                 ExecuteQueryResult(query, parameters);
+                                getcode = "";
                             }
                             catch (Exception ex)
                             {
@@ -3384,7 +3488,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 tPhi: 0,
                 tgTCThue: amountBeforeTax,
                 tgTThue: amountAfterTax,
-                true
+                true,
+                1
             );
         }
 
@@ -6431,15 +6536,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView1_CustomRowCellEdit(object sender, CustomRowCellEditEventArgs e)
         {
-            // Lấy giá trị của cột 10
-            object cellValue = gridView1.GetRowCellValue(e.RowHandle, gridView1.Columns["isAcess"]);
+            // Kiểm tra xem cột có phải là "InvoiceType" không
            
-            // Nếu giá trị là false, vô hiệu hóa ô chỉnh sửa
-            //if (cellValue is bool && !(bool)cellValue)
-            //{
-            //    e.RepositoryItem = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
-            //    e.RepositoryItem.ReadOnly = true; // Hoặc có thể sử dụng một loại điều khiển khác
-            //}
         }
 
         private void gridView1_ShownEditor(object sender, EventArgs e)
@@ -6799,25 +6897,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
           
         }
-
+        private System.Drawing.Color currentCorlor= System.Drawing.Color.Blue;
         private void gridView3_RowCellStyle(object sender, RowCellStyleEventArgs e)
         {
-            try
-            {
-                object cellValue = gridView3.GetRowCellValue(e.RowHandle, gridView3.Columns["isAcess"]);
-
-                //// Nếu giá trị của cột 10 là false
-                if (cellValue is bool && !(bool)cellValue)
-                {
-                    // Đặt màu nền và màu chữ để thể hiện dòng đã bị vô hiệu hóa
-                    e.Appearance.BackColor = System.Drawing.Color.Red; 
-                }
-            }
-            catch(Exception ex)
-            {
-
-            }
-          
+              
         }
 
         private void simpleButton2_Click(object sender, EventArgs e)
@@ -7395,7 +7478,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 gridView.SetRowCellValue(currentRowHandle, "DVT", hiddenValue2);
                                 gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
                                 bool replace = false;
-                                lstrowSohieu.RemoveAt(0);
+                                if (lstrowSohieu.Count > 0)
+                                    lstrowSohieu.RemoveAt(0);
                                 if (lstrowSohieu.Count > 0)
                                 {
                                     DialogResult result = XtraMessageBox.Show("Có " + lstrowSohieu.Count + " sản phẩm khác đang trùng tên với sản phẩm đang sửa, bạn có muốn cập nhật luôn mã mới?",
@@ -7656,6 +7740,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void LoadCustomDrawcell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
         {
+          
             if (e.Column.FieldName == "SoHieu")
             {
                 if (e.CellValue == null)
@@ -7902,6 +7987,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 return null;
             }
         }
+
+        private bool Kiemtratren(string namea, string nameb)
+        {
+            string getA = Helpers.RemoveVietnameseDiacritics(namea.ToLower());
+            string getB= Helpers.RemoveVietnameseDiacritics(nameb.ToLower());
+            if (getA.Contains(getB) || getB.Contains(getA))
+                return true;
+            return false;
+        }
             private void ReadExcelBank(string filePath)
         {
             // Xóa dữ liệu cũ nếu phương thức này được gọi nhiều lần
@@ -7944,7 +8038,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         indexNgaygiaodich = cell.Address.ColumnNumber;
                         headerRowNumber= cell.Address.RowNumber;
                     }
-                    else if (getdata.Contains("Description") || getdata.Contains("Transactions"))
+                    else if (getdata.Contains("Description") || getdata.Contains("Transactions") || Kiemtratren(getdata, "Nội dung giao dịch"))
                     {
                         indexDiengiai = cell.Address.ColumnNumber;
                     }
@@ -7952,11 +8046,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     {
                         indexMaGD = cell.Address.ColumnNumber;
                     }
-                    else if (getdata.Contains("Sô tiên rút") || getdata.Contains("Debit") || getdata.Contains("Phát sinh nợ"))
+                    else if (Kiemtratren(getdata, "Số tiền rút") || getdata.Contains("Debit") || getdata.Contains("Phát sinh nợ"))
                     {
                         indexTKCo = cell.Address.ColumnNumber;
                     }
-                    else if (getdata.Contains("SÔ tiên gửi") || getdata.Contains("Credit") || getdata.Contains("Phát sinh có"))
+                    else if (Kiemtratren(getdata, "Số tiền gửi") || getdata.Contains("Credit") || getdata.Contains("Phát sinh có"))
                     {
                         indexTKNo = cell.Address.ColumnNumber;
                     }
@@ -7975,9 +8069,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 // --- ĐỌC DỮ LIỆU TỪ CÁC HÀNG ---
                 // Bắt đầu vòng lặp từ hàng ngay sau hàng tiêu đề (headerRowNumber + 1)
                 // và kết thúc ở hàng cuối cùng có dữ liệu trong worksheet.
-                int sttValue= 1; 
+                int sttValue= 1;
+                string queryCheckVatTu = @"SELECT * FROM tbNganhang ";
+                var parameterss = new OleDbParameter[]
+                {
+ new OleDbParameter("?",null)
+                   };
+                var dtnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
                 for (int rowIndex = headerRowNumber + 1; rowIndex <= worksheet.LastCellUsed().Address.RowNumber; rowIndex++)
                 {
+                    if (rowIndex == 58)
+                    {
+                        int da = 10;
+                    }
                     var row = worksheet.Row(rowIndex);
 
                     // --- Xác thực cơ bản để bỏ qua các hàng trống hoặc không phải dữ liệu ---
@@ -8021,6 +8125,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
                         else
                             nganhang.Maso = row.Cell(indexMaGD).GetString().Trim();
+
+                        //Kiem tra trùng
+                        var filteredRows = dtnganhang.AsEnumerable().Any(rows => rows["SHDon"].ToString()== nganhang.Maso);
+
+                        if (filteredRows == true)
+                            continue;
                         DateTime? parsedNgayGD = DateHelper.ParseAndCorrectDate(ngayGDCellContent);
                         if (parsedNgayGD.HasValue)
                         {
@@ -8041,10 +8151,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         // Số tiền rút (TK Có) và Số tiền gửi (TK Nợ)
                         double tkco = 0;
                         // Sử dụng InvariantCulture để đảm bảo việc phân tích số nhất quán, loại bỏ dấu phẩy/chấm
-                        double.TryParse(row.Cell(indexTKCo).GetString().Replace(",", "").Replace(".", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
+                        double.TryParse(row.Cell(indexTKCo).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
 
                         double tkno = 0;
-                        double.TryParse(row.Cell(indexTKNo).GetString().Replace(",", "").Replace(".", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
+                        double.TryParse(row.Cell(indexTKNo).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
 
                         // Logic xác định ThanhTien, TKCo, TKNo dựa trên số tiền rút hoặc gửi
                         string tknganhan = lblTKNganhang.Text.Split('-')[0].ToString();
@@ -8126,7 +8236,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                    };
                 dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
             }
-           // ConvertImageTOexcel();
+            //ConvertImageTOexcel();
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
         }
@@ -8476,6 +8586,68 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             dtTo = dtDenngay.DateTime;
             frmTaiCoQuanThue.frmMain = this;
             frmTaiCoQuanThue.Show();
+        }
+
+        private void btnLichsuimport_Click(object sender, EventArgs e)
+        {
+            frmLichsu frmLichsu = new frmLichsu();
+            dtFrom = dtTungay.DateTime;
+            dtTo = dtDenngay.DateTime;
+            frmLichsu.frmMain = this;
+            frmLichsu.ShowDialog();
+        }
+        string currentname = "";
+        private void gridView3_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+
+            if (e.Column.FieldName == "InvoiceType")
+            {
+                // Lấy giá trị của cột "InvoiceType"
+                object invoiceType = e.CellValue;
+
+                // Kiểm tra giá trị và thay đổi màu nền
+                if (invoiceType != null && invoiceType.ToString() == "4")
+                {
+                    e.Appearance.BackColor = Color.Yellow; // Đặt màu nền ô
+                    e.Appearance.ForeColor = Color.White; // Đặt màu chữ nếu cần
+                    e.DisplayText = string.Empty;
+                } 
+                if (invoiceType != null && invoiceType.ToString() == "5")
+                {
+                    e.Appearance.BackColor = Color.Green; // Đặt màu nền ô
+                    e.Appearance.ForeColor = Color.White; // Đặt màu chữ nếu cần
+                    e.DisplayText = string.Empty;
+                }
+            }
+        }
+
+        private void gridView1_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            if (e.Column.FieldName == "InvoiceType")
+            {
+                // Lấy giá trị của cột "InvoiceType"
+                object invoiceType = e.CellValue;
+
+                // Kiểm tra giá trị và thay đổi màu nền
+                if (invoiceType != null && invoiceType.ToString() == "6")
+                {
+                    e.Appearance.BackColor = Color.Yellow; // Đặt màu nền ô
+                    e.Appearance.ForeColor = Color.White; // Đặt màu chữ nếu cần
+                    e.DisplayText = string.Empty;
+                }
+                if (invoiceType != null && invoiceType.ToString() == "8")
+                {
+                    e.Appearance.BackColor = Color.Red; // Đặt màu nền ô
+                    e.Appearance.ForeColor = Color.White; // Đặt màu chữ nếu cần
+                    e.DisplayText = string.Empty;
+                }
+                if (invoiceType != null && invoiceType.ToString() == "10")
+                {
+                    e.Appearance.BackColor = Color.Green; // Đặt màu nền ô
+                    e.Appearance.ForeColor = Color.White; // Đặt màu chữ nếu cần
+                    e.DisplayText = string.Empty;
+                }
+            }
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)

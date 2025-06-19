@@ -526,6 +526,7 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmCongtrinh.reso
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmDinhdanh.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmHangHoa.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmKhachhang.resources
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmLichsu.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmMatdinhNganHang.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmTaiCoQuanThue.resources
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.frmTaikhoan.resources

@@ -59,6 +59,7 @@
             this.colAcess = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colisHaschild = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colMST = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colInvoiceType = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colTen3 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colSoHieu3 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -84,6 +85,7 @@
             this.colAcess2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colisHaschild2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn12 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colInvoiceType2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
             this.progressPanel2 = new DevExpress.XtraWaitForm.ProgressPanel();
@@ -131,6 +133,7 @@
             this.progressBarControl1 = new DevExpress.XtraEditors.ProgressBarControl();
             this.comboBoxEdit2 = new DevExpress.XtraEditors.ComboBoxEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.btnLichsuimport = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton3 = new DevExpress.XtraEditors.SimpleButton();
             this.btnImportChungtunganhang = new DevExpress.XtraEditors.SimpleButton();
             this.btnMatdinhnganhang = new DevExpress.XtraEditors.SimpleButton();
@@ -348,13 +351,15 @@
             this.colPath,
             this.colAcess,
             this.colisHaschild,
-            this.colMST});
+            this.colMST,
+            this.colInvoiceType});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsCustomization.AllowSort = false;
             this.gridView1.OptionsDetail.ShowDetailTabs = false;
             this.gridView1.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView1_RowClick);
             this.gridView1.RowCellClick += new DevExpress.XtraGrid.Views.Grid.RowCellClickEventHandler(this.gridView1_RowCellClick);
+            this.gridView1.CustomDrawCell += new DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventHandler(this.gridView1_CustomDrawCell);
             this.gridView1.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView1_RowCellStyle);
             this.gridView1.MasterRowEmpty += new DevExpress.XtraGrid.Views.Grid.MasterRowEmptyEventHandler(this.gridView1_MasterRowEmpty);
             this.gridView1.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView1_MasterRowGetChildList);
@@ -384,7 +389,7 @@
             this.colIndex.UnboundDataType = typeof(int);
             this.colIndex.Visible = true;
             this.colIndex.VisibleIndex = 0;
-            this.colIndex.Width = 131;
+            this.colIndex.Width = 124;
             // 
             // colID
             // 
@@ -401,7 +406,7 @@
             this.colSHDon.OptionsColumn.AllowEdit = false;
             this.colSHDon.Visible = true;
             this.colSHDon.VisibleIndex = 1;
-            this.colSHDon.Width = 105;
+            this.colSHDon.Width = 99;
             // 
             // colNLap
             // 
@@ -412,7 +417,7 @@
             this.colNLap.OptionsColumn.AllowEdit = false;
             this.colNLap.Visible = true;
             this.colNLap.VisibleIndex = 2;
-            this.colNLap.Width = 104;
+            this.colNLap.Width = 98;
             // 
             // colTen
             // 
@@ -423,7 +428,7 @@
             this.colTen.OptionsColumn.AllowEdit = false;
             this.colTen.Visible = true;
             this.colTen.VisibleIndex = 3;
-            this.colTen.Width = 431;
+            this.colTen.Width = 411;
             // 
             // colTongTien
             // 
@@ -436,7 +441,7 @@
             this.colTongTien.OptionsColumn.AllowEdit = false;
             this.colTongTien.Visible = true;
             this.colTongTien.VisibleIndex = 4;
-            this.colTongTien.Width = 109;
+            this.colTongTien.Width = 103;
             // 
             // colTKNo
             // 
@@ -455,7 +460,7 @@
             this.colTKNo.ToolTip = "Chọn mã công trình";
             this.colTKNo.Visible = true;
             this.colTKNo.VisibleIndex = 5;
-            this.colTKNo.Width = 102;
+            this.colTKNo.Width = 96;
             // 
             // colTKCo
             // 
@@ -472,7 +477,7 @@
             this.colTKCo.Name = "colTKCo";
             this.colTKCo.Visible = true;
             this.colTKCo.VisibleIndex = 6;
-            this.colTKCo.Width = 81;
+            this.colTKCo.Width = 76;
             // 
             // colNoidung
             // 
@@ -482,7 +487,7 @@
             this.colNoidung.Name = "colNoidung";
             this.colNoidung.Visible = true;
             this.colNoidung.VisibleIndex = 7;
-            this.colNoidung.Width = 450;
+            this.colNoidung.Width = 429;
             // 
             // colChecked
             // 
@@ -494,7 +499,7 @@
             this.colChecked.Name = "colChecked";
             this.colChecked.Visible = true;
             this.colChecked.VisibleIndex = 8;
-            this.colChecked.Width = 85;
+            this.colChecked.Width = 80;
             // 
             // colPath
             // 
@@ -529,6 +534,16 @@
             this.colMST.Name = "colMST";
             this.colMST.Width = 112;
             // 
+            // colInvoiceType
+            // 
+            this.colInvoiceType.Caption = "InvoiceType";
+            this.colInvoiceType.FieldName = "InvoiceType";
+            this.colInvoiceType.MinWidth = 10;
+            this.colInvoiceType.Name = "colInvoiceType";
+            this.colInvoiceType.Visible = true;
+            this.colInvoiceType.VisibleIndex = 9;
+            this.colInvoiceType.Width = 25;
+            // 
             // gridView4
             // 
             this.gridView4.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
@@ -558,7 +573,7 @@
             this.colTen3.Name = "colTen3";
             this.colTen3.Visible = true;
             this.colTen3.VisibleIndex = 0;
-            this.colTen3.Width = 311;
+            this.colTen3.Width = 416;
             // 
             // colSoHieu3
             // 
@@ -568,7 +583,7 @@
             this.colSoHieu3.Name = "colSoHieu3";
             this.colSoHieu3.Visible = true;
             this.colSoHieu3.VisibleIndex = 1;
-            this.colSoHieu3.Width = 121;
+            this.colSoHieu3.Width = 110;
             // 
             // colSoluong3
             // 
@@ -578,7 +593,7 @@
             this.colSoluong3.Name = "colSoluong3";
             this.colSoluong3.Visible = true;
             this.colSoluong3.VisibleIndex = 2;
-            this.colSoluong3.Width = 194;
+            this.colSoluong3.Width = 177;
             // 
             // colDongia3
             // 
@@ -590,7 +605,7 @@
             this.colDongia3.Name = "colDongia3";
             this.colDongia3.Visible = true;
             this.colDongia3.VisibleIndex = 3;
-            this.colDongia3.Width = 194;
+            this.colDongia3.Width = 177;
             // 
             // colThanhtien2
             // 
@@ -602,7 +617,7 @@
             this.colThanhtien2.Name = "colThanhtien2";
             this.colThanhtien2.Visible = true;
             this.colThanhtien2.VisibleIndex = 4;
-            this.colThanhtien2.Width = 194;
+            this.colThanhtien2.Width = 177;
             // 
             // colDVT3
             // 
@@ -612,7 +627,7 @@
             this.colDVT3.Name = "colDVT3";
             this.colDVT3.Visible = true;
             this.colDVT3.VisibleIndex = 5;
-            this.colDVT3.Width = 194;
+            this.colDVT3.Width = 177;
             // 
             // colTKNo3
             // 
@@ -622,7 +637,7 @@
             this.colTKNo3.Name = "colTKNo3";
             this.colTKNo3.Visible = true;
             this.colTKNo3.VisibleIndex = 6;
-            this.colTKNo3.Width = 194;
+            this.colTKNo3.Width = 177;
             // 
             // colTKCo3
             // 
@@ -632,7 +647,7 @@
             this.colTKCo3.Name = "colTKCo3";
             this.colTKCo3.Visible = true;
             this.colTKCo3.VisibleIndex = 7;
-            this.colTKCo3.Width = 203;
+            this.colTKCo3.Width = 195;
             // 
             // gridControl2
             // 
@@ -647,7 +662,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1610, 157);
+            this.gridControl2.Size = new System.Drawing.Size(1633, 223);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -673,12 +688,14 @@
             this.gridColumn10,
             this.colAcess2,
             this.colisHaschild2,
-            this.gridColumn12});
+            this.gridColumn12,
+            this.colInvoiceType2});
             this.gridView3.GridControl = this.gridControl2;
             this.gridView3.Name = "gridView3";
             this.gridView3.OptionsCustomization.AllowSort = false;
             this.gridView3.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView3_RowClick);
             this.gridView3.RowCellClick += new DevExpress.XtraGrid.Views.Grid.RowCellClickEventHandler(this.gridView3_RowCellClick);
+            this.gridView3.CustomDrawCell += new DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventHandler(this.gridView3_CustomDrawCell);
             this.gridView3.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView3_RowCellStyle);
             this.gridView3.MasterRowEmpty += new DevExpress.XtraGrid.Views.Grid.MasterRowEmptyEventHandler(this.gridView3_MasterRowEmpty);
             this.gridView3.MasterRowGetChildList += new DevExpress.XtraGrid.Views.Grid.MasterRowGetChildListEventHandler(this.gridView3_MasterRowGetChildList);
@@ -702,7 +719,7 @@
             this.colIndex2.UnboundDataType = typeof(int);
             this.colIndex2.Visible = true;
             this.colIndex2.VisibleIndex = 0;
-            this.colIndex2.Width = 131;
+            this.colIndex2.Width = 107;
             // 
             // gridColumn2
             // 
@@ -712,7 +729,7 @@
             this.gridColumn2.OptionsColumn.AllowEdit = false;
             this.gridColumn2.Visible = true;
             this.gridColumn2.VisibleIndex = 1;
-            this.gridColumn2.Width = 105;
+            this.gridColumn2.Width = 85;
             // 
             // gridColumn3
             // 
@@ -723,7 +740,7 @@
             this.gridColumn3.OptionsColumn.AllowEdit = false;
             this.gridColumn3.Visible = true;
             this.gridColumn3.VisibleIndex = 2;
-            this.gridColumn3.Width = 104;
+            this.gridColumn3.Width = 84;
             // 
             // gridColumn4
             // 
@@ -734,7 +751,7 @@
             this.gridColumn4.OptionsColumn.AllowEdit = false;
             this.gridColumn4.Visible = true;
             this.gridColumn4.VisibleIndex = 3;
-            this.gridColumn4.Width = 434;
+            this.gridColumn4.Width = 358;
             // 
             // gridColumn5
             // 
@@ -744,7 +761,7 @@
             this.gridColumn5.Name = "gridColumn5";
             this.gridColumn5.Visible = true;
             this.gridColumn5.VisibleIndex = 7;
-            this.gridColumn5.Width = 448;
+            this.gridColumn5.Width = 370;
             // 
             // gridColumn6
             // 
@@ -762,7 +779,7 @@
             this.gridColumn6.Name = "gridColumn6";
             this.gridColumn6.Visible = true;
             this.gridColumn6.VisibleIndex = 6;
-            this.gridColumn6.Width = 82;
+            this.gridColumn6.Width = 66;
             // 
             // gridColumn7
             // 
@@ -779,7 +796,7 @@
             this.gridColumn7.Name = "gridColumn7";
             this.gridColumn7.Visible = true;
             this.gridColumn7.VisibleIndex = 5;
-            this.gridColumn7.Width = 110;
+            this.gridColumn7.Width = 90;
             // 
             // gridColumn8
             // 
@@ -792,7 +809,7 @@
             this.gridColumn8.OptionsColumn.AllowEdit = false;
             this.gridColumn8.Visible = true;
             this.gridColumn8.VisibleIndex = 4;
-            this.gridColumn8.Width = 110;
+            this.gridColumn8.Width = 90;
             // 
             // gridColumn9
             // 
@@ -803,7 +820,7 @@
             this.gridColumn9.OptionsColumn.AllowEdit = false;
             this.gridColumn9.Visible = true;
             this.gridColumn9.VisibleIndex = 8;
-            this.gridColumn9.Width = 83;
+            this.gridColumn9.Width = 67;
             // 
             // gridColumn1
             // 
@@ -845,13 +862,23 @@
             this.gridColumn12.Name = "gridColumn12";
             this.gridColumn12.Width = 112;
             // 
+            // colInvoiceType2
+            // 
+            this.colInvoiceType2.Caption = "InvoiceType";
+            this.colInvoiceType2.FieldName = "InvoiceType";
+            this.colInvoiceType2.MinWidth = 30;
+            this.colInvoiceType2.Name = "colInvoiceType2";
+            this.colInvoiceType2.Visible = true;
+            this.colInvoiceType2.VisibleIndex = 9;
+            this.colInvoiceType2.Width = 30;
+            // 
             // xtraTabControl1
             // 
             this.xtraTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1647, 542);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1670, 608);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1});
@@ -871,7 +898,7 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1635, 499);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1658, 565);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
@@ -905,7 +932,7 @@
             this.panelControl2.Controls.Add(this.progressPanel1);
             this.panelControl2.Location = new System.Drawing.Point(11, 192);
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(1629, 57);
+            this.panelControl2.Size = new System.Drawing.Size(1652, 57);
             this.panelControl2.TabIndex = 2;
             // 
             // progressPanel1
@@ -919,7 +946,7 @@
             this.progressPanel1.LineAnimationElementType = DevExpress.Utils.Animation.LineAnimationElementType.Rectangle;
             this.progressPanel1.Location = new System.Drawing.Point(5, 5);
             this.progressPanel1.Name = "progressPanel1";
-            this.progressPanel1.Size = new System.Drawing.Size(1619, 50);
+            this.progressPanel1.Size = new System.Drawing.Size(1642, 50);
             this.progressPanel1.TabIndex = 6;
             this.progressPanel1.Text = "progressPanel1";
             this.progressPanel1.Visible = false;
@@ -928,7 +955,7 @@
             // 
             this.lblThongbao.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblThongbao.AutoSize = true;
-            this.lblThongbao.Location = new System.Drawing.Point(1406, 474);
+            this.lblThongbao.Location = new System.Drawing.Point(1429, 540);
             this.lblThongbao.Name = "lblThongbao";
             this.lblThongbao.Size = new System.Drawing.Size(51, 19);
             this.lblThongbao.TabIndex = 11;
@@ -941,7 +968,7 @@
             this.panelControl4.Controls.Add(this.btnRefresh);
             this.panelControl4.Controls.Add(this.simpleButton1);
             this.panelControl4.Controls.Add(this.btnOpenFolder);
-            this.panelControl4.Location = new System.Drawing.Point(1573, 3);
+            this.panelControl4.Location = new System.Drawing.Point(1596, 3);
             this.panelControl4.Name = "panelControl4";
             this.panelControl4.Size = new System.Drawing.Size(65, 185);
             this.panelControl4.TabIndex = 10;
@@ -983,7 +1010,7 @@
             this.xtraTabControl2.Location = new System.Drawing.Point(11, 253);
             this.xtraTabControl2.Name = "xtraTabControl2";
             this.xtraTabControl2.SelectedTabPage = this.xtraTabPage3;
-            this.xtraTabControl2.Size = new System.Drawing.Size(1622, 200);
+            this.xtraTabControl2.Size = new System.Drawing.Size(1645, 266);
             this.xtraTabControl2.TabIndex = 8;
             this.xtraTabControl2.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage3,
@@ -1028,7 +1055,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1610, 157);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1633, 223);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -1198,7 +1225,7 @@
             this.lblDpPath.Appearance.ForeColor = System.Drawing.Color.Purple;
             this.lblDpPath.Appearance.Options.UseFont = true;
             this.lblDpPath.Appearance.Options.UseForeColor = true;
-            this.lblDpPath.Location = new System.Drawing.Point(11, 474);
+            this.lblDpPath.Location = new System.Drawing.Point(11, 540);
             this.lblDpPath.Name = "lblDpPath";
             this.lblDpPath.Size = new System.Drawing.Size(170, 19);
             this.lblDpPath.TabIndex = 7;
@@ -1337,7 +1364,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarControl1.Location = new System.Drawing.Point(13, 194);
             this.progressBarControl1.Name = "progressBarControl1";
-            this.progressBarControl1.Size = new System.Drawing.Size(1621, 36);
+            this.progressBarControl1.Size = new System.Drawing.Size(1644, 36);
             this.progressBarControl1.TabIndex = 3;
             this.progressBarControl1.Visible = false;
             // 
@@ -1349,12 +1376,13 @@
             this.comboBoxEdit2.Name = "comboBoxEdit2";
             this.comboBoxEdit2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit2.Size = new System.Drawing.Size(419, 27);
+            this.comboBoxEdit2.Size = new System.Drawing.Size(442, 27);
             this.comboBoxEdit2.TabIndex = 6;
             this.comboBoxEdit2.Visible = false;
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.btnLichsuimport);
             this.panelControl1.Controls.Add(this.simpleButton3);
             this.panelControl1.Controls.Add(this.btnImportChungtunganhang);
             this.panelControl1.Controls.Add(this.btnMatdinhnganhang);
@@ -1367,6 +1395,16 @@
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(915, 185);
             this.panelControl1.TabIndex = 1;
+            // 
+            // btnLichsuimport
+            // 
+            this.btnLichsuimport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnLichsuimport.ImageOptions.Image")));
+            this.btnLichsuimport.Location = new System.Drawing.Point(625, 142);
+            this.btnLichsuimport.Name = "btnLichsuimport";
+            this.btnLichsuimport.Size = new System.Drawing.Size(276, 34);
+            this.btnLichsuimport.TabIndex = 14;
+            this.btnLichsuimport.Text = "Lịch sử import";
+            this.btnLichsuimport.Click += new System.EventHandler(this.btnLichsuimport_Click);
             // 
             // simpleButton3
             // 
@@ -1456,7 +1494,7 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(427, 27);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(450, 27);
             this.comboBoxEdit1.TabIndex = 1;
             this.comboBoxEdit1.Visible = false;
             // 
@@ -1472,7 +1510,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1647, 542);
+            this.ClientSize = new System.Drawing.Size(1670, 608);
             this.Controls.Add(this.xtraTabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmMain";
@@ -1642,5 +1680,8 @@
         private DevExpress.XtraEditors.LabelControl lblTKNganhang;
         private DevExpress.XtraGrid.Columns.GridColumn gridColumn12;
         private DevExpress.XtraEditors.SimpleButton simpleButton3;
+        private DevExpress.XtraEditors.SimpleButton btnLichsuimport;
+        private DevExpress.XtraGrid.Columns.GridColumn colInvoiceType;
+        private DevExpress.XtraGrid.Columns.GridColumn colInvoiceType2;
     }
 }

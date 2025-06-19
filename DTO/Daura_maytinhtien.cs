@@ -14,22 +14,22 @@ namespace SaovietTax.DTO
     public class InvoiceRa2
     {
         public List<InvoiceRa2List> datas { get; set; }
-        public int total { get; set; }
+        public int? total { get; set; }
         public string state { get; set; }
-        public int time { get; set; }
+        public int? time { get; set; }
     }
 
     public class InvoiceRa2List
     {
         public string nbmst { get; set; }
-        public int khmshdon { get; set; }
+        public int? khmshdon { get; set; }
         public string khhdon { get; set; }
-        public int shdon { get; set; }
+        public int? shdon { get; set; }
         public string cqt { get; set; }
         public List<object> cttkhac { get; set; }
         public string hdon { get; set; }
         public string hsgoc { get; set; }
-        public int hthdon { get; set; }
+        public int? hthdon { get; set; }
         public string id { get; set; }
         public object idtbao { get; set; }
         public object idtbhgthdon { get; set; }
@@ -50,30 +50,30 @@ namespace SaovietTax.DTO
         public string ntao { get; set; }
         public string ntnhan { get; set; }
         public string pban { get; set; }
-        public int ptgui { get; set; }
+        public int? ptgui { get; set; }
         public object shdgoc { get; set; }
         public int tchat { get; set; }
         public string tdlap { get; set; }
-        public double tgtcthue { get; set; }
-        public double tgtthue { get; set; }
-        public string tgtttbchu { get; set; }
-        public double tgtttbso { get; set; }
+        public double? tgtcthue { get; set; }
+        public double? tgtthue { get; set; }
+        public string    tgtttbchu { get; set; }
+        public double? tgtttbso { get; set; }
         public string thdon { get; set; }
         public int thlap { get; set; }
         public List<TaxRate> thttltsuat { get; set; }
         public string tlhdon { get; set; }
-        public double ttcktmai { get; set; }
-        public int tthai { get; set; }
-        public int tttbao { get; set; }
+        public double ? ttcktmai { get; set; }
+        public int? tthai { get; set; }
+        public int? tttbao { get; set; }
         public List<AdditionalField> ttttkhac { get; set; }
-        public int ttxly { get; set; }
+        public int ? ttxly { get; set; }
         public string tvandnkntt { get; set; }
-        public int ladhddt { get; set; }
+        public int? ladhddt { get; set; }
         public string nbsdthoai { get; set; }
         public object nbcks { get; set; }
         public object nmsdthoai { get; set; }
         public string nmcccd { get; set; }
-        public int bhphap { get; set; }
+        public int? bhphap { get; set; }
         public object gchdgoc { get; set; }
         public object tbhgtngay { get; set; }
         public object bhpldo { get; set; }
@@ -115,8 +115,8 @@ namespace SaovietTax.DTO
     public class TaxRate
     {
         public string tsuat { get; set; }
-        public double thtien { get; set; }
-        public double tthue { get; set; }
+        public double? thtien { get; set; }
+        public double? tthue { get; set; }
         public object gttsuat { get; set; }
     }
 
