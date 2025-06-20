@@ -34,6 +34,7 @@ namespace SaovietTax
         public Khachhang dtoVatTu { get; set; }
         public frmMain frmMain;
         string dbPath = "";
+        public int Mode { get; set; } // Biến để xác định chế độ (thêm mới hay sửa đổi) 
         private DataTable ExecuteQuery(string query, params OleDbParameter[] parameters)
         {
             DataTable dataTable = new DataTable();
@@ -160,59 +161,7 @@ namespace SaovietTax
                 comboBoxEdit1.Properties.NullText = "Không có tài khoản nào";
             }
             //
-            //Load data vat tu
-            txtSohieu.Text = dtoVatTu.SoHieu;
-            txtTenvattu.Text = dtoVatTu.Ten; 
-            //Kiểm tra xem là sp moi hay cũ
-            string queryCheckVatTu = @"SELECT * FROM KhachHang WHERE  SoHieu = ? ";
-            var parameterss = new OleDbParameter[]
-            {
-                new OleDbParameter("?",dtoVatTu.SoHieu), 
-               };
-            var kq = ExecuteQuery(queryCheckVatTu, parameterss);
-            if (kq.Rows.Count == 0)
-            {
-                txtMaSo.Text = "0";
-            }
-            else
-            {
-                txtMaSo.Text = kq.Rows[0]["MaSo"].ToString();
-                txtTenvattu.Text = Helpers.ConvertVniToUnicode(kq.Rows[0]["Ten"].ToString());
-                txtSohieu.Text = kq.Rows[0]["SoHieu"].ToString();
-                txtDonvi.Text= kq.Rows[0]["MST"].ToString();
-                txtGhichu.Text = Helpers.ConvertVniToUnicode(kq.Rows[0]["DiaChi"].ToString());
-                int mapl = int.Parse(kq.Rows[0]["MaPhanLoai"].ToString());
-
-
-                //comboBoxEdit1.SelectedItem=
-                foreach (Item item in comboBoxEdit1.Properties.Items)
-                {
-                    if (item.Id == mapl)
-                    {
-                        comboBoxEdit1.EditValue = item; // Chọn mục theo ID
-                        break; // Thoát khỏi vòng lặp
-                    }
-                }
-            }
-
-            DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
-            for (int i = 0; i < view.RowCount; i++)
-            {
-                // Lấy giá trị của cột STT
-                if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
-                {
-                    this.BeginInvoke((MethodInvoker)delegate
-                    {
-                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
-                        {
-                            gridView1.FocusedRowHandle = i; // Đặt focus
-                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
-                            gridView1.SelectRow(i); // Chọn dòng
-                        }
-                    });
-                    return;
-                }
-            }
+            //Load data vat tu 
         }
 
         private void comboBoxEdit1_SelectedIndexChanged(object sender, EventArgs e)

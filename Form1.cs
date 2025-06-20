@@ -2950,9 +2950,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.Timeout = TimeSpan.FromSeconds(5);
-
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); 
+                client.Timeout = TimeSpan.FromSeconds(10); // Thêm timeout để tránh treo ứng dụng
                 try
                 {
                     HttpResponseMessage response=new HttpResponseMessage();
@@ -3013,11 +3012,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     if (kq2.Rows.Count > 0)
                     {
                         // Xử lý tên
-
+                        if (rootObject.Hdhhdvu == null)
+                            return;
                         bool hasVattu = false;
                         double ttrcthue = 0; 
                         foreach (var it in rootObject.Hdhhdvu)
                         {
+                            if (it.Ten == null)
+                                return;
                             ttrcthue+= it.Thtien != null ? it.Thtien.Value : 0;
                             foreach (var dtr in lstvt)
                             {
@@ -3034,6 +3036,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
     { it.Ten, getcode } // Thêm key và value vào từ điển
 };
                                         lstCheckname.Add(newDict);
+                                        break;
 
                                     }
                                     //else
@@ -3048,27 +3051,31 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 }
                                  
                             }
-                            if(string.IsNullOrEmpty(getcode))
+                            if (string.IsNullOrEmpty(getcode))
                             {
                                 foreach (var dict in lstCheckname)
                                 {
                                     if (dict.ContainsKey(it.Ten))
                                     {
-                                         getcode= dict[it.Ten].ToString();
+                                        getcode = dict[it.Ten].ToString();
                                         break; // Dừng vòng lặp nếu tìm thấy key
                                     }
-                                    
-                                }
 
-                                getcode = GenerateResultString(NormalizeVietnameseString(it.Ten.Trim()));
-                                var newDict = new Dictionary<string, string>
+                                }
+                                if (string.IsNullOrEmpty(getcode))
+                                {
+                                    getcode = GenerateResultString(NormalizeVietnameseString(it.Ten.Trim()));
+                                    var newDict = new Dictionary<string, string>
 {
     { it.Ten, getcode } // Thêm key và value vào từ điển
 };
-                                lstCheckname.Add(newDict);
+                                    lstCheckname.Add(newDict);
+                                    
+                                }
+
                             }
-                          
-                                if (!hasVattu)
+                            //
+                            if (!hasVattu)
                             {
                                 // Update nội dung cho Parent
                                 query = "UPDATE tbimport SET Noidung=? WHERE ID=?";
@@ -3080,10 +3087,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 ExecuteQueryResult(query, parametersss);
                                 hasVattu = true;
                                 fileImport.Noidung = it.Ten;
-                            } 
-                                //
-                                // Chèn chi tiết hóa đơn
-                                query = @"
+                            }
+                            //
+                            // Chèn chi tiết hóa đơn
+                            query = @"
                     INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo, TTien)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -8646,6 +8653,34 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     e.Appearance.BackColor = Color.Green; // Đặt màu nền ô
                     e.Appearance.ForeColor = Color.White; // Đặt màu chữ nếu cần
                     e.DisplayText = string.Empty;
+                }
+            }
+        }
+
+        private void gridView5_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.Enter)
+            {
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+                if (cellValue != null)
+                {
+                    if (cellValue.ToString().Contains("341"))
+                    {
+                        frmKhachhang frmKhachhang = new frmKhachhang();
+                        frmKhachhang.Mode = 2;
+                        frmKhachhang.frmMain = this;
+                        frmKhachhang.Khachhang vatTu = new frmKhachhang.Khachhang();
+                        vatTu.MaPhanLoai = 4;
+                        frmKhachhang.dtoVatTu=vatTu;
+                        frmKhachhang.ShowDialog();
+                        var d = this.hiddenValue2;
+                    }
                 }
             }
         }

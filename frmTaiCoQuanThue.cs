@@ -36,6 +36,7 @@ using DevExpress.XtraSpreadsheet;
 using DevExpress.Spreadsheet;
 using System.Data.OleDb;
 using DocumentFormat.OpenXml.VariantTypes;
+using DevExpress.XtraCharts.Design;
 namespace SaovietTax
 {
     public partial class frmTaiCoQuanThue : DevExpress.XtraEditors.XtraForm
@@ -235,7 +236,7 @@ namespace SaovietTax
                 // Thêm Bearer token vào Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.Timeout = TimeSpan.FromSeconds(20); // Thêm timeout để tránh treo ứng dụng
+                client.Timeout = TimeSpan.FromSeconds(30); // Thêm timeout để tránh treo ứng dụng
                 try
                 {
                     // Gửi yêu cầu GET
@@ -709,6 +710,10 @@ namespace SaovietTax
        
         private bool CheckExistKH(string mst, string ten)
         {
+            if(string.IsNullOrEmpty(mst) && string.IsNullOrEmpty(ten))
+            {
+                return true;
+            }
             if (mst == "0100109106")
             {
                 int a = 10;
@@ -733,6 +738,30 @@ namespace SaovietTax
         DataTable existingKhachHang = new DataTable();
         DataTable existingTbImport = new DataTable();
         string csohieu = "";
+        static string GenerateAbbreviation(string fullName, List<string> existingNames)
+        {
+            // Tách tên thành từng phần
+            string[] nameParts = fullName.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string abbreviation = "";
+
+            // Tạo viết tắt
+            foreach (string part in nameParts)
+            {
+                abbreviation += part[0].ToString().ToLower();
+            }
+
+            // Kiểm tra sự tồn tại của viết tắt
+            int counter = 1;
+            string uniqueAbbreviation = abbreviation;
+
+            while (existingNames.Contains(uniqueAbbreviation))
+            {
+                uniqueAbbreviation = abbreviation + "-" + counter;
+                counter++;
+            }
+
+            return uniqueAbbreviation;
+        }
         public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst)
         {
             int randNumber = 0;
@@ -743,12 +772,7 @@ namespace SaovietTax
 
             if (string.IsNullOrEmpty(Mst))
             {
-                Sohieu = Helpers.RemoveVietnameseDiacritics(Ten.Split(' ').LastOrDefault());
-                //Sohieu = CapitalizeFirstLetter(Sohieu);
-                if (Sohieu.Length >= 3)
-                    Sohieu = Sohieu.ToUpper().Substring(0, 3);
-                 randNumber = random.Next(101,999);
-                Sohieu = Sohieu + randNumber.ToString();
+                Sohieu = GenerateAbbreviation(Helpers.ConvertVniToUnicode(Ten), existingKhachHang.AsEnumerable().Select(row => row.Field<string>("SoHieu")).ToList()).ToUpper();
                 csohieu = Sohieu;
                 Mst = "00"; 
             }
@@ -883,9 +907,9 @@ namespace SaovietTax
                 }
                 else
                 {
-                    if (item.tgtkcthue != null)
+                    if (item.ttttkhac.Count > 0)
                     {
-                        tgtkcthue = item.tgtkcthue.ToString();
+                        tgtkcthue = item.ttttkhac.Count>2? item.ttttkhac[2].dlieu.ToString():"0";
                     }
                     else
                     {
@@ -943,7 +967,12 @@ namespace SaovietTax
             }
             else
             {
-                vat = Math.Round((TienThue / TienTrcthue) * 100).ToString(); 
+                if (TienThue != 0 && TienTrcthue != 0)
+                {
+                    vat = Math.Round((TienThue / TienTrcthue) * 100).ToString();
+                }
+                else
+                    vat = "0";
             }
                 OleDbParameter[] parameters = new OleDbParameter[]
                     {
@@ -978,12 +1007,16 @@ namespace SaovietTax
             }
             catch (Exception ex)
             {
-                var results = ex.Message;
+                XtraMessageBox.Show(ex.Message + "    " + item.shdon);
             }
 
         }
         public void InsertTbImport2(InvoiceRa2List item, string tokken, int invoceType)
         {
+            if(item.shdon== 1181)
+            {
+                int asa = 10;
+            }
             //Kiểm tra tồn tại trước khi thêm mới
             if (existingTbImport.AsEnumerable().Any(row => row.Field<string>("SHDon").ToString() == item.shdon.ToString() && row.Field<string>("KHHDon").ToString() == item.khhdon.ToString()))
             {
@@ -1012,7 +1045,7 @@ namespace SaovietTax
                 int maphanloai = 0;
                 maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
                 InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
-            }
+            } 
             string newNoidung = Helpers.ConvertUnicodeToVni("");
             //Lấy tài khoản từ mất định
             string tkno = "";
@@ -1077,13 +1110,26 @@ namespace SaovietTax
             if (item.thttltsuat.Count() > 0)
             {
                 vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+                if(vat== "KKKNT")
+                {
+                    vat = "0";
+                }
             }
             else
             {
-                vat = Math.Round((TienTrcthue / TienThue)).ToString(); 
+               
+                if (TienThue != 0 && TienTrcthue != 0)
+                {
+                    vat = Math.Round((TienThue / TienTrcthue) * 100).ToString();
+                }
+                else
+                    vat = "0";
+            }
+            if(string.IsNullOrEmpty(newTen) && string.IsNullOrEmpty(getMST))
+            {
+                getMST = "...";
+                newTen = Helpers.ConvertUnicodeToVni("Khách lẻ");
 
-                if(int.Parse(vat)>10)
-                    vat = "10"; // Giới hạn thuế GTGT không vượt quá 10%
             }
 
             OleDbParameter[] parameters = new OleDbParameter[]
@@ -1113,16 +1159,11 @@ namespace SaovietTax
             try
             {
                 int a = ExecuteQueryResult(query, parameters);
-                //Xu lý khách hàng
-
-                //Update lại MST cho tbimport 
-
-
-                //  GetdetailXML2(item.nbmst, item.khhdon, item.shdon.ToString(), tokken);
+                
             }
             catch (Exception ex)
             {
-                var a = ex.Message;
+                XtraMessageBox.Show(ex.Message + "    " + item.shdon);
             }
 
         }
@@ -1254,6 +1295,7 @@ namespace SaovietTax
                         };
 
                         frmMain.tokken = cookie.Value;
+                        Driver.Close();
                         ExecuteQueryResult(query, parametersss);
                         if(frmMain.type==1)
                         {
@@ -1264,6 +1306,7 @@ namespace SaovietTax
                         if (frmMain.type == 2)
                         {
                             Xulydaura1(cookie.Value);
+                            Thread.Sleep(1000); 
                             Xulydaura2(cookie.Value);
                         }
                      

@@ -318,7 +318,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1610, 157);
+            this.gridControl1.Size = new System.Drawing.Size(1633, 226);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -662,7 +662,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1633, 223);
+            this.gridControl2.Size = new System.Drawing.Size(1633, 226);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -898,7 +898,7 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1658, 565);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1658, 568);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
@@ -1025,7 +1025,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1610, 157);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1633, 226);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -1055,7 +1055,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1633, 223);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1633, 226);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -1082,7 +1082,7 @@
             this.xtraTabPage2.Controls.Add(this.btnChontknganhang);
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1610, 157);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1633, 226);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
             // lblTKNganhang
@@ -1139,6 +1139,7 @@
             this.gridView5.GridControl = this.gridControl3;
             this.gridView5.Name = "gridView5";
             this.gridView5.OptionsView.ShowGroupPanel = false;
+            this.gridView5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView5_KeyDown);
             // 
             // colStt
             // 
