@@ -7506,7 +7506,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             //Nếu chưa có, tìm hết danh sách
                             if (checkSH.Rows.Count == 0)
                             {
-                                foreach (var item in lstImportVao)
+                                foreach (var item in lstImportRa)
                                 {
                                     foreach (var it in item.fileImportDetails)
                                     {

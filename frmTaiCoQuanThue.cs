@@ -1295,7 +1295,14 @@ namespace SaovietTax
                         };
 
                         frmMain.tokken = cookie.Value;
-                        Driver.Close();
+                        try
+                        {
+
+                        }
+                        catch(Exception ex)
+                        {
+                            Driver.Close();
+                        }
                         ExecuteQueryResult(query, parametersss);
                         if(frmMain.type==1)
                         {
