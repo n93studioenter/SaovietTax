@@ -83,6 +83,7 @@ using DevExpress.Xpo;
 using DevExpress.CodeParser;
 using XmlNode = System.Xml.XmlNode;
 using Color = System.Drawing.Color;
+using DevExpress.Xpo.Helpers;
 
 namespace SaovietTax
 {
@@ -1210,8 +1211,8 @@ namespace SaovietTax
         }
         private async void frmMain_Load(object sender, EventArgs e)
         {
-
-            Kiemtraphienban();
+           
+            // Kiemtraphienban();
             InitDB();
             InitData(); 
             SetVietnameseCulture();
@@ -1222,6 +1223,25 @@ namespace SaovietTax
             lstvt = await  LoadDataVattuAsync();
             var query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             tbKhachhang = await Task.Run(() =>  ExecuteQuery(query));
+            //
+         //    query = "SELECT * FROM KhachHang2"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+         //  var  tbKhachhang2 =  ExecuteQuery(query);
+
+         //   query = "SELECT SoDuKhachHang.* FROM SoDuKhachHang WHERE SoDuKhachHang.MaKhachHang NOT IN (SELECT MaSo FROM khachhang);"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+         //   var tbhoadon =ExecuteQuery(query);
+         //   foreach (DataRow row in tbhoadon.Rows)
+         //   {
+         //       int makh = int.Parse(row["MaKhachHang"].ToString());
+         //       var getkh = tbKhachhang2.AsEnumerable().FirstOrDefault(m => m.Field<int>("MaSo") == makh);
+         //       var getidkhgoc = tbKhachhang.AsEnumerable().FirstOrDefault(m => m.Field<string>("SoHieu") == getkh["SoHieu"].ToString());
+         //       query = @"UPDATE SoDuKhachHang SET MaKhachHang=?  WHERE MaSo=?";
+         //       var parameters = new OleDbParameter[]
+         //{
+         //             new OleDbParameter("?",getidkhgoc["MaSo"].ToString()),
+         //                new OleDbParameter("?",row["MaSo"].ToString()),
+         //};
+         //       var rowsAffected = ExecuteQueryResult(query, parameters);
+         //   }
         }
         #endregion
         #region Xử lý xml
@@ -2157,10 +2177,29 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     item.TKNo = row["TKNo"].ToString();
                     item.TKCo = row["TKCo"].ToString();
                     item.TkThue = int.Parse(row["TkThue"].ToString());
-                    if ( conditions.Any(c => c.StartsWith("MST")) && item.TKNo == "6422")
+                    if ( conditions.Any(c => c.StartsWith("MST")) && item.TKNo.Contains("642"))
                     {
                         item.Noidung = row["Type"].ToString();
                     }
+                    //Cập nhật database
+                   string query = @"UPDATE tbimport SET TKNo=?,TKCo=?,Noidung=?  WHERE ID=?";
+                    var parameters = new OleDbParameter[]
+             {
+                                new OleDbParameter("?",item.TKNo),
+                                   new OleDbParameter("?",item.TKCo),
+                                   new OleDbParameter("?",Helpers.ConvertUnicodeToVni(item.Noidung)),
+                                   new OleDbParameter("?",item.ID),
+             };
+                    int rowsAffected = ExecuteQueryResult(query, parameters);
+                    //Cap nhat con
+                     query = @"UPDATE tbimportdetail SET TKNo=?,TKCo=?  WHERE ParentId=?";
+                     parameters = new OleDbParameter[]
+             {
+                                new OleDbParameter("?",item.TKNo),
+                                   new OleDbParameter("?",item.TKCo), 
+                                   new OleDbParameter("?",item.ID),
+             };
+                      rowsAffected = ExecuteQueryResult(query, parameters);
                     return; // Tìm thấy quy tắc phù hợp, thoát
                 }
             }
@@ -2950,8 +2989,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json")); 
-                client.Timeout = TimeSpan.FromSeconds(10); // Thêm timeout để tránh treo ứng dụng
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.Timeout = TimeSpan.FromSeconds(10); // Ví dụ: 30 giây
+
+                string responseBody = "";
                 try
                 {
                     HttpResponseMessage response=new HttpResponseMessage();
@@ -2963,16 +3004,26 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                         // Đảm bảo phản hồi thành công
                         response.EnsureSuccessStatusCode();
+                        responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     }
                     catch (Exception ex)
                     {
-                        var aa = ex.Message;
-                        return;
+                        // XtraMessageBox.Show($"Lỗi khi lấy dữ liệu từ API: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (invoiceType == 4 || invoiceType == 6 || invoiceType == 8)
+                            url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=2";
+                        if (invoiceType == 5 || invoiceType == 10)
+                            url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=2";
+                        Thread.Sleep(400);
+                        response = client.GetAsync(url).GetAwaiter().GetResult();
+
+                        // Đảm bảo phản hồi thành công
+                        response.EnsureSuccessStatusCode();
+                        responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     }
 
 
                     // Đọc nội dung phản hồi đồng bộ
-                    string responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                  
                   
                     var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
                     if (rootObject == null)
@@ -3012,7 +3063,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     if (kq2.Rows.Count > 0)
                     {
                         // Xử lý tên
-                        if (rootObject.Hdhhdvu == null)
+                        if (rootObject==null || rootObject.Hdhhdvu == null)
                             return;
                         bool hasVattu = false;
                         double ttrcthue = 0; 
@@ -8132,6 +8183,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         }
                         else
                             nganhang.Maso = row.Cell(indexMaGD).GetString().Trim();
+                        if(nganhang.Maso== "TT25142V0Y9X")
+                        {
+                            int a = 10;
+                        }
 
                         //Kiem tra trùng
                         var filteredRows = dtnganhang.AsEnumerable().Any(rows => rows["SHDon"].ToString()== nganhang.Maso);
@@ -8148,23 +8203,37 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             Console.WriteLine($"Cảnh báo: Không thể phân tích hoặc sửa ngày '{ngayGDCellContent}' tại hàng {rowIndex}. Bỏ qua dòng.");
                             continue; // Bỏ qua dòng nếu ngày không hợp lệ
                         }
-
+                        double tkco = 0;
+                        double tkno = 0;
                         // Diễn giải
                         nganhang.Diengiai = row.Cell(indexDiengiai).GetString().Trim();
+                        double checkdouble = 0;
+                        if(String.IsNullOrEmpty(nganhang.Diengiai) || double.TryParse(nganhang.Diengiai,out checkdouble))
+                        {
+                            nganhang.Diengiai = row.Cell(indexDiengiai-1).GetString().Trim();
+                            // Sử dụng InvariantCulture để đảm bảo việc phân tích số nhất quán, loại bỏ dấu phẩy/chấm
+                            double.TryParse(row.Cell(indexTKCo-1).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
 
-                        // Mã Giao dịch
-                       
 
-                        // Số tiền rút (TK Có) và Số tiền gửi (TK Nợ)
-                        double tkco = 0;
-                        // Sử dụng InvariantCulture để đảm bảo việc phân tích số nhất quán, loại bỏ dấu phẩy/chấm
-                        double.TryParse(row.Cell(indexTKCo).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
+                            double.TryParse(row.Cell(indexTKNo-1).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
+                        }
+                        else
+                        {
+                            // Sử dụng InvariantCulture để đảm bảo việc phân tích số nhất quán, loại bỏ dấu phẩy/chấm
+                            double.TryParse(row.Cell(indexTKCo).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
 
-                        double tkno = 0;
-                        double.TryParse(row.Cell(indexTKNo).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
 
-                        // Logic xác định ThanhTien, TKCo, TKNo dựa trên số tiền rút hoặc gửi
-                        string tknganhan = lblTKNganhang.Text.Split('-')[0].ToString();
+                            double.TryParse(row.Cell(indexTKNo).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
+                        }
+                            // Mã Giao dịch
+
+
+                            // Số tiền rút (TK Có) và Số tiền gửi (TK Nợ)
+
+
+
+                            // Logic xác định ThanhTien, TKCo, TKNo dựa trên số tiền rút hoặc gửi
+                            string tknganhan = lblTKNganhang.Text.Split('-')[0].ToString();
                         //Kiểm tra mật định
                         string tkDoiung = "1111";
                         if (dtMatdinhnganhang.Rows.Count > 0)
@@ -8184,6 +8253,32 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             nganhang.ThanhTien = tkco;
                             nganhang.TKCo = tknganhan;  // Tài khoản Có mẫu
                             nganhang.TKNo = tkDoiung; // Tài khoản Nợ mẫu
+                            if (nganhang.TKNo.Contains("341"))
+                            {
+                                nganhang.TKNo = nganhang.TKNo + "|" + XulyLD(nganhang.Diengiai);
+                                //Kiểm tra đã có hợp đồng chưa
+                                 queryCheckVatTu = @"SELECT * FROM KhachHang ";
+                                var dtkh = ExecuteQuery(queryCheckVatTu, null);
+                                if (dtkh.Rows.Count==0)
+                                {
+                                    var qtimpl = "select * from PhanLoaiKhachHang where Ten ='Khoaûn vay' ";
+                                    var dtpl = ExecuteQuery(qtimpl, null);
+                                    //Tìm mã phân loại trước
+                                    //                        var query = @"INSERT INTO KhachHang (MaPhanLoai, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status) VALUES (?, ?, ?, ?, ?,?,?,?)";
+                                    //                        var parameters = new OleDbParameter[]
+                                    //                           {
+                                    //new OleDbParameter("?", item.Maso),
+                                    //new OleDbParameter("?", item.NgayGD),
+                                    //new OleDbParameter("?", Helpers.ConvertUnicodeToVni(item.Diengiai)),
+                                    //new OleDbParameter("?", item.ThanhTien),
+                                    //   new OleDbParameter("?", item.ThanhTien2),
+                                    //new OleDbParameter("?", item.TKNo),
+                                    //new OleDbParameter("?", item.TKCo),
+                                    //  new OleDbParameter("?","0"),
+                                    //                           };
+                                    //                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                                }
+                            }
                         }
                         else if (tkno != 0) // Dùng else if để tránh trường hợp cả hai đều có giá trị (nếu có lỗi dữ liệu)
                         {
@@ -8227,6 +8322,24 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
 
         System.Data.DataTable dtMatdinhnganhang = new System.Data.DataTable();
+        private  string XulyLD(string input)
+        {
+           // string input = "Tra Lai Vay Hop Dong LD2505000007";
+            string pattern = @"\bLD\d+\b"; // Mẫu cho ID hợp đồng với số lượng chữ số tùy ý
+
+            Match match = Regex.Match(input, pattern);
+
+            if (match.Success)
+            {
+                Console.WriteLine(match.Value); // Kết quả: LD2505000007
+                return match.Value;
+            }
+            else
+            {
+                Console.WriteLine("Không tìm thấy mã hợp đồng.");
+                return input;
+            }
+        }
         private void btnReadPDF_Click(object sender, EventArgs e)
         {
             if (lblTKNganhang.Text == "...")
@@ -8243,7 +8356,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                    };
                 dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
             }
-            //ConvertImageTOexcel();
+          //  ConvertImageTOexcel();
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
         }

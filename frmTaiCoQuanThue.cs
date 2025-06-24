@@ -336,7 +336,7 @@ namespace SaovietTax
 
                     while (!string.IsNullOrEmpty(rootObject.state))
                     {
-                        url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&state=" + rootObject.state + "&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5";
+                        url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/purchase?sort=tdlap:desc,khmshdon:asc,shdon:desc&size=50&state=" + rootObject.state + "&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==" + ttxly;
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -822,7 +822,7 @@ namespace SaovietTax
         }
         public void InsertTbImport(Data item,int invoceType)
         {
-            if(item.shdon== 1933)
+            if(item.shdon== 238309)
             {
                 int ass = 10;
             }
@@ -909,7 +909,7 @@ namespace SaovietTax
                 {
                     if (item.ttttkhac.Count > 0)
                     {
-                        tgtkcthue = item.ttttkhac.Count>2? item.ttttkhac[2].dlieu.ToString():"0";
+                        tgtkcthue = item.ttttkhac.Count>2? item.ttttkhac[0].dlieu.ToString():"0";
                     }
                     else
                     {
@@ -1315,9 +1315,9 @@ namespace SaovietTax
                 }
                 catch (Exception ex)
                 { 
-                    Driver.Close();
-                    this.Close();
-                    // MessageBox.Show($"Lỗi: {ex.Message}");
+                   // Driver.Close();
+                    //this.Close();
+                     MessageBox.Show($"Lỗi: {ex.Message}");
                 }
             }
              
