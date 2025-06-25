@@ -47,6 +47,12 @@ namespace SaovietTax
             this.StartPosition = FormStartPosition.Manual; // Cài đặt vị trí thủ công
 
         }
+        public class QLHD
+        {
+            public string LoaiHD { get; set; }  
+            public int Totals { get; set; } // Tổng số hóa đơn  
+            public int Downloaded { get; set; } // Số hóa đơn đã tải về 
+        }
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -190,7 +196,14 @@ namespace SaovietTax
                     {
                         rootObject = JsonConvert.DeserializeObject<InvoiceRa2>(responseBody);
                     }
-
+                    if(rootObject == null)
+                    {
+                        return;
+                    }
+                    QLHD qLHD = new QLHD();
+                    qLHD.LoaiHD = "Hóa đơn điện tử";
+                    qLHD.Totals += rootObject.total.Value;
+                    lstDaura.Add(qLHD);
                     XulyRa2ML(rootObject, tokken,4);
                     while (!string.IsNullOrEmpty(rootObject.state))
                     {
@@ -214,7 +227,7 @@ namespace SaovietTax
                             // Xử lý lỗi nếu cần
                         }
                     }
-
+                    gridControl2.DataSource = lstDaura;
                     Console.WriteLine("Response Body:");
                     Console.WriteLine(responseBody);
                    
@@ -256,7 +269,14 @@ namespace SaovietTax
                     {
                         rootObject = JsonConvert.DeserializeObject<InvoiceRa2>(responseBody);
                     }
-
+                    if(rootObject == null)
+                    {
+                        return;
+                    }
+                    QLHD qLHD = new QLHD();
+                    qLHD.LoaiHD = "Máy tính tiền";
+                    qLHD.Totals += rootObject.total.Value;
+                    lstDaura.Add(qLHD);
                     XulyRa2ML(rootObject, tokken,5);
                     while (!string.IsNullOrEmpty(rootObject.state))
                     {
@@ -280,17 +300,17 @@ namespace SaovietTax
                             // Xử lý lỗi nếu cần
                         }
                     }
-
+                    gridControl2.DataSource = lstDaura; 
                     Console.WriteLine("Response Body:");
                     Console.WriteLine(responseBody);
                     frmMain.tokken = tokken;
-                    Driver.Close();
-                    this.Close();
+                    Driver.Quit();
+                   // this.Close();
                 }
                 catch (HttpRequestException e)
                 {
                     XtraMessageBox.Show(e.Message);
-                    Driver.Close();
+                    Driver.Quit();
                     //this.Close();
                 }
             }
@@ -331,7 +351,16 @@ namespace SaovietTax
                     // Đọc nội dung phản hồi
                     string responseBody = response.Content.ReadAsStringAsync().Result;
                     RootObject rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
-
+                    if(rootObject== null )
+                    {
+                        return;
+                    }
+                    QLHD QLHD = new QLHD();
+                    if(type==6)
+                        QLHD.LoaiHD = "Đã cấp mã hóa đơn";
+                    if (type == 8)
+                        QLHD.LoaiHD = "Cục Thuế đã nhận không mã";
+                    QLHD.Totals += rootObject.total;
                     XulyDataXML(rootObject, tokken, type);
 
                     while (!string.IsNullOrEmpty(rootObject.state))
@@ -348,9 +377,10 @@ namespace SaovietTax
                         // Đọc nội dung phản hồi
                         responseBody = response.Content.ReadAsStringAsync().Result;
                         rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                        QLHD.Totals += rootObject.total;
                         XulyDataXML(rootObject, tokken, type);
                     }
-
+                    lstDauvao.Add(QLHD);  
                     Console.WriteLine("Response Body:");
                     Console.WriteLine(responseBody);
                 }
@@ -389,20 +419,29 @@ namespace SaovietTax
                         if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
                         {
                             XtraMessageBox.Show("Lỗi máy chủ, vui lòng thử lại sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            Driver.Close();
-                            this.Close();   
+                            Driver.Quit();
+                            //this.Close();   
                         }
                     }
                     catch(Exception ex)
                     {
                         XtraMessageBox.Show("Lỗi máy chủ, vui lòng thử tải hóa đơn máy tính tiền lại sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        Driver.Close();
-                        this.Close();
+                        Driver.Quit();
+                        gridControl1.DataSource = lstDauvao;
+                        //this.Close();
                     }
 
                     // Đảm bảo phản hồi thành công
+                    if (response == null)
+                    {
+                        XtraMessageBox.Show("Lỗi máy chủ, vui lòng thử tải hóa đơn máy tính tiền lại sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Driver.Quit();
+                        // this.Close();
+                        gridControl1.DataSource = lstDauvao;
+                        return;
+                    }
                     response.EnsureSuccessStatusCode();
-
+                   
                     // Đọc nội dung phản hồi
                     string responseBody = await response.Content.ReadAsStringAsync();
                     RootObject rootObject;
@@ -414,7 +453,9 @@ namespace SaovietTax
                     {
                         rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
                     }
-
+                    QLHD QLHD = new QLHD();
+                    QLHD.LoaiHD = "Máy tính tiền";
+                    QLHD.Totals += rootObject.total;
                     XulyDataXML(rootObject, tokken, type);
                     while (!string.IsNullOrEmpty(rootObject.state))
                     {
@@ -438,10 +479,17 @@ namespace SaovietTax
 
                         }
                     }
+
+                    lstDauvao.Add(QLHD);
+                    QLHD QLHDs= new QLHD();
+                    QLHDs.LoaiHD = "Tổng cộng";
+                    QLHDs.Totals = lstDauvao.Sum(x => x.Totals);
+                    lstDauvao.Add(QLHDs);
+                    gridControl1.DataSource = lstDauvao;
                     Console.WriteLine("Response Body:");
                     Console.WriteLine(responseBody); 
-                    Driver.Close();
-                    this.Close();
+                    Driver.Quit();
+                   // this.Close();
                 }
                 catch (HttpRequestException e)
                 {
@@ -752,7 +800,7 @@ namespace SaovietTax
 
             // Kiểm tra sự tồn tại của viết tắt
             int counter = 1;
-            string uniqueAbbreviation = abbreviation;
+            string uniqueAbbreviation = abbreviation.ToUpper();
 
             while (existingNames.Contains(uniqueAbbreviation))
             {
@@ -974,6 +1022,10 @@ namespace SaovietTax
                 else
                     vat = "0";
             }
+            if(vat=="KCT")
+            {
+                vat = "0";
+            }
                 OleDbParameter[] parameters = new OleDbParameter[]
                     {
                 new OleDbParameter("?", item.shdon),
@@ -1004,6 +1056,8 @@ namespace SaovietTax
             try
             {
                 int a = ExecuteQueryResult(query, parameters);
+                stt += 1;
+                Application.DoEvents();
             }
             catch (Exception ex)
             {
@@ -1167,8 +1221,19 @@ namespace SaovietTax
             }
 
         }
+        int stt = 1;
+        private List<QLHD> lstDauvao = new List<QLHD>();
+        private List<QLHD> lstDaura = new List<QLHD>();
         private void frmTaiCoQuanThue_Load(object sender, EventArgs e)
         {
+            if (frmMain.type == 1)
+            {
+                xtraTabControl1.SelectedTabPageIndex = 0;
+            }
+            else
+            {
+                xtraTabControl1.SelectedTabPageIndex = 1;
+            }
             var query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
             query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
@@ -1194,11 +1259,11 @@ namespace SaovietTax
                 options.AddUserProfilePreference("safebrowsing.disable_download_protection", true);
                 // Tối ưu hóa trình duyệt
 
-                options.AddArguments(
-                    "--disable-notifications",
-                    "--start-maximized",
-                    "--disable-extensions",
-                    "--disable-infobars");
+                options.AddArguments(  
+                  "--disable-notifications",   // Tắt thông báo
+                   "--start-maximized",         // Khởi động ở chế độ tối đa
+                  "--disable-extensions",      // Tắt các tiện ích mở rộng
+                   "--disable-infobars");       // Tắt thông báo thông tin
                 //
                 string downloadPath = "";
                 if (frmMain.type == 1)
@@ -1277,11 +1342,7 @@ namespace SaovietTax
                     d.FindElements(By.XPath("//div[contains(@class,'home-header-menu-item')]//span[text()='Đăng nhập']")).Count == 0);
                     //DoTask = int.Parse(comboBoxEdit1.SelectedItem.ToString());
                     //Endtask = int.Parse(comboBoxEdit2.SelectedItem.ToString()); 
-
-
-                 
-
-
+                     
                     var cookies = Driver.Manage().Cookies.AllCookies.Where(m=>m.Name== "jwt");
 
                     foreach (var cookie in cookies)
@@ -1295,13 +1356,14 @@ namespace SaovietTax
                         };
 
                         frmMain.tokken = cookie.Value;
+                       
                         try
                         {
-
+                            Driver.Quit();
                         }
                         catch(Exception ex)
                         {
-                            Driver.Close();
+                           
                         }
                         ExecuteQueryResult(query, parametersss);
                         if(frmMain.type==1)
@@ -1334,14 +1396,14 @@ namespace SaovietTax
             {
                 try
                 {
-                    Driver.Close();
+                    Driver.Quit();
                 }
                 catch(Exception ex)
                 {
                     Console.WriteLine("Lỗi khi đóng trình duyệt: " + ex.Message);
                 }
-            } 
-            this.Close(); 
+            }
+            Driver.Quit();
 
         }
 

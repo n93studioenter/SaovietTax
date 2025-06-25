@@ -129,6 +129,8 @@ namespace SaovietTax
         }
         private void frmKhachhang_Load(object sender, EventArgs e)
         {
+            gridView1.OptionsFind.AlwaysVisible = true; // Luôn hiển thị ô tìm kiếm
+
             string query = @"SELECT * FROM PhanLoaiKhachHang ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
             if (dt != null && dt.Rows.Count > 0)
@@ -147,9 +149,18 @@ namespace SaovietTax
 
                 comboBoxEdit1.Properties.NullText = "Chọn Tài khoản";
                 comboBoxEdit1.Properties.TextEditStyle = TextEditStyles.DisableTextEditor; // Ngăn người dùng nhập trực tiếp
+                int idsl = 0;
                 if (comboBoxEdit1.Properties.Items.Count > 0)
                 {
-                    comboBoxEdit1.SelectedIndex = 0; // Chọn phần tử đầu tiên
+                    foreach (Item item in comboBoxEdit1.Properties.Items)
+                    {
+                        if (item.Id == frmMain.currentselectId)
+                        {
+                            idsl = comboBoxEdit1.Properties.Items.IndexOf(item);
+                            break;
+                        }
+                    }
+                    comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
                     var selectedItem = comboBoxEdit1.SelectedItem as Item;
 
                     LoadData(selectedItem.Id);
@@ -162,6 +173,30 @@ namespace SaovietTax
             }
             //
             //Load data vat tu 
+            txtSohieu.Text = dtoVatTu.SoHieu;
+            txtTenvattu.Text = dtoVatTu.Ten;
+            txtMaSo.Text = dtoVatTu.Mst;
+            txtGhichu.Text = dtoVatTu.DiaChi;
+            txtDonvi.Text = dtoVatTu.Mst.ToString();
+            txtMaSo.Text=dtoVatTu.MaSo.ToString();
+            DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+            for (int i = 0; i < view.RowCount; i++)
+            {
+                // Lấy giá trị của cột STT
+                if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
+                {
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
+                        {
+                            gridView1.FocusedRowHandle = i; // Đặt focus
+                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
+                            gridView1.SelectRow(i); // Chọn dòng
+                        }
+                    });
+                    return;
+                }
+            }
         }
 
         private void comboBoxEdit1_SelectedIndexChanged(object sender, EventArgs e)
@@ -208,7 +243,7 @@ namespace SaovietTax
             
             txtSohieu.Text = getKhachhang["SoHieu"].ToString();
             txtTenvattu.Text = Helpers.ConvertVniToUnicode(getKhachhang["Ten"].ToString());
-            txtMaSo.Text = getKhachhang["MST"].ToString();
+            txtDonvi.Text = getKhachhang["MST"].ToString();
             txtGhichu.Text = Helpers.ConvertVniToUnicode(getKhachhang["DiaChi"].ToString());
             txtMaSo.Text = getKhachhang["MaSo"].ToString();
         }
@@ -259,7 +294,7 @@ namespace SaovietTax
             new OleDbParameter("?", selectedId),
             new OleDbParameter("?", txtSohieu.Text),
             new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtTenvattu.Text)),
-            new OleDbParameter("?", Helpers.ConvertUnicodeToVni(txtGhichu.Text)),
+            new OleDbParameter("?", txtGhichu.Text),
             new OleDbParameter("?", txtDonvi.Text),
             new OleDbParameter("?", txtMaSo.Text)
                 };
@@ -311,6 +346,7 @@ namespace SaovietTax
         {
             this.Close();
         }
+        public bool isChange = false;
 
         private void gridControl1_DoubleClick(object sender, EventArgs e)
         {
@@ -329,8 +365,8 @@ namespace SaovietTax
                 var hiddenValue3 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["MST"]);
                 frmMain.hiddenValue = hiddenValue.ToString();
                 frmMain.hiddenValue2 = hiddenValue2.ToString();
-                frmMain.hiddenValue3 = hiddenValue3.ToString(); 
-
+                frmMain.hiddenValue3 = hiddenValue3.ToString();
+                isChange = true;
                 this.Close();
             }
         }

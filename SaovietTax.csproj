@@ -325,6 +325,7 @@
     <None Include="Properties\DataSources\frmMain.FileImport.datasource" />
     <None Include="Properties\DataSources\frmMain.FileImportDetail.datasource" />
     <None Include="Properties\DataSources\frmMain.Nganhang.datasource" />
+    <None Include="Properties\DataSources\frmTaiCoQuanThue.QLHD.datasource" />
     <None Include="Properties\DataSources\SaovietTax.DTO.Matdinhnganhang.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
