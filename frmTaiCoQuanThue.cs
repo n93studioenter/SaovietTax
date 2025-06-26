@@ -1159,19 +1159,14 @@ namespace SaovietTax
             string vat = "0";
             double TienTrcthue = 0;
             double TienThue = 0;
-            TienTrcthue =  !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.thttltsuat !=null? item.thttltsuat[0].thtien.Value: item.tgtttbso.Value;
+            TienTrcthue = !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.tgtttbso.Value;
             TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
             if (item.thttltsuat.Count() > 0)
             {
                 vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
-                if(vat== "KKKNT")
-                {
-                    vat = "0";
-                }
             }
             else
             {
-               
                 if (TienThue != 0 && TienTrcthue != 0)
                 {
                     vat = Math.Round((TienThue / TienTrcthue) * 100).ToString();
@@ -1179,7 +1174,7 @@ namespace SaovietTax
                 else
                     vat = "0";
             }
-            if(string.IsNullOrEmpty(newTen) && string.IsNullOrEmpty(getMST))
+            if (string.IsNullOrEmpty(newTen) && string.IsNullOrEmpty(getMST))
             {
                 getMST = "...";
                 newTen = Helpers.ConvertUnicodeToVni("Khách lẻ");

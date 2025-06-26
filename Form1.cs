@@ -84,6 +84,7 @@ using DevExpress.CodeParser;
 using XmlNode = System.Xml.XmlNode;
 using Color = System.Drawing.Color;
 using DevExpress.Xpo.Helpers;
+using Windows.Media.Protection.PlayReady;
 
 namespace SaovietTax
 {
@@ -324,6 +325,11 @@ namespace SaovietTax
                         else
                         {
                             GetdetailXML2(item["Mst"].ToString(), item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()), fileImport);
+                            if(string.IsNullOrEmpty(item["Path"].ToString()))
+                            {
+                                GetdetailXML3(item["Mst"].ToString(), item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()), fileImport);
+                            }
+                           
                             var parame = new OleDbParameter[]
                         {
     new OleDbParameter("?",int.Parse(item["ID"].ToString()))
@@ -464,6 +470,10 @@ namespace SaovietTax
                         else
                         {
                             GetdetailXML2(mstcty, item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()), fileImport);
+                            if (string.IsNullOrEmpty(item["Path"].ToString()))
+                            {
+                                GetdetailXML3(mstcty, item["KHHDon"].ToString(), item["SHDon"].ToString(), tokken, int.Parse(item["InvoiceType"].ToString()), fileImport);
+                            }
                             var parame = new OleDbParameter[]
                         {
                             new OleDbParameter("?",int.Parse(item["ID"].ToString()))
@@ -2370,6 +2380,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                  string noidung=  parentView.GetRowCellValue(focusedRowHandle, "Noidung").ToString();
                 string tenkh= Helpers.ConvertUnicodeToVni(parentView.GetRowCellValue(focusedRowHandle, "Ten").ToString());
                 string mst = Helpers.ConvertUnicodeToVni(parentView.GetRowCellValue(focusedRowHandle, "Mst").ToString());
+                string tkno = parentView.GetRowCellValue(focusedRowHandle, "TKNo").ToString();
+                string tkco = parentView.GetRowCellValue(focusedRowHandle, "TKCo").ToString(); 
                 string query = @"select * FROM KhachHang 
                                     WHERE MST = ? ";
                 var parameterss = new OleDbParameter[]
@@ -2386,11 +2398,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             if (item.Mst == mst)
                             {
                                 item.Noidung = noidung;
-                                query = @"UPDATE tbimport SET Noidung=?  WHERE ID=?";
+                                item.TKNo = tkno;
+                                item.TKCo = tkco;
+                                query = @"UPDATE tbimport SET Noidung=?,TKNo=?,TKCo=?  WHERE ID=?";
                                 var parameters = new OleDbParameter[]
                          {
-                                new OleDbParameter("?", Helpers.ConvertUnicodeToVni(noidung)),
-                                   new OleDbParameter("?",item.ID),
+                                 new OleDbParameter("?", Helpers.ConvertUnicodeToVni(noidung)),
+                                 new OleDbParameter("?", Helpers.ConvertUnicodeToVni(tkno)),
+                                 new OleDbParameter("?", Helpers.ConvertUnicodeToVni(tkco)),
+                                 new OleDbParameter("?",item.ID),
                          };
                                 int rowsAffected = ExecuteQueryResult(query, parameters);
                             }
@@ -2414,8 +2430,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         {
             new OleDbParameter("?", noidung),
              new OleDbParameter("?","MST="+getMST),
-              new OleDbParameter("?", 6422),
-               new OleDbParameter("?", 1111),
+              new OleDbParameter("?", tkno),
+               new OleDbParameter("?", tkco),
                  new OleDbParameter("?", 1331),
                         };
                         int rowsAffected = ExecuteQueryResult(query, parameters);
@@ -3098,17 +3114,62 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
         }
         List<Dictionary<string, string>> lstCheckname = new List<Dictionary<string, string>>();
-         public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType,FileImport fileImport)
+        public async Task GetdetailXML3(string nbmst, string khhdon, string shdon, string token, int invoiceType, FileImport fileImport)
         {
+            string url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-xml?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon={1}";
+            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-xml?nbmst=3500728427&khhdon=C25THD&shdon=2181&khmshdon=1
+
+            string zipFilePath = @"C:\hoadon\invoice.zip"; // Đường dẫn lưu file ZIP
+            string pathravao = "";
+            if (fileImport.Type == 1)
+            {
+                pathravao = "HDVao";
+            }
+            if (fileImport.Type==2)
+            {
+                pathravao = "HDRa";
+            }
+            string filename=  fileImport.SHDon + "_" + fileImport.KHHDon + ".zip";
+            string path = savedPath + @"\" + pathravao+@"\"+fileImport.NLap.Month+@"\"+ filename;
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream")); // Định dạng nhị phân
+
+                try
+                {
+                    Thread.Sleep(300); // Đợi một chút trước khi gửi yêu cầu    
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode(); // Ném ngoại lệ nếu không thành công
+
+                    // Đọc nội dung phản hồi dưới dạng byte
+                    var fileBytes = await response.Content.ReadAsByteArrayAsync();
+
+                    // Lưu file ZIP
+                    File.WriteAllBytes(path, fileBytes); // Sử dụng WriteAllBytes
+                    Console.WriteLine($"File ZIP đã được lưu tại: {zipFilePath}");
+                    ExtractZipXML(path,  fileImport);
+                    //Cập nhật lại path cho parent
+                    // Update nội dung cho Parent
+                 
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Đã xảy ra lỗi: {ex.Message}");
+                }
+            }
+        }
+        public void GetdetailXML2(string nbmst, string khhdon, string shdon, string tokken,int invoiceType,FileImport fileImport)
+        {
+
+
             if (shdon == "129")
             {
                 int asd = 10;
             }
             string url = "";
-            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst=0302712571&khhdon=C25TMB&shdon=48267&khmshdon=1
-
-            if (invoiceType==4 || invoiceType==6  || invoiceType == 8)
-            url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
+            if (invoiceType == 4 || invoiceType == 6 || invoiceType == 8)
+                url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
             if (invoiceType == 5 || invoiceType == 10)
                 url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=1";
             using (var client = new HttpClient())
@@ -4433,6 +4494,36 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 // Nếu bạn muốn ném lại ngoại lệ, hãy dùng 'throw;' (không phải 'throw ex;') để giữ nguyên stack trace.
                 // throw;
             }
+        }
+        private void ExtractZipXML(string path,FileImport fileImport)
+        {
+            try
+            {
+                string rootPath = Path.GetDirectoryName(path);
+                string getnamefile = Path.GetFileNameWithoutExtension(path);
+                string directoryPath = rootPath + @"\Giainen" + "_" + getnamefile;
+
+                ZipFile.ExtractToDirectory(path, directoryPath);
+                var files = Directory.GetFiles(directoryPath, "invoice.html", SearchOption.AllDirectories);
+                string targetFilePath = Path.Combine(rootPath, getnamefile + ".html");
+
+                File.Move(files.FirstOrDefault(), targetFilePath);
+                File.Delete(path);
+                Directory.Delete(directoryPath, true);
+                var query = "UPDATE tbimport SET Path=? WHERE ID=?";
+                var parametersss = new OleDbParameter[]
+                {
+                            new OleDbParameter("?",targetFilePath),
+                            new OleDbParameter("?", fileImport.ID),
+                };
+                fileImport.Path = targetFilePath;
+                ExecuteQueryResult(query, parametersss);
+            }
+            catch(Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message + path, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
         }
         private void  ExtractZip(string path, string filename)
         {
