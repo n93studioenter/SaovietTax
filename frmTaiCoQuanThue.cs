@@ -1022,11 +1022,11 @@ namespace SaovietTax
                 else
                     vat = "0";
             }
-            if(vat=="KCT")
+            if (vat == "KCT" || vat == "KKKNT")
             {
                 vat = "0";
             }
-                OleDbParameter[] parameters = new OleDbParameter[]
+            OleDbParameter[] parameters = new OleDbParameter[]
                     {
                 new OleDbParameter("?", item.shdon),
                 new OleDbParameter("?", item.khhdon),
@@ -1181,6 +1181,12 @@ namespace SaovietTax
 
             }
 
+            if (vat == "KCT" || vat== "KKKNT")
+            {
+                vat = "0";
+            }
+            int vats = 0;
+             
             OleDbParameter[] parameters = new OleDbParameter[]
             {
                 new OleDbParameter("?", item.shdon),

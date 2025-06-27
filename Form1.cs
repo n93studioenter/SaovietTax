@@ -3116,7 +3116,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         List<Dictionary<string, string>> lstCheckname = new List<Dictionary<string, string>>();
         public async Task GetdetailXML3(string nbmst, string khhdon, string shdon, string token, int invoiceType, FileImport fileImport)
         {
-            string url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-xml?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon={1}";
+            string url = "";
+            if (invoiceType == 4 || invoiceType == 6 || invoiceType == 8)
+                url = $"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-xml?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon={1}";
+            if (invoiceType == 5 || invoiceType == 10)
+                url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/export-xml?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon={1}";
             //https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-xml?nbmst=3500728427&khhdon=C25THD&shdon=2181&khmshdon=1
 
             string zipFilePath = @"C:\hoadon\invoice.zip"; // Đường dẫn lưu file ZIP
@@ -4497,6 +4501,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void ExtractZipXML(string path,FileImport fileImport)
         {
+           
             try
             {
                 string rootPath = Path.GetDirectoryName(path);
@@ -6737,6 +6742,28 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
             DevExpress.XtraGrid.Views.Grid.GridView gridView = gridControl2.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
 
+            if (e.KeyCode.ToString() == "Delete")
+            {
+                int selectedRowHandle = gridView.FocusedRowHandle;
+                if (selectedRowHandle >= 0)
+                {
+                    // Lấy DataRow tương ứng
+                    DataRow dataRow = gridView.GetDataRow(selectedRowHandle);
+
+                    if (dataRow != null)
+                    {
+                        // Xử lý DataRow (ví dụ: xóa hàng)
+                        string shDon = dataRow["SHDon"].ToString(); // Ví dụ: lấy giá trị từ cột "SHDon"
+
+                        // Thực hiện xóa hoặc các thao tác khác
+                        XtraMessageBox.Show($"Bạn có chắc chắn muốn xóa Hóa đơn: {shDon}?", "Xác nhận", MessageBoxButtons.YesNo);
+
+                        // Nếu người dùng xác nhận xóa
+                        // lstImportRa.RemoveAt(selectedRowHandle);
+                        // bindingSource.ResetBindings(false);
+                    }
+                }
+            }
             // Kiểm tra nếu có hàng con nào đang mở
             if (gridView != null && IsAnyRowExpanded(gridView))
             {
@@ -7616,18 +7643,37 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
             }
 
-            if (e.KeyCode == System.Windows.Forms.Keys.Delete)
+            if (e.KeyCode.ToString() == "Delete")
             {
                 DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
 
                 int currentRowHandle = gridView.FocusedRowHandle;
 
-                // Lấy tên của cột hiện tại
-                string currentColumnName = gridView.FocusedColumn.FieldName;
-                object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+                // Lấy tên của cột hiện tại 
+                int cellValue = (int)gridView.GetRowCellValue(currentRowHandle, "ID");
+                //Delete row
+                foreach (var item in lstImportVao)
+                {
+                    // Lấy danh sách chi tiết mà có ID tương ứng với cellValue
+                    var detailsToRemove = item.fileImportDetails.Where(n => n.ID == cellValue).ToList();
 
-            } 
-           
+                    // Xóa các chi tiết này khỏi danh sách
+                    foreach (var detail in detailsToRemove)
+                    {
+                        item.fileImportDetails.Remove(detail);
+                    }
+                }
+                //Xóa trong database tbimport detail
+                var query = @"delete from  tbimportdetail WHERE ID=?";
+                var parameters = new OleDbParameter[]
+                   {
+            new OleDbParameter("?", cellValue)
+                   };
+                var rowsAffected = ExecuteQueryResult(query, parameters);
+                gridControl2.DataSource = lstImportRa;
+                gridControl2.RefreshDataSource();
+            }
+
         }
 
         private void gridView3_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
@@ -7703,7 +7749,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         frmCongtrinh frmCongtrinh = new frmCongtrinh();
                         frmCongtrinh.frmMain = this;
                         frmCongtrinh.VatTu vatTu = new frmCongtrinh.VatTu();
-                        vatTu.SoHieu = cellValue.ToString();  
+                        vatTu.SoHieu = cellValue.ToString();
                         frmCongtrinh.dtoVatTu = vatTu;
                         frmCongtrinh.ShowDialog();
                         if (cellValue.ToString().Contains("|"))
@@ -7807,13 +7853,44 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     }
                                     lstrowSohieu = new List<int>();
                                 }
-                              
+
                             }
 
                         }
                     }
                 }
 
+            }
+
+            if (e.KeyCode.ToString() == "Delete")
+            {
+                DevExpress.XtraGrid.Views.Grid.GridView gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+
+                // Lấy tên của cột hiện tại 
+                int cellValue = (int)gridView.GetRowCellValue(currentRowHandle, "ID");
+                //Delete row
+                foreach (var item in lstImportRa)
+                {
+                    // Lấy danh sách chi tiết mà có ID tương ứng với cellValue
+                    var detailsToRemove = item.fileImportDetails.Where(n => n.ID == cellValue).ToList();
+
+                    // Xóa các chi tiết này khỏi danh sách
+                    foreach (var detail in detailsToRemove)
+                    {
+                        item.fileImportDetails.Remove(detail);
+                    }
+                }
+                //Xóa trong database tbimport detail
+               var query = @"delete from  tbimportdetail WHERE ID=?";
+             var   parameters = new OleDbParameter[]
+                {
+            new OleDbParameter("?", cellValue)
+                };
+                var rowsAffected = ExecuteQueryResult(query, parameters);
+                gridControl2.DataSource = lstImportRa;
+                gridControl2.RefreshDataSource();
             }
         }
         public DataTable tbKhachhang = new DataTable();
@@ -7917,6 +7994,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
 
             }
+           
         }
 
         private void gridControl1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -8614,7 +8692,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                    };
                 dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
             }
-          //  ConvertImageTOexcel();
+            ConvertImageTOexcel();
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
         }
@@ -9055,6 +9133,11 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                 }
             }
+        }
+
+        private void gridView4_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)

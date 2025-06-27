@@ -217,6 +217,7 @@
             this.colTen2.FieldName = "Ten";
             this.colTen2.MinWidth = 30;
             this.colTen2.Name = "colTen2";
+            this.colTen2.OptionsColumn.AllowEdit = false;
             this.colTen2.Visible = true;
             this.colTen2.VisibleIndex = 0;
             this.colTen2.Width = 287;
@@ -318,7 +319,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1667, 226);
+            this.gridControl1.Size = new System.Drawing.Size(1677, 235);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -566,6 +567,7 @@
             this.gridView4.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView4_RowCellStyle);
             this.gridView4.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView4_CellValueChanged);
             this.gridView4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView4_KeyDown);
+            this.gridView4.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gridView4_KeyPress);
             this.gridView4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView4_MouseDown);
             // 
             // colTen3
@@ -574,6 +576,7 @@
             this.colTen3.FieldName = "Ten";
             this.colTen3.MinWidth = 30;
             this.colTen3.Name = "colTen3";
+            this.colTen3.OptionsColumn.AllowEdit = false;
             this.colTen3.Visible = true;
             this.colTen3.VisibleIndex = 0;
             this.colTen3.Width = 416;
@@ -665,7 +668,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1667, 226);
+            this.gridControl2.Size = new System.Drawing.Size(1677, 235);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -904,7 +907,7 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1692, 568);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1702, 577);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
@@ -1031,7 +1034,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1667, 226);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1677, 235);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -1063,7 +1066,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1667, 226);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1677, 235);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -1094,7 +1097,7 @@
             this.xtraTabPage2.Controls.Add(this.btnChontknganhang);
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1667, 226);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1677, 235);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
             // lblTKNganhang
