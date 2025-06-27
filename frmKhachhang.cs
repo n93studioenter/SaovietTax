@@ -174,10 +174,9 @@ namespace SaovietTax
             //
             //Load data vat tu 
             txtSohieu.Text = dtoVatTu.SoHieu;
-            txtTenvattu.Text = dtoVatTu.Ten;
-            txtMaSo.Text = dtoVatTu.Mst;
-            txtGhichu.Text = dtoVatTu.DiaChi;
-            txtDonvi.Text = dtoVatTu.Mst.ToString();
+            txtTenvattu.Text = dtoVatTu.Ten; 
+            txtGhichu.Text = dtoVatTu.DiaChi!=null? dtoVatTu.DiaChi:"";
+            txtDonvi.Text = dtoVatTu.Mst!=null?dtoVatTu.Mst.ToString():"";
             txtMaSo.Text=dtoVatTu.MaSo.ToString();
             DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
             for (int i = 0; i < view.RowCount; i++)

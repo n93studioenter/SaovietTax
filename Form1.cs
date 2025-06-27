@@ -774,6 +774,11 @@ namespace SaovietTax
                 }
                 else
                 {
+                    if (!ColumnExists(connection, "tbNganhang", "Checked"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbNganhang", "Checked", "NUMBER"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbNganhang", "Status"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -1345,38 +1350,41 @@ namespace SaovietTax
             lstvt = await  LoadDataVattuAsync();
             var query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             tbKhachhang = await Task.Run(() =>  ExecuteQuery(query));
+            gridView1.Columns["Checked"].OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            gridView3.Columns["Checked"].OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            gridView5.Columns["Checked"].OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
             //
-           // query = "SELECT * FROM tbimport"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
-           // var tbip = ExecuteQuery(query);
-           // foreach(DataRow item in tbip.Rows)
-           // {
-           //     query = "SELECT * FROM ChungTu WHERE SoHieu = ? and ThangCT=6";
-           //   var  parameters = new OleDbParameter[]
-           //   {
-           // new OleDbParameter("?", item["SHDon"].ToString()),      
-           //   };
-           //    var kq = ExecuteQuery(query, parameters);
-           //     foreach(DataRow r2 in kq.Rows)
-           //     {
-           //         var ngay = item["NLap"].ToString();
-           //         query = @"UPDATE ChungTu SET NgayCT=?,NgayGS=?  WHERE MaSo=? ";
-           //         parameters = new OleDbParameter[]
-           //{
-           //           new OleDbParameter("?",ngay),
-           //             new OleDbParameter("?",ngay),
-           //              new OleDbParameter("?",r2["MaSo"].ToString()),
-           //};
-           //         try
-           //         {
-           //             var rowsAffected = ExecuteQueryResult(query, parameters);
+            // query = "SELECT * FROM tbimport"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            // var tbip = ExecuteQuery(query);
+            // foreach(DataRow item in tbip.Rows)
+            // {
+            //     query = "SELECT * FROM ChungTu WHERE SoHieu = ? and ThangCT=6";
+            //   var  parameters = new OleDbParameter[]
+            //   {
+            // new OleDbParameter("?", item["SHDon"].ToString()),      
+            //   };
+            //    var kq = ExecuteQuery(query, parameters);
+            //     foreach(DataRow r2 in kq.Rows)
+            //     {
+            //         var ngay = item["NLap"].ToString();
+            //         query = @"UPDATE ChungTu SET NgayCT=?,NgayGS=?  WHERE MaSo=? ";
+            //         parameters = new OleDbParameter[]
+            //{
+            //           new OleDbParameter("?",ngay),
+            //             new OleDbParameter("?",ngay),
+            //              new OleDbParameter("?",r2["MaSo"].ToString()),
+            //};
+            //         try
+            //         {
+            //             var rowsAffected = ExecuteQueryResult(query, parameters);
 
-           //         }
-           //         catch(Exception ex)
-           //         {
-           //             MessageBox.Show(ex.Message);
-           //         }
-           //     }
-           // }
+            //         }
+            //         catch(Exception ex)
+            //         {
+            //             MessageBox.Show(ex.Message);
+            //         }
+            //     }
+            // }
         }
         #endregion
         #region Xử lý xml
@@ -7506,7 +7514,33 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private System.Windows.Forms.Timer clickTimer;
         private void gridView1_MouseDown(object sender, MouseEventArgs e)
         {
-            
+            var hitInfo = gridView1.CalcHitInfo(e.Location);
+            if (hitInfo.InColumn)
+            {
+                var column = hitInfo.Column;
+                if (column.ToString() == "Chọn")
+                {
+                    if (checkedCtype == 0)
+                    {
+                        checkedCtype = 1;
+                        //Bỏ check tất cả
+                        foreach (var item in lstNganhan)
+                        {
+                            item.Checked = false;
+                        }
+                    }
+                    else
+                    {
+                        checkedCtype = 0;
+                        foreach (var item in lstNganhan)
+                        {
+                            item.Checked = true;
+                        }
+                    }
+                    gridControl1.DataSource = lstNganhan;
+                    gridControl1.RefreshDataSource();
+                }
+            }
         }
         private List<int> lstrowSohieu = new List<int>();
         private void gridView2_KeyDown(object sender, KeyEventArgs e)
@@ -8299,6 +8333,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             public double ThanhTien2 { get; set; }
             public string TKNo { get; set; }
             public string TKCo { get; set; }
+            public bool Checked { get; set; }
         }
         private List<Nganhang> lstNganhan = new List<Nganhang>();
         System.Windows.Forms.BindingSource bdNganhang = new System.Windows.Forms.BindingSource();
@@ -8629,7 +8664,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             Console.WriteLine($"Cảnh báo: Dòng {rowIndex} không có giá trị Debit/Credit (TKCo/TKNo). Bỏ qua dòng.");
                             continue; // Bỏ qua dòng này
                         }
-
+                        nganhang.Checked = true;
                         lstNganhan.Add(nganhang); // Thêm đối tượng Nganhang vào danh sách
                     }
                     catch (Exception ex)
@@ -8678,6 +8713,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void btnReadPDF_Click(object sender, EventArgs e)
         {
+            progressPanel1.Visible = true;
+            Application.DoEvents();
             if (lblTKNganhang.Text == "...")
             {
                 XtraMessageBox.Show("Vui lòng chọn tài khoản ngân hàng!");
@@ -8692,9 +8729,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                    };
                 dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
             }
-            ConvertImageTOexcel();
+          //  ConvertImageTOexcel();
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
+            progressPanel1.Visible = false;
         }
 
         private void gridView2_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
@@ -9005,6 +9043,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 foreach (var item in lstNganhan)
                 {
+                    if (item.Checked == false)
+                        continue;
                     var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status) VALUES (?, ?, ?, ?, ?,?,?,?)";
                     var parameters = new OleDbParameter[]
                        {
@@ -9117,9 +9157,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 // Lấy tên của cột hiện tại
                 string currentColumnName = gridView.FocusedColumn.FieldName;
                 object cellValue = gridView.GetRowCellValue(currentRowHandle, currentColumnName);
+                string maso = gridView.GetRowCellValue(currentRowHandle, "Maso").ToString();
+                string tkco = gridView.GetRowCellValue(currentRowHandle, "TKCo").ToString();
+                string tkno = gridView.GetRowCellValue(currentRowHandle, "TKNo").ToString();    
                 if (cellValue != null)
                 {
-                    if (cellValue.ToString().Contains("341"))
+                    if (cellValue.ToString().Contains("341") || cellValue.ToString().Contains("131"))
                     {
                         frmKhachhang frmKhachhang = new frmKhachhang();
                         frmKhachhang.Mode = 2;
@@ -9128,8 +9171,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         vatTu.MaPhanLoai = 4;
                         frmKhachhang.dtoVatTu = vatTu;
                         frmKhachhang.ShowDialog();
-                        var d = this.hiddenValue2;
-                      
+                        var getSohieu = this.hiddenValue2;
+                        var getnh = lstNganhan.Where(m => m.Maso == maso).FirstOrDefault();
+                        if (getnh != null)
+                        {
+                            if (currentColumnName == "TKCo")
+                            {
+                                gridView.SetRowCellValue(currentRowHandle, currentColumnName, getSohieu);
+                                getnh.TKCo = tkco + "|" + getSohieu;
+                            }
+                            else if (currentColumnName == "TKNo")
+                            {
+                                gridView.SetRowCellValue(currentRowHandle, currentColumnName, getSohieu);
+                                getnh.TKNo = tkno + "|" + getSohieu;
+                            }
+                        }
                     }
                 }
             }
@@ -9138,6 +9194,38 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private void gridView4_KeyPress(object sender, KeyPressEventArgs e)
         {
 
+        }
+        int checkedCtype = 0;
+      
+        private void gridView5_MouseDown(object sender, MouseEventArgs e)
+        {
+            var hitInfo = gridView5.CalcHitInfo(e.Location);
+            if (hitInfo.InColumn)
+            {
+                var column = hitInfo.Column;
+                if (column.ToString() == "Chọn")
+                {
+                    if (checkedCtype == 0)
+                    {
+                        checkedCtype = 1;
+                        //Bỏ check tất cả
+                        foreach(var item in lstNganhan)
+                        {
+                            item.Checked = false;
+                        }
+                    }
+                    else
+                    {
+                        checkedCtype = 0;
+                        foreach (var item in lstNganhan)
+                        {
+                            item.Checked = true;
+                        }
+                    }
+                    gridControl3.DataSource = lstNganhan;
+                    gridControl3.RefreshDataSource();
+                }
+            }
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)

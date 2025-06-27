@@ -108,7 +108,7 @@
             this.lblTKNganhang = new DevExpress.XtraEditors.LabelControl();
             this.btnChontknganhang = new DevExpress.XtraEditors.SimpleButton();
             this.gridControl3 = new DevExpress.XtraGrid.GridControl();
-            this.nganhangBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.nganhangBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.gridView5 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colStt = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colNgayGD = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -118,6 +118,7 @@
             this.gridColumn11 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKCo1 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colCheck = new DevExpress.XtraGrid.Columns.GridColumn();
             this.lblDpPath = new DevExpress.XtraEditors.LabelControl();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
             this.dtDenngay = new DevExpress.XtraEditors.DateEdit();
@@ -143,6 +144,7 @@
             this.btnChonthang = new DevExpress.XtraEditors.SimpleButton();
             this.btnTaicoquanthue = new DevExpress.XtraEditors.SimpleButton();
             this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.nganhangBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.fileImportDetailBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
             this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
@@ -167,7 +169,7 @@
             this.xtraTabPage4.SuspendLayout();
             this.xtraTabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
@@ -182,6 +184,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radialMenu1)).BeginInit();
             this.SuspendLayout();
@@ -319,7 +322,7 @@
             this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1677, 235);
+            this.gridControl1.Size = new System.Drawing.Size(1672, 231);
             this.gridControl1.TabIndex = 0;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1,
@@ -668,7 +671,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1677, 235);
+            this.gridControl2.Size = new System.Drawing.Size(1672, 231);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -907,7 +910,7 @@
             this.xtraTabPage1.Controls.Add(this.panelControl1);
             this.xtraTabPage1.Controls.Add(this.comboBoxEdit1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(1702, 577);
+            this.xtraTabPage1.Size = new System.Drawing.Size(1697, 573);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
             // 
@@ -1034,7 +1037,7 @@
             this.xtraTabPage3.Controls.Add(this.lblSofiles);
             this.xtraTabPage3.Controls.Add(this.gridControl1);
             this.xtraTabPage3.Name = "xtraTabPage3";
-            this.xtraTabPage3.Size = new System.Drawing.Size(1677, 235);
+            this.xtraTabPage3.Size = new System.Drawing.Size(1672, 231);
             this.xtraTabPage3.Text = "HĐ đầu vào";
             // 
             // label1
@@ -1066,7 +1069,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1677, 235);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1672, 231);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -1097,7 +1100,7 @@
             this.xtraTabPage2.Controls.Add(this.btnChontknganhang);
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1677, 235);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1672, 231);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
             // lblTKNganhang
@@ -1127,7 +1130,7 @@
             this.gridControl3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gridControl3.DataSource = this.nganhangBindingSource;
+            this.gridControl3.DataSource = this.nganhangBindingSource1;
             this.gridControl3.Location = new System.Drawing.Point(0, 50);
             this.gridControl3.MainView = this.gridView5;
             this.gridControl3.Name = "gridControl3";
@@ -1136,9 +1139,9 @@
             this.gridControl3.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView5});
             // 
-            // nganhangBindingSource
+            // nganhangBindingSource1
             // 
-            this.nganhangBindingSource.DataSource = typeof(SaovietTax.frmMain.Nganhang);
+            this.nganhangBindingSource1.DataSource = typeof(SaovietTax.frmMain.Nganhang);
             // 
             // gridView5
             // 
@@ -1150,11 +1153,13 @@
             this.colThanhTien1,
             this.gridColumn11,
             this.colTKNo1,
-            this.colTKCo1});
+            this.colTKCo1,
+            this.colCheck});
             this.gridView5.GridControl = this.gridControl3;
             this.gridView5.Name = "gridView5";
             this.gridView5.OptionsView.ShowGroupPanel = false;
             this.gridView5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView5_KeyDown);
+            this.gridView5.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView5_MouseDown);
             // 
             // colStt
             // 
@@ -1163,34 +1168,37 @@
             this.colStt.Name = "colStt";
             this.colStt.Visible = true;
             this.colStt.VisibleIndex = 0;
-            this.colStt.Width = 67;
+            this.colStt.Width = 63;
             // 
             // colNgayGD
             // 
+            this.colNgayGD.Caption = "Ngày giao dịch";
             this.colNgayGD.FieldName = "NgayGD";
             this.colNgayGD.MinWidth = 30;
             this.colNgayGD.Name = "colNgayGD";
             this.colNgayGD.Visible = true;
             this.colNgayGD.VisibleIndex = 1;
-            this.colNgayGD.Width = 111;
+            this.colNgayGD.Width = 125;
             // 
             // colMaso
             // 
+            this.colMaso.Caption = "Mã số";
             this.colMaso.FieldName = "Maso";
             this.colMaso.MinWidth = 30;
             this.colMaso.Name = "colMaso";
             this.colMaso.Visible = true;
             this.colMaso.VisibleIndex = 2;
-            this.colMaso.Width = 143;
+            this.colMaso.Width = 131;
             // 
             // colDiengiai
             // 
+            this.colDiengiai.Caption = "Diễn giải";
             this.colDiengiai.FieldName = "Diengiai";
             this.colDiengiai.MinWidth = 30;
             this.colDiengiai.Name = "colDiengiai";
             this.colDiengiai.Visible = true;
             this.colDiengiai.VisibleIndex = 3;
-            this.colDiengiai.Width = 595;
+            this.colDiengiai.Width = 551;
             // 
             // colThanhTien1
             // 
@@ -1202,7 +1210,7 @@
             this.colThanhTien1.Name = "colThanhTien1";
             this.colThanhTien1.Visible = true;
             this.colThanhTien1.VisibleIndex = 4;
-            this.colThanhTien1.Width = 229;
+            this.colThanhTien1.Width = 211;
             // 
             // gridColumn11
             // 
@@ -1214,25 +1222,45 @@
             this.gridColumn11.Name = "gridColumn11";
             this.gridColumn11.Visible = true;
             this.gridColumn11.VisibleIndex = 5;
-            this.gridColumn11.Width = 112;
+            this.gridColumn11.Width = 102;
             // 
             // colTKNo1
             // 
+            this.colTKNo1.AppearanceCell.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.colTKNo1.AppearanceCell.ForeColor = System.Drawing.Color.Blue;
+            this.colTKNo1.AppearanceCell.Options.UseFont = true;
+            this.colTKNo1.AppearanceCell.Options.UseForeColor = true;
+            this.colTKNo1.Caption = "Tài khoản Nợ";
             this.colTKNo1.FieldName = "TKNo";
             this.colTKNo1.MinWidth = 30;
             this.colTKNo1.Name = "colTKNo1";
             this.colTKNo1.Visible = true;
             this.colTKNo1.VisibleIndex = 6;
-            this.colTKNo1.Width = 229;
+            this.colTKNo1.Width = 211;
             // 
             // colTKCo1
             // 
+            this.colTKCo1.AppearanceCell.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.colTKCo1.AppearanceCell.ForeColor = DevExpress.LookAndFeel.DXSkinColors.ForeColors.Information;
+            this.colTKCo1.AppearanceCell.Options.UseFont = true;
+            this.colTKCo1.AppearanceCell.Options.UseForeColor = true;
+            this.colTKCo1.Caption = "Tài khoản có";
             this.colTKCo1.FieldName = "TKCo";
             this.colTKCo1.MinWidth = 30;
             this.colTKCo1.Name = "colTKCo1";
             this.colTKCo1.Visible = true;
             this.colTKCo1.VisibleIndex = 7;
-            this.colTKCo1.Width = 237;
+            this.colTKCo1.Width = 230;
+            // 
+            // colCheck
+            // 
+            this.colCheck.Caption = "Chọn";
+            this.colCheck.FieldName = "Checked";
+            this.colCheck.MinWidth = 30;
+            this.colCheck.Name = "colCheck";
+            this.colCheck.Visible = true;
+            this.colCheck.VisibleIndex = 8;
+            this.colCheck.Width = 112;
             // 
             // lblDpPath
             // 
@@ -1514,6 +1542,10 @@
             this.comboBoxEdit1.TabIndex = 1;
             this.comboBoxEdit1.Visible = false;
             // 
+            // nganhangBindingSource
+            // 
+            this.nganhangBindingSource.DataSource = typeof(SaovietTax.frmMain.Nganhang);
+            // 
             // fileImportDetailBindingSource
             // 
             this.fileImportDetailBindingSource.DataSource = typeof(SaovietTax.frmMain.FileImportDetail);
@@ -1560,7 +1592,7 @@
             this.xtraTabPage2.ResumeLayout(false);
             this.xtraTabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
@@ -1576,6 +1608,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nganhangBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportDetailBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.radialMenu1)).EndInit();
             this.ResumeLayout(false);
@@ -1699,5 +1732,7 @@
         private DevExpress.XtraEditors.SimpleButton btnLichsuimport;
         private DevExpress.XtraGrid.Columns.GridColumn colInvoiceType;
         private DevExpress.XtraGrid.Columns.GridColumn colInvoiceType2;
+        private System.Windows.Forms.BindingSource nganhangBindingSource1;
+        private DevExpress.XtraGrid.Columns.GridColumn colCheck;
     }
 }
