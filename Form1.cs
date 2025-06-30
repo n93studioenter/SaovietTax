@@ -7514,33 +7514,33 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private System.Windows.Forms.Timer clickTimer;
         private void gridView1_MouseDown(object sender, MouseEventArgs e)
         {
-            var hitInfo = gridView1.CalcHitInfo(e.Location);
-            if (hitInfo.InColumn)
-            {
-                var column = hitInfo.Column;
-                if (column.ToString() == "Chọn")
-                {
-                    if (checkedCtype == 0)
-                    {
-                        checkedCtype = 1;
-                        //Bỏ check tất cả
-                        foreach (var item in lstNganhan)
-                        {
-                            item.Checked = false;
-                        }
-                    }
-                    else
-                    {
-                        checkedCtype = 0;
-                        foreach (var item in lstNganhan)
-                        {
-                            item.Checked = true;
-                        }
-                    }
-                    gridControl1.DataSource = lstNganhan;
-                    gridControl1.RefreshDataSource();
-                }
-            }
+            //var hitInfo = gridView1.CalcHitInfo(e.Location);
+            //if (hitInfo.InColumn)
+            //{
+            //    var column = hitInfo.Column;
+            //    if (column.ToString() == "Chọn")
+            //    {
+            //        if (checkedCtype == 0)
+            //        {
+            //            checkedCtype = 1;
+            //            //Bỏ check tất cả
+            //            foreach (var item in lstNganhan)
+            //            {
+            //                item.Checked = false;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            checkedCtype = 0;
+            //            foreach (var item in lstNganhan)
+            //            {
+            //                item.Checked = true;
+            //            }
+            //        }
+            //        gridControl1.DataSource = lstNganhan;
+            //        gridControl1.RefreshDataSource();
+            //    }
+            //}
         }
         private List<int> lstrowSohieu = new List<int>();
         private void gridView2_KeyDown(object sender, KeyEventArgs e)
@@ -7629,7 +7629,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue3);
                                 //  Fill lai cho lstrowSohieu
                                 bool replace = false;
-                                lstrowSohieu.RemoveAt(0);
+                                if (lstrowSohieu.Count > 0)
+                                    lstrowSohieu.RemoveAt(0);
                                 if (lstrowSohieu.Count > 0)
                                 {
                                     DialogResult result = XtraMessageBox.Show("Có "+ lstrowSohieu.Count+" sản phẩm khác đang trùng tên với sản phẩm đang sửa, bạn có muốn cập nhật luôn mã mới?",
@@ -8729,7 +8730,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                    };
                 dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
             }
-          //  ConvertImageTOexcel();
+            ConvertImageTOexcel();
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
             progressPanel1.Visible = false;

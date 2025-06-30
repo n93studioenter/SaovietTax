@@ -1007,7 +1007,22 @@ namespace SaovietTax
             string vat = "0";
             double TienTrcthue = 0;
             double TienThue = 0;
-            TienTrcthue = !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.tgtttbso;
+            if (item.tgtcthue.HasValue)
+            {
+                TienTrcthue = double.Parse(item.tgtcthue.Value.ToString());
+            }
+            else
+            {
+                if (item.tgtkcthue!=null)
+                {
+                    TienTrcthue = double.Parse(item.tgtkcthue.ToString());
+                }
+                else
+                {
+                    TienTrcthue =0;
+                }
+            }
+                //TienTrcthue = item.t ? double.Parse(tgtkcthue) : item.tgtttbso;
             TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
             if (item.thttltsuat.Count() > 0 )
             {
@@ -1159,8 +1174,24 @@ namespace SaovietTax
             string vat = "0";
             double TienTrcthue = 0;
             double TienThue = 0;
-            TienTrcthue = !string.IsNullOrEmpty(tgtkcthue) ? double.Parse(tgtkcthue) : item.tgtttbso.Value;
-            TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
+            if (item.tgtcthue.HasValue)
+            {
+                TienTrcthue = double.Parse(item.tgtcthue.Value.ToString());
+            }
+            else
+            {
+                TienTrcthue = 0;
+            }
+            if (item.tgtthue != null)
+            {
+                TienThue=double.Parse(item.tgtthue.ToString());
+            }
+            else
+            {
+                TienThue = 0;
+            }
+
+            //TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
             if (item.thttltsuat.Count() > 0)
             {
                 vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");

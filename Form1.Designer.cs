@@ -88,6 +88,7 @@
             this.colInvoiceType2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.progressPanel2 = new DevExpress.XtraWaitForm.ProgressPanel();
             this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
@@ -159,6 +160,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.xtraTabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
@@ -897,6 +899,7 @@
             // 
             // xtraTabPage1
             // 
+            this.xtraTabPage1.Controls.Add(this.pictureBox1);
             this.xtraTabPage1.Controls.Add(this.progressPanel2);
             this.xtraTabPage1.Controls.Add(this.simpleButton2);
             this.xtraTabPage1.Controls.Add(this.panelControl2);
@@ -913,6 +916,17 @@
             this.xtraTabPage1.Size = new System.Drawing.Size(1697, 573);
             this.xtraTabPage1.Text = "Sao việt tải hóa đơn";
             this.xtraTabPage1.Paint += new System.Windows.Forms.PaintEventHandler(this.xtraTabPage1_Paint);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(1425, 8);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(199, 171);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 14;
+            this.pictureBox1.TabStop = false;
             // 
             // progressPanel2
             // 
@@ -1437,13 +1451,13 @@
             this.panelControl1.Controls.Add(this.btnTaicoquanthue);
             this.panelControl1.Location = new System.Drawing.Point(556, 3);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(915, 185);
+            this.panelControl1.Size = new System.Drawing.Size(851, 185);
             this.panelControl1.TabIndex = 1;
             // 
             // btnLichsuimport
             // 
             this.btnLichsuimport.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnLichsuimport.ImageOptions.Image")));
-            this.btnLichsuimport.Location = new System.Drawing.Point(625, 142);
+            this.btnLichsuimport.Location = new System.Drawing.Point(568, 142);
             this.btnLichsuimport.Name = "btnLichsuimport";
             this.btnLichsuimport.Size = new System.Drawing.Size(276, 34);
             this.btnLichsuimport.TabIndex = 14;
@@ -1463,7 +1477,7 @@
             // btnImportChungtunganhang
             // 
             this.btnImportChungtunganhang.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnImportChungtunganhang.ImageOptions.Image")));
-            this.btnImportChungtunganhang.Location = new System.Drawing.Point(625, 100);
+            this.btnImportChungtunganhang.Location = new System.Drawing.Point(568, 100);
             this.btnImportChungtunganhang.Name = "btnImportChungtunganhang";
             this.btnImportChungtunganhang.Size = new System.Drawing.Size(276, 34);
             this.btnImportChungtunganhang.TabIndex = 12;
@@ -1473,7 +1487,7 @@
             // btnMatdinhnganhang
             // 
             this.btnMatdinhnganhang.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMatdinhnganhang.ImageOptions.Image")));
-            this.btnMatdinhnganhang.Location = new System.Drawing.Point(625, 11);
+            this.btnMatdinhnganhang.Location = new System.Drawing.Point(568, 11);
             this.btnMatdinhnganhang.Name = "btnMatdinhnganhang";
             this.btnMatdinhnganhang.Size = new System.Drawing.Size(276, 34);
             this.btnMatdinhnganhang.TabIndex = 11;
@@ -1483,7 +1497,7 @@
             // btnReadPDF
             // 
             this.btnReadPDF.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnReadPDF.ImageOptions.Image")));
-            this.btnReadPDF.Location = new System.Drawing.Point(625, 55);
+            this.btnReadPDF.Location = new System.Drawing.Point(568, 55);
             this.btnReadPDF.Name = "btnReadPDF";
             this.btnReadPDF.Size = new System.Drawing.Size(276, 34);
             this.btnReadPDF.TabIndex = 10;
@@ -1579,6 +1593,7 @@
             this.xtraTabControl1.ResumeLayout(false);
             this.xtraTabPage1.ResumeLayout(false);
             this.xtraTabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).EndInit();
@@ -1734,5 +1749,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn colInvoiceType2;
         private System.Windows.Forms.BindingSource nganhangBindingSource1;
         private DevExpress.XtraGrid.Columns.GridColumn colCheck;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
