@@ -9052,6 +9052,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 foreach (var item in lstNganhan)
                 {
+                    if(item.TKNo.Contains("131") || item.TKNo.Contains("341"))
+                    {
+                        if (!item.TKNo.Contains('|'))
+                            XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                        return;
+                    }
+                    if (item.TKCo.Contains("131") || item.TKCo.Contains("341"))
+                    {
+                        if (!item.TKCo.Contains('|'))
+                            XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                        return;
+                    }
                     if (item.Checked == false)
                         continue;
                     var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status) VALUES (?, ?, ?, ?, ?,?,?,?)";
