@@ -60,7 +60,7 @@
             this.xtraTabControl1.Location = new System.Drawing.Point(0, 0);
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.xtraTabPage1;
-            this.xtraTabControl1.Size = new System.Drawing.Size(981, 570);
+            this.xtraTabControl1.Size = new System.Drawing.Size(977, 575);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.xtraTabPage1,
@@ -70,7 +70,7 @@
             // 
             this.xtraTabPage1.Controls.Add(this.gridControl1);
             this.xtraTabPage1.Name = "xtraTabPage1";
-            this.xtraTabPage1.Size = new System.Drawing.Size(974, 534);
+            this.xtraTabPage1.Size = new System.Drawing.Size(965, 535);
             this.xtraTabPage1.Text = "Hóa đơn vào";
             // 
             // gridControl1
@@ -128,7 +128,7 @@
             // 
             this.xtraTabPage2.Controls.Add(this.gridControl2);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(975, 544);
+            this.xtraTabPage2.Size = new System.Drawing.Size(974, 535);
             this.xtraTabPage2.Text = "Hóa đơn ra";
             // 
             // gridControl2
@@ -182,7 +182,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(981, 570);
+            this.ClientSize = new System.Drawing.Size(977, 575);
             this.Controls.Add(this.xtraTabControl1);
             this.Name = "frmTaiCoQuanThue";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

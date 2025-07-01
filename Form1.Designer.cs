@@ -1172,6 +1172,7 @@
             this.gridView5.GridControl = this.gridControl3;
             this.gridView5.Name = "gridView5";
             this.gridView5.OptionsView.ShowGroupPanel = false;
+            this.gridView5.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView5_CellValueChanging);
             this.gridView5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView5_KeyDown);
             this.gridView5.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView5_MouseDown);
             // 
@@ -1502,7 +1503,7 @@
             this.btnReadPDF.Size = new System.Drawing.Size(276, 34);
             this.btnReadPDF.TabIndex = 10;
             this.btnReadPDF.Text = "Đọc file PDF";
-            this.btnReadPDF.Click += new System.EventHandler(this.btnReadPDF_Click);
+            this.btnReadPDF.Click += new System.EventHandler(this.btnReadPDF_Click_1);
             // 
             // btnimport
             // 

@@ -157,7 +157,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1149, 574);
+            this.ClientSize = new System.Drawing.Size(1145, 579);
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.treeList1);
             this.Name = "frmTaikhoan";
