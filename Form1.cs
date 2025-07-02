@@ -346,19 +346,18 @@ namespace SaovietTax
                     }
                 }
                 //load matdinhtaikhoan
-                //foreach (DataRow it in kq.Rows)
-                //{
-                //    FileImport item = lstImportVao.Where(m => m.ID == int.Parse(it["ID"].ToString())).FirstOrDefault();
-                //    if (item != null)
-                //    {
-                //        ApplyDefaultAndRuleBasedAccounts(item, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien);
-                //        if (item.fileImportDetails.Count > 0 && string.IsNullOrEmpty(item.Noidung))
-                //        {
-                //            item.Noidung = item.fileImportDetails.FirstOrDefault().Ten;
-                //        }
-                //    }
-
-                //}
+                foreach (DataRow it in kq.Rows)
+                {
+                    FileImport item = lstImportVao.Where(m => m.ID == int.Parse(it["ID"].ToString())).FirstOrDefault();
+                    if (item != null)
+                    {
+                        ApplyDefaultAndRuleBasedAccounts(item, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien);
+                        if (item.fileImportDetails.Count > 0 && string.IsNullOrEmpty(item.Noidung))
+                        {
+                            item.Noidung = item.fileImportDetails.FirstOrDefault().Ten;
+                        }
+                    }
+                }
                 bindingSource.DataSource = lstImportVao;
                 gridControl1.DataSource = bindingSource;
                 gridControl1.RefreshDataSource();
@@ -490,19 +489,19 @@ namespace SaovietTax
                     }
                 }
                 //load matdinhtaikhoan
-                //foreach (DataRow it in kq.Rows)
-                //{
-                //    FileImport item = lstImportRa.Where(m => m.ID == int.Parse(it["ID"].ToString())).FirstOrDefault();
-                //    if (item != null)
-                //    {
-                //        ApplyDefaultAndRuleBasedAccounts(item, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien);
-                //        if (item.fileImportDetails.Count > 0 && string.IsNullOrEmpty(item.Noidung))
-                //        {
-                //            item.Noidung = item.fileImportDetails.FirstOrDefault().Ten;
-                //        }
-                //    }
+                foreach (DataRow it in kq.Rows)
+                {
+                    FileImport item = lstImportRa.Where(m => m.ID == int.Parse(it["ID"].ToString())).FirstOrDefault();
+                    if (item != null)
+                    {
+                        ApplyDefaultAndRuleBasedAccounts(item, tbDinhDanhtaikhoan, tbDinhDanhtaikhoanUuTien);
+                        if (item.fileImportDetails.Count > 0 && string.IsNullOrEmpty(item.Noidung))
+                        {
+                            item.Noidung = item.fileImportDetails.FirstOrDefault().Ten;
+                        }
+                    }
 
-                //}
+                }
                 bindingSource.DataSource = lstImportRa;
                 gridControl2.DataSource = bindingSource;
                 gridControl2.RefreshDataSource();
@@ -774,6 +773,11 @@ namespace SaovietTax
                 }
                 else
                 {
+                    if (!ColumnExists(connection, "tbDinhdanhNganhang", "SoHieu"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbDinhdanhNganhang", "SoHieu", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbNganhang", "Checked"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -4534,7 +4538,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             catch (Exception ex)
             {
-                XtraMessageBox.Show(ex.Message + path, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               // XtraMessageBox.Show(ex.Message + path, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -8465,7 +8469,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     // Tìm chỉ số cột, không phụ thuộc vào headerRowNumber hiện tại
                     var cellBelow = worksheet.Cell(cell.Address.RowNumber + 1, cell.Address.ColumnNumber);
                     var getdata2 = cellBelow.GetString().Trim(); // Lấy nội dung ô và loại bỏ khoảng trắng thừa
-                    if (getdata.Contains("Ngày GD") || getdata.Contains("Ngày giao dịch") || getdata.Contains("Tran Date") || getdata.Contains("hiệu lực") || (getdata2 == "hiệu lực"))
+                    if (getdata.Contains("Ngày GD") || getdata.Contains("Ngày giao dịch") || getdata.Contains("Tran Date") || getdata.Contains("hiệu lực") || (getdata2 == "hiệu lực") || getdata.Contains("Ngày Datẽ"))
                     {
                         indexNgaygiaodich = cell.Address.ColumnNumber;
 
@@ -8474,19 +8478,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             headerRowNumber += 1;
                     }
 
-                    else if (getdata.Contains("Description") || getdata.Contains("Transactions") || Kiemtratren(getdata, "Nội dung giao dịch") || getdata.Contains("Nội dung"))
+                    else if (getdata.Contains("Description") || getdata.Contains("Transactions") || Kiemtratren(getdata, "Nội dung giao dịch") || getdata.Contains("Nội dung") || getdata.Contains("Ghi chú") || getdata.Contains("Remark"))
                     {
                         indexDiengiai = cell.Address.ColumnNumber;
                     }
-                    else if ((getdata.Contains("GD") || getdata.Contains("GDV") || getdata.Contains("So CT")) && indexMaGD == 0)
+                    else if ((getdata.Contains("GD") || getdata.Contains("GDV") || getdata.Contains("So CT")) && indexMaGD == 0 || getdata.Contains("Số tham chiếu"))
                     {
                         indexMaGD = cell.Address.ColumnNumber;
                     }
-                    else if (getdata.Contains("Số tiền rút") || getdata.Contains("Debit") || getdata.Contains("Phát sinh nợ") || (getdata.Contains("Số tiền") && getdata2.Contains("rút ra")))
+                    else if (getdata.Contains("Số tiền rút") || getdata.Contains("Debit") || getdata.Contains("Phát sinh nợ") || (getdata.Contains("Số tiền") && getdata2.Contains("rút ra")) || getdata.Contains("Dr"))
                     {
                         indexTKCo = cell.Address.ColumnNumber;
                     }
-                    else if (getdata.Contains("Số tiền gửi") || getdata.Contains("Credit") || getdata.Contains("Phát sinh có") || (getdata.Contains("Số tiền") && getdata2.Contains("gửi vào")))
+                    else if (getdata.Contains("Số tiền gửi") || getdata.Contains("Credit") || getdata.Contains("Phát sinh có") || (getdata.Contains("Số tiền") && getdata2.Contains("gửi vào")) || getdata.Contains("Cr"))
                     {
                         indexTKNo = cell.Address.ColumnNumber;
                     }
@@ -8506,7 +8510,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 // Bắt đầu vòng lặp từ hàng ngay sau hàng tiêu đề (headerRowNumber + 1)
                 // và kết thúc ở hàng cuối cùng có dữ liệu trong worksheet.
                 int sttValue = 1;
-                string queryCheckVatTu = @"SELECT * FROM tbNganhang ";
+                string queryCheckVatTu = @"SELECT * FROM tbNganhang where Status = 0";
                 var parameterss = new OleDbParameter[]
                 {
  new OleDbParameter("?",null)
@@ -8624,12 +8628,30 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                         // Số tiền rút (TK Có) và Số tiền gửi (TK Nợ)
 
-
+                        
 
                         // Logic xác định ThanhTien, TKCo, TKNo dựa trên số tiền rút hoặc gửi
-                        string tknganhan = lblTKNganhang.Text.Split('-')[0].ToString();
-                        //Kiểm tra mật định
-                        string tkDoiung = "1111";
+                        string tknganhan = "";
+                        if (typeNganhang == 1)
+                        {
+                            tknganhan = lblTKNganhang.Text.Split('-')[0].ToString();
+                        }
+                        else
+                        {
+                            //Lọc ko có
+                           
+
+                            var filteredRows = dtnganhang.AsEnumerable().Where(rows => rows["DienGiai"].ToString() == nganhang.Diengiai).FirstOrDefault();
+                            if (filteredRows==null)
+                                continue; // Bỏ qua nếu đã xử lý
+                            if (filteredRows["TKNo"].ToString().Contains("112"))
+                                tknganhan = filteredRows?["TKNo"].ToString();
+                            else
+                                tknganhan = filteredRows?["TKCo"].ToString();
+                        }
+
+                            //Kiểm tra mật định
+                            string tkDoiung = "1111";
                         if (dtMatdinhnganhang.Rows.Count > 0)
                         {
                             foreach (DataRow dtRow in dtMatdinhnganhang.Rows)
@@ -8638,7 +8660,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 //Kiểm tra có chứa mặc định không
                                 if (RemoveVietnameseDiacritics(nganhang.Diengiai).Contains(getNoidung))
                                 {
+                                    if(string.IsNullOrEmpty(dtRow["SoHieu"].ToString()))
                                     tkDoiung = dtRow["TK"].ToString();
+                                    else
+                                        tkDoiung = dtRow["TK"].ToString()+"|"+ dtRow["SoHieu"].ToString();
                                 }
                             }
                         }
@@ -9078,7 +9103,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", item.TKCo),
               new OleDbParameter("?","0"),
                        };
-                    int rowsAffected = ExecuteQueryResult(query, parameters);
+                    try
+                    {
+                        int rowsAffected = ExecuteQueryResult(query, parameters);
+                    }
+                    catch(Exception ex)
+                    {
+                        XtraMessageBox.Show(ex.Message);
+                    }
                 }
                 this.Close();
             }
@@ -9307,7 +9339,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void btnReadPDF_Click_1(object sender, EventArgs e)
         {
-
+            typeNganhang = 1;
             progressPanel1.Visible = true;
             Application.DoEvents();
             if (lblTKNganhang.Text == "...")
@@ -9328,6 +9360,28 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             string path = savedPath + @"\output.xlsx";
             ReadExcelBank(path);
             progressPanel1.Visible = false;
+        }
+        private int typeNganhang=0;
+        private void btnLocdulieuNganhang_Click(object sender, EventArgs e)
+        {
+            typeNganhang = 2;
+            progressPanel1.Visible = true;
+            Application.DoEvents();
+            if (dtMatdinhnganhang.Rows.Count == 0)
+            {
+                string queryCheckVatTu = @"SELECT * FROM tbDinhdanhNganhang ";
+                var parameterss = new OleDbParameter[]
+                {
+                 new OleDbParameter("?",null)
+                   };
+                dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
+            }
+           
+            string path = savedPath + @"\output.xlsx";
+            ReadExcelBank(path);
+
+            progressPanel1.Visible = false;
+
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)

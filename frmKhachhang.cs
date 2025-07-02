@@ -13,6 +13,7 @@ using System.Data.OleDb;
 using System.Reflection;
 using System.IO;
 using static SaovietTax.frmKhachhang;
+using DevExpress.XtraGrid.Views.Grid;
 
 namespace SaovietTax
 {
@@ -32,6 +33,7 @@ namespace SaovietTax
             public string DiaChi { get; set; }  
         }
         public Khachhang dtoVatTu { get; set; }
+        public frmMatdinhNganHang frmMatdinhNganHang { get; set; } // Biến để lưu trữ form frmMatdinhNganHang
         public frmMain frmMain;
         string dbPath = "";
         public int Mode { get; set; } // Biến để xác định chế độ (thêm mới hay sửa đổi) 
@@ -152,18 +154,22 @@ namespace SaovietTax
                 int idsl = 0;
                 if (comboBoxEdit1.Properties.Items.Count > 0)
                 {
-                    foreach (Item item in comboBoxEdit1.Properties.Items)
+                    if (frmMain != null)
                     {
-                        if (item.Id == frmMain.currentselectId)
+                        foreach (Item item in comboBoxEdit1.Properties.Items)
                         {
-                            idsl = comboBoxEdit1.Properties.Items.IndexOf(item);
-                            break;
+                            if (item.Id == frmMain.currentselectId)
+                            {
+                                idsl = comboBoxEdit1.Properties.Items.IndexOf(item);
+                                break;
+                            }
                         }
-                    }
-                    comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
-                    var selectedItem = comboBoxEdit1.SelectedItem as Item;
+                        comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
+                        var selectedItem = comboBoxEdit1.SelectedItem as Item;
 
-                    LoadData(selectedItem.Id);
+                        LoadData(selectedItem.Id);
+                    }
+                  
                 }
             }
             else
@@ -173,29 +179,33 @@ namespace SaovietTax
             }
             //
             //Load data vat tu 
-            txtSohieu.Text = dtoVatTu.SoHieu;
-            txtTenvattu.Text = dtoVatTu.Ten; 
-            txtGhichu.Text = dtoVatTu.DiaChi!=null? dtoVatTu.DiaChi:"";
-            txtDonvi.Text = dtoVatTu.Mst!=null?dtoVatTu.Mst.ToString():"";
-            txtMaSo.Text=dtoVatTu.MaSo.ToString();
-            DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
-            for (int i = 0; i < view.RowCount; i++)
+            if (frmMain != null)
             {
-                // Lấy giá trị của cột STT
-                if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
+                txtSohieu.Text = dtoVatTu.SoHieu;
+                txtTenvattu.Text = dtoVatTu.Ten;
+                txtGhichu.Text = dtoVatTu.DiaChi != null ? dtoVatTu.DiaChi : "";
+                txtDonvi.Text = dtoVatTu.Mst != null ? dtoVatTu.Mst.ToString() : "";
+                txtMaSo.Text = dtoVatTu.MaSo.ToString();
+                DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView;
+                for (int i = 0; i < view.RowCount; i++)
                 {
-                    this.BeginInvoke((MethodInvoker)delegate
+                    // Lấy giá trị của cột STT
+                    if (view.GetRowCellValue(i, "SoHieu").ToString() == txtSohieu.Text)
                     {
-                        if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
+                        this.BeginInvoke((MethodInvoker)delegate
                         {
-                            gridView1.FocusedRowHandle = i; // Đặt focus
-                            gridView1.MakeRowVisible(i); // Cuộn đến dòng
-                            gridView1.SelectRow(i); // Chọn dòng
-                        }
-                    });
-                    return;
+                            if (gridView1.RowCount > i) // Kiểm tra số lượng dòng
+                            {
+                                gridView1.FocusedRowHandle = i; // Đặt focus
+                                gridView1.MakeRowVisible(i); // Cuộn đến dòng
+                                gridView1.SelectRow(i); // Chọn dòng
+                            }
+                        });
+                        return;
+                    }
                 }
             }
+           
         }
 
         private void comboBoxEdit1_SelectedIndexChanged(object sender, EventArgs e)
@@ -207,9 +217,18 @@ namespace SaovietTax
 
                 if (selectedItem != null)
                 {
-                    int selectedId = selectedItem.Id; // Lấy giá trị Id 
-                    frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
-                    LoadData(selectedId);
+                    if (frmMain != null)
+                    {
+                        int selectedId = selectedItem.Id; // Lấy giá trị Id 
+                        frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
+                        LoadData(selectedId);
+                    }
+                    else
+                    {
+                        int selectedId = selectedItem.Id; // Lấy giá trị Id 
+                        LoadData(selectedId);
+                    }
+                   
                 }
             }
         }
@@ -237,14 +256,17 @@ namespace SaovietTax
             // Lấy dữ liệu từ hàng
             var value = gridView1.GetRowCellValue(rowHandle, "SoHieu").ToString();
             // tbKhachhang.AsEnumerable().Where(row => row.Field<string>("MST") == mst).FirstOrDefault();
-            var getKhachhang =frmMain.tbKhachhang.AsEnumerable().Where(row => row.Field<Int32>("MaSo") == ID).FirstOrDefault();
-            // Lấy chỉ số hàng đã click
-            
-            txtSohieu.Text = getKhachhang["SoHieu"].ToString();
-            txtTenvattu.Text = Helpers.ConvertVniToUnicode(getKhachhang["Ten"].ToString());
-            txtDonvi.Text = getKhachhang["MST"].ToString();
-            txtGhichu.Text = Helpers.ConvertVniToUnicode(getKhachhang["DiaChi"].ToString());
-            txtMaSo.Text = getKhachhang["MaSo"].ToString();
+            if (frmMain != null)
+            {
+                var getKhachhang = frmMain.tbKhachhang.AsEnumerable().Where(row => row.Field<Int32>("MaSo") == ID).FirstOrDefault();
+                // Lấy chỉ số hàng đã click
+
+                txtSohieu.Text = getKhachhang["SoHieu"].ToString();
+                txtTenvattu.Text = Helpers.ConvertVniToUnicode(getKhachhang["Ten"].ToString());
+                txtDonvi.Text = getKhachhang["MST"].ToString();
+                txtGhichu.Text = Helpers.ConvertVniToUnicode(getKhachhang["DiaChi"].ToString());
+                txtMaSo.Text = getKhachhang["MaSo"].ToString();
+            }
         }
         private void RefreshData()
         {
@@ -269,7 +291,7 @@ namespace SaovietTax
             }
 
             // Xác định xem đây là thêm mới hay cập nhật
-            bool isInsert = txtMaSo.Text == "";
+            bool isInsert = txtMaSo.Text == "" || txtMaSo.Text == "0";
             string query;
             OleDbParameter[] parameters;
 
@@ -362,11 +384,31 @@ namespace SaovietTax
                 var hiddenValue = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["Ten"]);
                 var hiddenValue2 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["SoHieu"]);
                 var hiddenValue3 = gridView.GetRowCellValue(hitInfo.RowHandle, gridView.Columns["MST"]);
-                frmMain.hiddenValue = hiddenValue.ToString();
-                frmMain.hiddenValue2 = hiddenValue2.ToString();
-                frmMain.hiddenValue3 = hiddenValue3.ToString();
-                isChange = true;
+                if (frmMain != null)
+                {
+                    frmMain.hiddenValue = hiddenValue.ToString();
+                    frmMain.hiddenValue2 = hiddenValue2.ToString();
+                    frmMain.hiddenValue3 = hiddenValue3.ToString();
+                    isChange = true;
+                }
+                else
+                {
+                    frmMatdinhNganHang.Sohieu = hiddenValue2.ToString();
+                }
                 this.Close();
+            }
+        }
+
+        private void gridView1_CustomRowFilter(object sender, DevExpress.XtraGrid.Views.Base.RowFilterEventArgs e)
+        {
+            var view = sender as GridView;
+            string searchText = view.FindFilterText;
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                e.Visible = true;
+                e.Handled = true;
+                return;
             }
         }
     }

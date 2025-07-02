@@ -37,17 +37,19 @@ namespace SaovietTax
         }
         private void btnLuudinhdanh_Click(object sender, EventArgs e)
         {
-            var query = @"INSERT INTO tbDinhdanhNganhang (Noidung,TK) VALUES (?, ?)";
+            var query = @"INSERT INTO tbDinhdanhNganhang (Noidung,TK,SoHieu) VALUES (?, ?,?)";
             var parameters = new OleDbParameter[]
             {
             new OleDbParameter("?", txtDiengiai.Text), 
-            new OleDbParameter("?", textEdit1.Text)
+            new OleDbParameter("?", textEdit1.Text),
+             new OleDbParameter("?", txtMaKH.Text)
             };
             int rowsAffected = ExecuteQueryResult(query, parameters);
             LoadData();
         }
 
         string dbPath = "";
+        public string Sohieu { get; set; }
         private DataTable ExecuteQuery(string query, params OleDbParameter[] parameters)
         {
             DataTable dataTable = new DataTable();
@@ -168,6 +170,17 @@ namespace SaovietTax
                     LoadData();
                 }
                
+            }
+        }
+
+        private void txtMaKH_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                frmKhachhang frmKhachhang = new frmKhachhang();
+                frmKhachhang.frmMatdinhNganHang = this; // Truyền tham chiếu đến frmMatdinhNganHang
+                frmKhachhang.ShowDialog();
+                txtMaKH.Text = Sohieu; // Lấy giá trị từ frmKhachhang
             }
         }
     }
