@@ -785,6 +785,7 @@ namespace SaovietTax
         }
         DataTable existingKhachHang = new DataTable();
         DataTable existingTbImport = new DataTable();
+        DataTable existingTbChungtu = new DataTable();
         string csohieu = "";
         static string GenerateAbbreviation(string fullName, List<string> existingNames)
         {
@@ -878,6 +879,7 @@ namespace SaovietTax
             {
                 return;
             }
+            if (existingTbChungtu.AsEnumerable().Any(row => row.Field<string>("SoHieu").ToString() == item.shdon.ToString() && row.Field<DateTime>("NgayCT").Month == item.ntao.Month)) { return; }
 
             int type = frmMain.type;
             string query = @"
@@ -1273,7 +1275,11 @@ namespace SaovietTax
             //existingTbImport
             query = "SELECT * FROM tbimport"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             existingTbImport = ExecuteQuery(query);
+            //Danh sách chứng từ
+            query = "SELECT * FROM ChungTu"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            existingTbChungtu= ExecuteQuery(query);
             // XulyFileExcel();
+
             // return;
             Driver = null;
             if (Driver == null)

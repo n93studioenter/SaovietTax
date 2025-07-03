@@ -131,7 +131,7 @@ namespace SaovietTax
         }
         private void frmKhachhang_Load(object sender, EventArgs e)
         {
-            gridView1.OptionsFind.AlwaysVisible = true; // Luôn hiển thị ô tìm kiếm
+           // gridView1.OptionsFind.AlwaysVisible = true; // Luôn hiển thị ô tìm kiếm
 
             string query = @"SELECT * FROM PhanLoaiKhachHang ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
@@ -167,7 +167,7 @@ namespace SaovietTax
                         comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
                         var selectedItem = comboBoxEdit1.SelectedItem as Item;
 
-                        LoadData(selectedItem.Id);
+                        LoadData(selectedItem.Id, txtSearch.Text);
                     }
                   
                 }
@@ -221,32 +221,42 @@ namespace SaovietTax
                     {
                         int selectedId = selectedItem.Id; // Lấy giá trị Id 
                         frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
-                        LoadData(selectedId);
+                        LoadData(selectedId,txtSearch.Text);
                     }
                     else
                     {
                         int selectedId = selectedItem.Id; // Lấy giá trị Id 
-                        LoadData(selectedId);
+                        LoadData(selectedId, txtSearch.Text);
                     }
                    
                 }
             }
         }
-        private void LoadData(int Maso)
+        private void LoadData(int Maso, string keysearch)
         {
-            string query = @" SELECT *  FROM KhachHang where MaPhanLoai= ? ";
-            var parameterss = new OleDbParameter[]
+            string query = @"SELECT * FROM KhachHang WHERE MaPhanLoai = ?";
+
+            // Khởi tạo danh sách tham số
+            var parameterss = new List<OleDbParameter>
+    {
+        new OleDbParameter("?", Maso)
+    };
+
+            // Kiểm tra xem keysearch có rỗng không
+            if (!string.IsNullOrEmpty(keysearch))
             {
-                new OleDbParameter("?",Maso)
-               };
-            var kq = ExecuteQuery(query, parameterss);
+                query += " AND LCASE(Ten) LIKE ?";
+                parameterss.Add(new OleDbParameter("?", "%" + Helpers.ConvertUnicodeToVni(keysearch).ToLower() + "%")); // Chuyển keysearch thành chữ thường
+            }
+
+            var kq = ExecuteQuery(query, parameterss.ToArray());
             foreach (DataRow item in kq.Rows)
             {
                 item["Ten"] = Helpers.ConvertVniToUnicode(item["Ten"].ToString());
                 item["SoHieu"] = Helpers.ConvertVniToUnicode(item["SoHieu"].ToString());
             }
-            gridControl1.DataSource = kq;
 
+            gridControl1.DataSource = kq;
         }
 
         private void gridView1_RowCellClick(object sender, DevExpress.XtraGrid.Views.Grid.RowCellClickEventArgs e)
@@ -337,7 +347,7 @@ namespace SaovietTax
                 frmMain.hiddenValue3 = txtTenvattu.Text;
                 //this.Close();
 
-                LoadData(selectedItem.Id);
+                LoadData(selectedItem.Id,txtSearch.Text);
               //  RefreshData();
                 DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView; // Lấy GridView
                 for (int i = 0; i < view.RowCount; i++)
@@ -410,6 +420,13 @@ namespace SaovietTax
                 e.Handled = true;
                 return;
             }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            var selectedItem = comboBoxEdit1.SelectedItem as Item;
+
+            LoadData(selectedItem.Id, txtSearch.Text);
         }
     }
 }

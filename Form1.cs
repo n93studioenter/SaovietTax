@@ -1354,6 +1354,9 @@ namespace SaovietTax
             lstvt = await LoadDataVattuAsync();
             var query = "SELECT * FROM KhachHang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             tbKhachhang = await Task.Run(() => ExecuteQuery(query));
+            query = "SELECT * FROM tbNganhang"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            tbNganhang = await Task.Run(() => ExecuteQuery(query));
+            
             gridView1.Columns["Checked"].OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
             gridView3.Columns["Checked"].OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
             gridView5.Columns["Checked"].OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
@@ -7933,6 +7936,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
         }
         public DataTable tbKhachhang = new DataTable();
+        public DataTable tbNganhang = new DataTable();
         private void TooogleKH(DevExpress.XtraGrid.Views.Grid.GridView gridView, string cellValue, int currentRowHandle, string mst, string ten)
         {
             frmKhachhang frmKhachhang = new frmKhachhang();
@@ -9077,23 +9081,47 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 foreach (var item in lstNganhan)
                 {
-                    if(item.TKNo.Contains("131") || item.TKNo.Contains("341"))
+                    //Kiểm tra xem đã có chưa
+                    if (tbNganhang.AsEnumerable().Any(row =>
+                      row.Field<string>("SHDon") != null &&
+                      row.Field<string>("SHDon") == item.Maso &&
+                      row.Field<string>("NgayGD") != null &&
+                      DateTime.TryParse(row.Field<string>("NgayGD"), out DateTime ngayGD) &&
+                      ngayGD.Date == item.NgayGD.Date))
                     {
-                        if (!item.TKNo.Contains('|'))
-                            XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
-                        return;
+                        //Nếu bỏ check thì cập nhật bỏ check
+                        var query = @"update tbNganhang set  ";
+                        var parameters = new OleDbParameter[]
+                           {
+            new OleDbParameter("?", item.Maso), 
+                           };
+                        try
+                        {
+                           // int rowsAffected = ExecuteQueryResult(query, parameters);
+                        }
+                        catch(Exception ex)
+                        {
+
+                        }
                     }
-                    if (item.TKCo.Contains("131") || item.TKCo.Contains("341"))
+                    else
                     {
-                        if (!item.TKCo.Contains('|'))
-                            XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
-                        return;
-                    }
-                    if (item.Checked == false)
-                        continue;
-                    var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status) VALUES (?, ?, ?, ?, ?,?,?,?)";
-                    var parameters = new OleDbParameter[]
-                       {
+                        if (item.TKNo.Contains("131") || item.TKNo.Contains("341"))
+                        {
+                            if (!item.TKNo.Contains('|'))
+                                XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                            return;
+                        }
+                        if (item.TKCo.Contains("131") || item.TKCo.Contains("341"))
+                        {
+                            if (!item.TKCo.Contains('|'))
+                                XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status,Checked) VALUES (?, ?, ?, ?, ?,?,?,?,?)";
+                        var parameters = new OleDbParameter[]
+                           {
             new OleDbParameter("?", item.Maso),
             new OleDbParameter("?", item.NgayGD),
             new OleDbParameter("?", Helpers.ConvertUnicodeToVni(item.Diengiai)),
@@ -9102,15 +9130,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             new OleDbParameter("?", item.TKNo),
             new OleDbParameter("?", item.TKCo),
               new OleDbParameter("?","0"),
-                       };
-                    try
-                    {
-                        int rowsAffected = ExecuteQueryResult(query, parameters);
+               new OleDbParameter("?",item.Checked?"1":"0"),
+                           };
+                        try
+                        {
+                            int rowsAffected = ExecuteQueryResult(query, parameters);
+                        }
+                        catch (Exception ex)
+                        {
+                            XtraMessageBox.Show(ex.Message);
+                        }
                     }
-                    catch(Exception ex)
-                    {
-                        XtraMessageBox.Show(ex.Message);
-                    }
+                   
                 }
                 this.Close();
             }
@@ -9216,7 +9247,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 int stt = int.Parse(gridView.GetRowCellValue(currentRowHandle, "Stt").ToString());
                 if (cellValue != null)
                 {
-                    if (cellValue.ToString().Contains("341") || cellValue.ToString().Contains("131"))
+                    if (cellValue.ToString().Contains("341") || cellValue.ToString().Contains("131") || cellValue.ToString().Contains("331"))
                     {
                         frmKhachhang frmKhachhang = new frmKhachhang();
                         frmKhachhang.Mode = 2;
@@ -9364,23 +9395,48 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private int typeNganhang=0;
         private void btnLocdulieuNganhang_Click(object sender, EventArgs e)
         {
-            typeNganhang = 2;
-            progressPanel1.Visible = true;
-            Application.DoEvents();
-            if (dtMatdinhnganhang.Rows.Count == 0)
-            {
-                string queryCheckVatTu = @"SELECT * FROM tbDinhdanhNganhang ";
-                var parameterss = new OleDbParameter[]
-                {
-                 new OleDbParameter("?",null)
-                   };
-                dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
-            }
-           
-            string path = savedPath + @"\output.xlsx";
-            ReadExcelBank(path);
+            //typeNganhang = 2;
+            //progressPanel1.Visible = true;
+            //Application.DoEvents();
+            //if (dtMatdinhnganhang.Rows.Count == 0)
+            //{
+            //    string queryCheckVatTu = @"SELECT * FROM tbDinhdanhNganhang ";
+            //    var parameterss = new OleDbParameter[]
+            //    {
+            //     new OleDbParameter("?",null)
+            //       };
+            //    dtMatdinhnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
+            //}
 
-            progressPanel1.Visible = false;
+            //string path = savedPath + @"\output.xlsx";
+            //ReadExcelBank(path);
+
+            //progressPanel1.Visible = false;
+
+            string queryCheckVatTu = @"SELECT * FROM tbNganhang where Status = 0";
+            var parameterss = new OleDbParameter[]
+            {
+ new OleDbParameter("?",null)
+               };
+            var dtnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
+            //Dịch sang tbnganhang
+            int stt = 1;
+            foreach (DataRow item in dtnganhang.Rows)
+            {
+                Nganhang nganhang = new Nganhang();
+                nganhang.Stt = stt;
+                stt += 1;
+                nganhang.NgayGD = DateTime.Parse(item["NgayGD"].ToString());
+                nganhang.Maso = item["SHDon"].ToString();
+                nganhang.Diengiai = item["DienGiai"].ToString();
+                nganhang.ThanhTien = item["TongTien"].ToString()!="0"?double.Parse(item["TongTien"].ToString()):0;
+                nganhang.ThanhTien2 = item["TongTien2"].ToString() != "0" ? double.Parse(item["TongTien2"].ToString()) : 0;
+                nganhang.TKNo = item["TKNo"].ToString();
+                nganhang.TKCo = item["TKCo"].ToString();
+                nganhang.Checked = true;
+                lstNganhan.Add(nganhang);
+            }
+            gridControl3.DataSource = lstNganhan;
 
         }
 

@@ -36,38 +36,42 @@ namespace SaovietTax
             public string DonVi { get; set; }
         }
         public VatTu dtoVatTu { get; set; }
-        private void LoadData(int id)
+        private void LoadData(int id, string keysearch)
         {
             txtId.Text = "0";
-            if (id == 0)
+            string query;
+            List<OleDbParameter> parameters = new List<OleDbParameter>();
+
+            if (id != 0)
             {
-                string query = @" SELECT *  FROM TP154 "; 
-                var kq = ExecuteQuery(query, null);
-                for (int i = 0; i < kq.Rows.Count; i++)
-                {
-                    kq.Rows[i]["TenVattu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["TenVattu"].ToString());
-                    kq.Rows[i]["DonVi"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["DonVi"].ToString());
-                    kq.Rows[i]["GhiChu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["GhiChu"].ToString());
-                }
-                gridControl1.DataSource = kq;
+                parameters.Add(new OleDbParameter("?", id)); // Thêm tham số MaPhanLoai
+                query = "SELECT * FROM TP154 WHERE MaPhanLoai=?";
             }
             else
             {
-                string query = @" SELECT *  FROM TP154 where MaPhanLoai=? ";
-                var parameterss = new OleDbParameter[]
-                   {
-                new OleDbParameter("?",id)
-                      };
-                var kq = ExecuteQuery(query, parameterss);
-                for (int i = 0; i < kq.Rows.Count; i++)
-                {
-                    kq.Rows[i]["TenVattu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["TenVattu"].ToString());
-                    kq.Rows[i]["DonVi"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["DonVi"].ToString());
-                    kq.Rows[i]["GhiChu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["GhiChu"].ToString());
-                }
-                gridControl1.DataSource = kq;
+                query = "SELECT * FROM TP154";
             }
-                
+
+            if (!string.IsNullOrEmpty(keysearch))
+            {
+                // Chuyển keysearch thành chữ thường và thêm ký tự % vào trước và sau
+                keysearch = "%" + Helpers.ConvertUnicodeToVni(keysearch) + "%";
+                query += (id == 0) ? " WHERE LCase(TenVattu) like LCase(?)" : " AND LCase(TenVattu) like LCase(?)";
+                parameters.Add(new OleDbParameter("?", keysearch)); // Thêm tham số TenVattu
+            }
+
+            // Thực hiện truy vấn
+            var kq = ExecuteQuery(query, parameters.ToArray());
+
+            // Xử lý dữ liệu
+            for (int i = 0; i < kq.Rows.Count; i++)
+            {
+                kq.Rows[i]["TenVattu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["TenVattu"].ToString());
+                kq.Rows[i]["DonVi"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["DonVi"].ToString());
+                kq.Rows[i]["GhiChu"] = Helpers.ConvertVniToUnicode(kq.Rows[i]["GhiChu"].ToString());
+            }
+
+            gridControl1.DataSource = kq;
         }
         public class Item
         {
@@ -81,7 +85,7 @@ namespace SaovietTax
         }
         private void frmCongtrinh_Load(object sender, EventArgs e)
         {
-            gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
+          //  gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
 
             string query = @"SELECT * FROM PhanLoai154 ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
@@ -106,7 +110,7 @@ namespace SaovietTax
                     comboBoxEdit1.SelectedIndex = frmMain.currentselectId; // Chọn phần tử đầu tiên
                     var selectedItem = comboBoxEdit1.SelectedItem as Item;
 
-                    LoadData(selectedItem.Id);
+                    LoadData(selectedItem.Id,txtSearch.Text);
                 }
             }
             else
@@ -324,7 +328,7 @@ namespace SaovietTax
 
                 // Thực thi truy vấn và lấy kết quả
                 int a = ExecuteQueryResult(query, parameters);
-                LoadData(selectedId);
+                LoadData(selectedId, txtSearch.Text);
             }
             else
             {
@@ -367,7 +371,7 @@ namespace SaovietTax
                 {
                     selectedId = selectedItem.Id; // Lấy giá trị Id  
                 }
-                LoadData(selectedId);
+                LoadData(selectedId, txtSearch.Text);
             }
         }
 
@@ -397,7 +401,7 @@ namespace SaovietTax
                  new OleDbParameter("?",txtId.Text),
             };
             int a = ExecuteQueryResult(query, parameters);
-            LoadData(0);
+            LoadData(0, txtSearch.Text);
         }
 
         private void gridView1_RowClick(object sender, RowClickEventArgs e)
@@ -462,9 +466,21 @@ namespace SaovietTax
                 {
                     int selectedId = selectedItem.Id; // Lấy giá trị Id 
                     frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
-                    LoadData(selectedId);
+                    LoadData(selectedId, txtSearch.Text);
                 }
             }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            var selectedItem = comboBoxEdit1.SelectedItem as Item;
+            int selectedId = selectedItem.Id; // Lấy giá trị Id 
+            LoadData(selectedId, txtSearch.Text);
+        }
+
+        private void txtSearch_EditValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

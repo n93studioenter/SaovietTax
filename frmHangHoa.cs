@@ -55,25 +55,17 @@ namespace SaovietTax
 
             }
         }
-        private void LoadData(int Maso)
+        private void LoadData(int Maso,string keysearch)
         {
             string query = "";
             if (Maso != 0)
             {  
-                gridControl1.DataSource = frmMain.lstvt.Where(m=>m.MaPhanLoai==Maso);
+                gridControl1.DataSource = frmMain.lstvt.Where(m=>m.MaPhanLoai==Maso &&(string.IsNullOrEmpty(keysearch)|| (m.TenVattu.ToLower().Contains(keysearch.ToLower()))));
                 GridStripRow(gridView1);
             }
             else
             {
-                //query = @" SELECT *  FROM Vattu  "; 
-                //var kq = ExecuteQuery(query, null);
-                //foreach (DataRow item in kq.Rows)
-                //{
-                //    item["TenVattu"] = Helpers.ConvertVniToUnicode(item["TenVattu"].ToString());
-                //    item["DonVi"] = Helpers.ConvertVniToUnicode(item["DonVi"].ToString());
-                //}
-                gridControl1.DataSource = frmMain.lstvt;
-
+                gridControl1.DataSource = frmMain.lstvt.Where(m => (m.TenVattu.ToLower().Contains(keysearch.ToLower()))); ;
                 GridStripRow(gridView1);
             }
         }
@@ -200,7 +192,7 @@ namespace SaovietTax
                 {
                     int selectedId = selectedItem.Id; // Lấy giá trị Id 
                     //frmMain.currentselectId = comboBoxEdit1.SelectedIndex;
-                    LoadData(selectedId);
+                    LoadData(selectedId, txtSearch.Text);
                 }
             }
         }
@@ -292,7 +284,7 @@ namespace SaovietTax
                 isChange = true;
                 this.Close();
 
-                LoadData(selectedItem.Id);
+                LoadData(selectedItem.Id,txtSearch.Text);
                 // RefreshData();
                 DevExpress.XtraGrid.Views.Grid.GridView view = gridControl1.MainView as DevExpress.XtraGrid.Views.Grid.GridView; // Lấy GridView
                 for (int i = 0; i < view.RowCount; i++)
@@ -408,7 +400,7 @@ namespace SaovietTax
                 if (selectedItem != null)
                 {
                     int selectedId = selectedItem.Id; // Lấy giá trị Id 
-                    LoadData(selectedId);
+                    LoadData(selectedId, txtSearch.Text);
                 }
             }
             
@@ -421,7 +413,7 @@ namespace SaovietTax
 
         private void frmHangHoa_Load_1(object sender, EventArgs e)
         {
-            gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
+            //gridView1.OptionsFind.AlwaysVisible = true; // Kích hoạt thanh tìm kiếm
 
             var query = @"SELECT * FROM PhanLoaiVattu ORDER BY TenPhanLoai";
             var dt = ExecuteQuery(query, null);
@@ -455,7 +447,7 @@ namespace SaovietTax
                     comboBoxEdit1.SelectedIndex = idsl; // Chọn phần tử đầu tiên
                     var selectedItem = comboBoxEdit1.SelectedItem as Item;
                     firstload = false;
-                    LoadData(selectedItem.Id);
+                    LoadData(selectedItem.Id, txtSearch.Text);
                 }
             }
             else
@@ -515,6 +507,12 @@ namespace SaovietTax
                     return;
                 }
             }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            var selectedItem = comboBoxEdit1.SelectedItem as Item; 
+            LoadData(selectedItem.Id, txtSearch.Text);
         }
     }
 }
