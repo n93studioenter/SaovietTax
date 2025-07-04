@@ -51,6 +51,8 @@
             this.colNLap = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTen = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colMST = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colVat = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colVat2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTongTien = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKCo = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -79,6 +81,8 @@
             this.gridColumn5 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn6 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn7 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.col2Vat = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.col2Vat2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn8 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn9 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridColumn1 = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -151,6 +155,7 @@
             this.radialMenu1 = new DevExpress.XtraBars.Ribbon.RadialMenu(this.components);
             this.toolTipController1 = new DevExpress.Utils.ToolTipController(this.components);
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.colVat3 = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fileImportBindingSource)).BeginInit();
@@ -351,6 +356,9 @@
             this.colNLap,
             this.colTen,
             this.colMST,
+            this.colVat,
+            this.colVat2,
+            this.colVat3,
             this.colTongTien,
             this.colTKNo,
             this.colTKCo,
@@ -448,6 +456,26 @@
             this.colMST.VisibleIndex = 4;
             this.colMST.Width = 112;
             // 
+            // colVat
+            // 
+            this.colVat.Caption = "Vat 1";
+            this.colVat.FieldName = "Vat";
+            this.colVat.MinWidth = 30;
+            this.colVat.Name = "colVat";
+            this.colVat.Visible = true;
+            this.colVat.VisibleIndex = 5;
+            this.colVat.Width = 112;
+            // 
+            // colVat2
+            // 
+            this.colVat2.Caption = "Vat 2";
+            this.colVat2.FieldName = "Vat2";
+            this.colVat2.MinWidth = 30;
+            this.colVat2.Name = "colVat2";
+            this.colVat2.Visible = true;
+            this.colVat2.VisibleIndex = 6;
+            this.colVat2.Width = 112;
+            // 
             // colTongTien
             // 
             this.colTongTien.Caption = "Thành tiền";
@@ -458,7 +486,7 @@
             this.colTongTien.Name = "colTongTien";
             this.colTongTien.OptionsColumn.AllowEdit = false;
             this.colTongTien.Visible = true;
-            this.colTongTien.VisibleIndex = 5;
+            this.colTongTien.VisibleIndex = 8;
             this.colTongTien.Width = 103;
             // 
             // colTKNo
@@ -477,7 +505,7 @@
             this.colTKNo.Name = "colTKNo";
             this.colTKNo.ToolTip = "Chọn mã công trình";
             this.colTKNo.Visible = true;
-            this.colTKNo.VisibleIndex = 6;
+            this.colTKNo.VisibleIndex = 9;
             this.colTKNo.Width = 96;
             // 
             // colTKCo
@@ -494,7 +522,7 @@
             this.colTKCo.MinWidth = 30;
             this.colTKCo.Name = "colTKCo";
             this.colTKCo.Visible = true;
-            this.colTKCo.VisibleIndex = 7;
+            this.colTKCo.VisibleIndex = 10;
             this.colTKCo.Width = 76;
             // 
             // colNoidung
@@ -504,7 +532,7 @@
             this.colNoidung.MinWidth = 30;
             this.colNoidung.Name = "colNoidung";
             this.colNoidung.Visible = true;
-            this.colNoidung.VisibleIndex = 8;
+            this.colNoidung.VisibleIndex = 11;
             this.colNoidung.Width = 429;
             // 
             // colChecked
@@ -516,7 +544,7 @@
             this.colChecked.MinWidth = 50;
             this.colChecked.Name = "colChecked";
             this.colChecked.Visible = true;
-            this.colChecked.VisibleIndex = 9;
+            this.colChecked.VisibleIndex = 12;
             this.colChecked.Width = 80;
             // 
             // colPath
@@ -551,7 +579,7 @@
             this.colInvoiceType.MinWidth = 10;
             this.colInvoiceType.Name = "colInvoiceType";
             this.colInvoiceType.Visible = true;
-            this.colInvoiceType.VisibleIndex = 10;
+            this.colInvoiceType.VisibleIndex = 13;
             this.colInvoiceType.Width = 25;
             // 
             // gridView4
@@ -695,6 +723,8 @@
             this.gridColumn5,
             this.gridColumn6,
             this.gridColumn7,
+            this.col2Vat,
+            this.col2Vat2,
             this.gridColumn8,
             this.gridColumn9,
             this.gridColumn1,
@@ -783,7 +813,7 @@
             this.gridColumn5.MinWidth = 30;
             this.gridColumn5.Name = "gridColumn5";
             this.gridColumn5.Visible = true;
-            this.gridColumn5.VisibleIndex = 8;
+            this.gridColumn5.VisibleIndex = 10;
             this.gridColumn5.Width = 370;
             // 
             // gridColumn6
@@ -801,7 +831,7 @@
             this.gridColumn6.MinWidth = 30;
             this.gridColumn6.Name = "gridColumn6";
             this.gridColumn6.Visible = true;
-            this.gridColumn6.VisibleIndex = 7;
+            this.gridColumn6.VisibleIndex = 9;
             this.gridColumn6.Width = 66;
             // 
             // gridColumn7
@@ -818,8 +848,28 @@
             this.gridColumn7.MinWidth = 30;
             this.gridColumn7.Name = "gridColumn7";
             this.gridColumn7.Visible = true;
-            this.gridColumn7.VisibleIndex = 6;
+            this.gridColumn7.VisibleIndex = 8;
             this.gridColumn7.Width = 90;
+            // 
+            // col2Vat
+            // 
+            this.col2Vat.Caption = "Vat 1";
+            this.col2Vat.FieldName = "Vat";
+            this.col2Vat.MinWidth = 30;
+            this.col2Vat.Name = "col2Vat";
+            this.col2Vat.Visible = true;
+            this.col2Vat.VisibleIndex = 6;
+            this.col2Vat.Width = 112;
+            // 
+            // col2Vat2
+            // 
+            this.col2Vat2.Caption = "Vat 2";
+            this.col2Vat2.FieldName = "Vat2";
+            this.col2Vat2.MinWidth = 30;
+            this.col2Vat2.Name = "col2Vat2";
+            this.col2Vat2.Visible = true;
+            this.col2Vat2.VisibleIndex = 7;
+            this.col2Vat2.Width = 112;
             // 
             // gridColumn8
             // 
@@ -842,7 +892,7 @@
             this.gridColumn9.Name = "gridColumn9";
             this.gridColumn9.OptionsColumn.AllowEdit = false;
             this.gridColumn9.Visible = true;
-            this.gridColumn9.VisibleIndex = 9;
+            this.gridColumn9.VisibleIndex = 11;
             this.gridColumn9.Width = 67;
             // 
             // gridColumn1
@@ -884,7 +934,7 @@
             this.colInvoiceType2.MinWidth = 30;
             this.colInvoiceType2.Name = "colInvoiceType2";
             this.colInvoiceType2.Visible = true;
-            this.colInvoiceType2.VisibleIndex = 10;
+            this.colInvoiceType2.VisibleIndex = 12;
             this.colInvoiceType2.Width = 30;
             // 
             // xtraTabControl1
@@ -1589,6 +1639,16 @@
             // 
             this.radialMenu1.Name = "radialMenu1";
             // 
+            // colVat3
+            // 
+            this.colVat3.Caption = "Vat 3";
+            this.colVat3.FieldName = "Vat3";
+            this.colVat3.MinWidth = 30;
+            this.colVat3.Name = "colVat3";
+            this.colVat3.Visible = true;
+            this.colVat3.VisibleIndex = 7;
+            this.colVat3.Width = 112;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
@@ -1772,5 +1832,10 @@
         private DevExpress.XtraGrid.Columns.GridColumn colCheck;
         private System.Windows.Forms.PictureBox pictureBox1;
         private DevExpress.XtraEditors.SimpleButton btnLocdulieuNganhang;
+        private DevExpress.XtraGrid.Columns.GridColumn colVat;
+        private DevExpress.XtraGrid.Columns.GridColumn colVat2;
+        private DevExpress.XtraGrid.Columns.GridColumn col2Vat;
+        private DevExpress.XtraGrid.Columns.GridColumn col2Vat2;
+        private DevExpress.XtraGrid.Columns.GridColumn colVat3;
     }
 }

@@ -159,13 +159,18 @@ namespace SaovietTax
             public double TgTCThue { get; set; }
             public double TgTThue { get; set; }
             public int Vat { get; set; }
+            public int Vat2 { get; set; }
+            public int Vat3 { get; set; }
+            public double TVat { get; set; }
+            public double TVat2 { get; set; }
+            public double TVat3 { get; set; }
             public int Type { get; set; }
             public bool isAcess { get; set; }
             public bool isHaschild { get; set; }
             public int InvoiceType { get; set; }
             public string SoHieuTP { get; set; }
             public List<FileImportDetail> fileImportDetails;
-            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP, bool isacess, double tPhi, double tgTCThue, double tgTThue, bool _isHaschild, int _InvoiceType)
+            public FileImport(string path, string shdon, string khhdon, DateTime nlap, string ten, string noidung, string tkno, string tkco, int tkthue, string mst, double tongTien, int vat, int type, string tenTP, bool isacess, double tPhi, double tgTCThue, double tgTThue, bool _isHaschild, int _InvoiceType,double tvat,int vat2,double tvat2,int vat3,double tvat3)
             {
                 ID = Id;
                 SHDon = shdon;
@@ -191,6 +196,11 @@ namespace SaovietTax
                 TgTThue = tgTThue;
                 isHaschild = _isHaschild;
                 InvoiceType = _InvoiceType;
+                TVat = tvat;
+                Vat2 = vat2;
+                TVat2 = tvat2;
+                Vat3 = vat3;
+                TVat3 = tvat3;
             }
 
         }
@@ -208,8 +218,53 @@ namespace SaovietTax
             return null;
         }
         public string tokken { get; set; } = "";
+        private void Xulyexcel()
+        {
+            string directoryPath = Path.Combine(savedPath, "HDVao", dtTungay.DateTime.Month.ToString());
+
+            // Kiểm tra xem thư mục có tồn tại không
+            if (!Directory.Exists(directoryPath))
+            {
+                Console.WriteLine("Thư mục không tồn tại.");
+                return;
+            }
+
+            var excelFiles = Directory.EnumerateFiles(directoryPath, "*.xlsx", SearchOption.AllDirectories).ToList();
+
+            foreach (var excelFile in excelFiles)
+            {
+                Console.WriteLine($"Đang xử lý tệp: {excelFile}");
+                ReadExcelFile(excelFile); // Gọi phương thức đọc tệp Excel
+            }
+        }
+
+        private void ReadExcelFile(string filePath)
+        {
+            using (var workbook = new XLWorkbook(filePath))
+
+            {
+                var worksheet = workbook.Worksheet(1); // Lấy sheet đầu tiên
+                foreach (var row in worksheet.RowsUsed().Skip(3)) // Bỏ qua 6 hàng đầu tiên
+                {
+                    var getSHHD = row.Cell("C").Value.ToString(); // Lấy giá trị của cột A trong hàng hiện tại
+                    var getSohd = row.Cell("D").Value.ToString(); // Lấy giá trị của cột C trong hàng hiện tại
+                    var getMST = row.Cell("F").Value.ToString(); // Lấy giá trị của cột B trong hàng hiện tại
+                    var GetNLap = row.Cell("E").Value.ToString();
+                    string query = @"UPDATE tbimport SET NLap=?  WHERE SHDon=? and KHHDon=? and Mst=?";
+                    var parameters = new OleDbParameter[]
+             {
+                                new OleDbParameter("?",GetNLap),
+                                   new OleDbParameter("?",getSohd),
+                                   new OleDbParameter("?",getSHHD),
+                                   new OleDbParameter("?",getMST),
+             };
+                    int rowsAffected = ExecuteQueryResult(query, parameters);
+                }
+            }
+        }
         private void LoadDataGridview(int type)
         {
+            Xulyexcel();
             string mstcty = "";
             string query = "SELECT * FROM tbRegister";
             var kq2 = ExecuteQuery(query, null);
@@ -286,6 +341,11 @@ namespace SaovietTax
                             string mst = item["Mst"].ToString();
                             double tongTien = double.Parse(item["TongTien"].ToString());
                             int vat = int.Parse(item["Vat"].ToString());
+                            int vat2 = int.Parse(item["Vat2"].ToString());
+                            double Tvat = double.Parse(item["TVat"].ToString());
+                            double Tvat2 = double.Parse(item["TVat2"].ToString());
+                            int vat3 = int.Parse(item["Vat3"].ToString());
+                            double Tvat3 = double.Parse(item["TVat3"].ToString());
                             string soHieuTP = item["SohieuTP"].ToString();
                             bool hasChild = true; // Giá trị mặc định
                             double tpHi = double.Parse(item["TPHi"].ToString());
@@ -294,7 +354,7 @@ namespace SaovietTax
                             int invoiceType = int.Parse(item["InvoiceType"].ToString());
 
                             // Khởi tạo đối tượng FileImport
-                            fileImport = new FileImport(path, shDon, khhDon, nLap, ten, noidung, tkNo, tkCo, tkThue, mst, tongTien, vat, type, soHieuTP, hasChild, tpHi, tgTCThue, tgTThue, haschild, invoiceType);
+                            fileImport = new FileImport(path, shDon, khhDon, nLap, ten, noidung, tkNo, tkCo, tkThue, mst, tongTien, vat, type, soHieuTP, hasChild, tpHi, tgTCThue, tgTThue, haschild, invoiceType, Tvat, vat2, Tvat2,vat3,Tvat3);
                         }
                         catch (Exception ex)
                         {
@@ -430,6 +490,11 @@ namespace SaovietTax
                             string mst = item["Mst"].ToString();
                             double tongTien = double.Parse(item["TongTien"].ToString());
                             int vat = int.Parse(item["Vat"].ToString());
+                            int vat2 = int.Parse(item["Vat2"].ToString());
+                            double Tvat = double.Parse(item["TVat"].ToString());
+                            double Tvat2 = double.Parse(item["TVat2"].ToString());
+                            int vat3 = int.Parse(item["Vat3"].ToString());
+                            double Tvat3 = double.Parse(item["TVat3"].ToString());
                             string soHieuTP = item["SohieuTP"].ToString();
                             bool hasChild = true; // Giá trị mặc định
                             double tpHi = double.Parse(item["TPHi"].ToString());
@@ -438,7 +503,7 @@ namespace SaovietTax
                             int invoiceType = int.Parse(item["InvoiceType"].ToString());
 
                             // Khởi tạo đối tượng FileImport
-                            fileImport = new FileImport(path, shDon, khhDon, nLap, ten, noidung, tkNo, tkCo, tkThue, mst, tongTien, vat, type, soHieuTP, hasChild, tpHi, tgTCThue, tgTThue, haschild, invoiceType);
+                            fileImport = new FileImport(path, shDon, khhDon, nLap, ten, noidung, tkNo, tkCo, tkThue, mst, tongTien, vat, type, soHieuTP, hasChild, tpHi, tgTCThue, tgTThue, haschild, invoiceType,Tvat,vat2, Tvat2,vat3,Tvat3);
                         }
                         catch (Exception ex)
                         {
@@ -773,6 +838,31 @@ namespace SaovietTax
                 }
                 else
                 {
+                    if (!ColumnExists(connection, "tbimport", "TVat3"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "TVat3", "NUMBER"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "TVat2"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "TVat2", "NUMBER"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "TVat"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "TVat", "NUMBER"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "Vat3"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "Vat3", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
+                    if (!ColumnExists(connection, "tbimport", "Vat2"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbimport", "Vat2", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbDinhdanhNganhang", "SoHieu"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -1793,7 +1883,7 @@ WHERE kh.SoHieu = ?";
                         aa = CapitalizeFirstLetter(aa);
                         mst = ConvertToTenDigitNumber(aa).ToString();
                     }
-                    peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "", isAcess, TPhi, TgTCThue, TgTThue, true, 1));
+                    peopleTemp.Add(new FileImport(file, SHDon, KHHDon, NLap, ten, diengiai, TkNo.ToString(), TkCo.ToString(), TkThue, mst, Thanhtien, Vat, 1, "", isAcess, TPhi, TgTCThue, TgTThue, true, 1,0,0,0,0,0));
                 }
 
                 lblThongbao.Text = "Thêm danh sách sản phẩm con";
@@ -2270,12 +2360,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         }
         private void ApplyDefaultAndRuleBasedAccounts(FileImport item, System.Data.DataTable dinhDanhChung, System.Data.DataTable dinhDanhUuTien)
         {
-            if (item.fileImportDetails.Count == 1 && string.IsNullOrEmpty(item.fileImportDetails[0].DVT))
-            {
-                item.TKNo = "6422";
-                item.TKCo = "1111";
-                item.TkThue = 1331;
-            }
+            //if (item.fileImportDetails.Count == 1 && string.IsNullOrEmpty(item.fileImportDetails[0].DVT))
+            //{
+            //    item.TKNo = "6422";
+            //    item.TKCo = "1111";
+            //    item.TkThue = 1331;
+            //}
 
             //if (string.IsNullOrEmpty(item.TKNo) || item.TKNo == "0")
             //{
@@ -2841,7 +2931,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 else
                     newxmlFile = xmlFile.Replace("HDRa", "HDRaChonLoc").ToString();
 
-                FileImport newFileImport = new FileImport(newxmlFile, sHDon, kHHDon, nLap, ten ?? "Khách vãng lai", diengiai, tkNo.ToString(), tkCo.ToString(), tkThue, mst == "00" ? sohieuKH : mst, thanhtien, vat, type, "", isAcess, tPhi, tgTCThue, tgTThue, true, 1);
+                FileImport newFileImport = new FileImport(newxmlFile, sHDon, kHHDon, nLap, ten ?? "Khách vãng lai", diengiai, tkNo.ToString(), tkCo.ToString(), tkThue, mst == "00" ? sohieuKH : mst, thanhtien, vat, type, "", isAcess, tPhi, tgTCThue, tgTThue, true, 1,0,0,0,0,0);
                 peopleTemp.Add(newFileImport);
 
                 // Thêm chi tiết hóa đơn
@@ -3219,11 +3309,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         if (invoiceType == 5 || invoiceType == 10)
                             url = $"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/detail?nbmst={nbmst}&khhdon={khhdon}&shdon={shdon}&khmshdon=2";
                         Thread.Sleep(400);
-                        response = client.GetAsync(url).GetAwaiter().GetResult();
+                        try
+                        {
+                            response = client.GetAsync(url).GetAwaiter().GetResult();
 
-                        // Đảm bảo phản hồi thành công
-                        response.EnsureSuccessStatusCode();
-                        responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                            // Đảm bảo phản hồi thành công
+                            response.EnsureSuccessStatusCode();
+                            responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                        }
+                        catch(Exception ex2)
+                        {
+
+                        }
                     }
 
 
@@ -3761,7 +3858,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 tgTCThue: amountBeforeTax,
                 tgTThue: amountAfterTax,
                 true,
-                1
+                1,0,0,0,0,0
             );
         }
 
@@ -6114,7 +6211,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     }
                     if (item.Checked)
                     {
-
+                        //Cập nhật cho 5113 ko có chi tiết
+                       
                         string query = @"UPDATE tbimport SET  Status =0 WHERE ID=?";
                         var parameters = new OleDbParameter[]
                          {
@@ -6210,7 +6308,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                          };
                         int rowsAffected = ExecuteQueryResult(query, parameters);
                     }
-
+                    if (item.TKCo.Contains("5113"))
+                    {
+                        string querys = @"UPDATE tbimport SET  IsHaschild =0 WHERE ID=?";
+                        var parameterss = new OleDbParameter[]
+                         {
+            new OleDbParameter("?", item.ID)
+                         };
+                        int rowsAffectedss = ExecuteQueryResult(querys, parameterss);
+                    }
                     if (!item.isHaschild)
                     {
                         var query = @"delete from tbimportdetail  WHERE ParentId=?";

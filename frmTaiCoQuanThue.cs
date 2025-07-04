@@ -37,6 +37,7 @@ using DevExpress.Spreadsheet;
 using System.Data.OleDb;
 using DocumentFormat.OpenXml.VariantTypes;
 using DevExpress.XtraCharts.Design;
+using static SaovietTax.frmMain;
 namespace SaovietTax
 {
     public partial class frmTaiCoQuanThue : DevExpress.XtraEditors.XtraForm
@@ -312,6 +313,49 @@ namespace SaovietTax
                     XtraMessageBox.Show(e.Message);
                     Driver.Quit();
                     //this.Close();
+                }
+            }
+        }
+        private async Task Xulyexel(string token,Data item)
+        {
+            string formattedDate1 = frmMain.dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
+            string formattedDate2 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
+            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=05/06/2025T00:00:00;tdlap=le=04/07/2025T23:59:59;ttxly==6%20%20%20%20&type=purchase
+            string url = "";
+            url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge="+ formattedDate1+";tdlap=le=" + formattedDate2 + ";ttxly==6%20%20%20%20&type=purchase";
+            string filename = item.shdon + "_" + item.khhdon + ".xlsx";
+            string path = frmMain.savedPath + @"\" + "HDVao" + @"\" + item.ntao.Month + @"\" + filename;
+            //Xóa tat ca file excel truc khi tải
+            string directoryPath = Path.Combine(frmMain.savedPath, "HDVao", item.ntao.Month.ToString());
+            string deletpath = Path.Combine(directoryPath, filename);
+            // Xóa tất cả các tệp Excel trong thư mục
+            if (Directory.Exists(directoryPath))
+            {
+                var excelFiles = Directory.GetFiles(directoryPath, "*.xlsx");
+                foreach (var file in excelFiles)
+                {
+                    File.Delete(file);
+                }
+            }
+
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream")); // Định dạng nhị phân 
+                try
+                {
+                    Thread.Sleep(300); // Đợi một chút trước khi gửi yêu cầu    
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode(); // Ném ngoại lệ nếu không thành công
+                    var fileBytes = await response.Content.ReadAsByteArrayAsync();
+
+                    // Lưu file ZIP
+                    File.WriteAllBytes(path, fileBytes); // Sử dụng WriteAllBytes
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Đã xảy ra lỗi: {ex.Message}");
                 }
             }
         }
@@ -739,11 +783,18 @@ namespace SaovietTax
 
             return -1;
         }
+        bool xlExcel = false;
         public  void XulyDataXML(RootObject rootObject,string tokken,int invoceType)
         {
             foreach(var item in rootObject.datas)
             {
                 InsertTbImport(item, invoceType);
+                if (xlExcel == false)
+                {
+                    xlExcel = true;
+                    Xulyexel(tokken, item);
+                }
+              
                 // GetdetailXML(item.nbmst, item.khhdon, item.shdon.ToString(),tokken);
             }
         }
@@ -871,7 +922,7 @@ namespace SaovietTax
         }
         public void InsertTbImport(Data item,int invoceType)
         {
-            if(item.shdon== 238309)
+            if(item.shdon== 10692)
             {
                 int ass = 10;
             }
@@ -879,12 +930,14 @@ namespace SaovietTax
             {
                 return;
             }
-            if (existingTbChungtu.AsEnumerable().Any(row => row.Field<string>("SoHieu").ToString() == item.shdon.ToString() && row.Field<DateTime>("NgayCT").Month == item.ntao.Month)) { return; }
+            if (existingTbChungtu.AsEnumerable().Any(row => row.Field<string>("SoHD").ToString() == item.shdon.ToString() && row.Field<string>("KyHieu").ToString()==item.khhdon &&  row.Field<DateTime>("NgayPH").Month == item.ntao.Month)) {
+                return; 
+            }
 
             int type = frmMain.type;
             string query = @"
-            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild,TVat,Vat2,TVat2,Vat3,TVat3)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?)";
 
             string newTen = Helpers.ConvertUnicodeToVni(item.nbten);
             string newNoidung = "";
@@ -1006,9 +1059,14 @@ namespace SaovietTax
             string dateTimeString = nl.ToString();
             DateTime dateTime = DateTime.Parse(dateTimeString);
             string formattedDate = dateTime.ToShortDateString();
+
             string vat = "0";
+            string vat2 = "0";  
+            string vat3 = "0";
+            double tvat=0, tvat2=0, tvat3 = 0;
             double TienTrcthue = 0;
             double TienThue = 0;
+
             if (item.tgtcthue.HasValue)
             {
                 TienTrcthue = double.Parse(item.tgtcthue.Value.ToString());
@@ -1028,7 +1086,21 @@ namespace SaovietTax
             TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
             if (item.thttltsuat.Count() > 0 )
             {
-                vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+                if(item.thttltsuat.Count>=1)
+                {
+                    vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+                    tvat = item.thttltsuat[0].tthue;
+                }
+                if (item.thttltsuat.Count >= 2)
+                {
+                    vat2 = item.thttltsuat[1].tsuat.ToString().Replace("%", "");
+                    tvat2 = item.thttltsuat[1].tthue;
+                }
+                if (item.thttltsuat.Count >= 3)
+                {
+                    vat3 = item.thttltsuat[2].tsuat.ToString().Replace("%", "");
+                    tvat3 = item.thttltsuat[2].tthue;
+                }
             }
             else
             {
@@ -1066,8 +1138,12 @@ namespace SaovietTax
                 //new OleDbParameter("?",item.thttltsuat[0].tthue.ToString()),
                 new OleDbParameter("?", type),
                 new OleDbParameter("?", invoceType),
-                 new OleDbParameter("?","1")
-
+                new OleDbParameter("?","1"),
+                new OleDbParameter("?",tvat),
+                new OleDbParameter("?",vat2), 
+                new OleDbParameter("?",tvat2),
+                new OleDbParameter("?",vat3),
+                new OleDbParameter("?",tvat3),
                     };
 
             try
@@ -1095,8 +1171,8 @@ namespace SaovietTax
             }
             int type = frmMain.type;
             string query = @"
-            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
+            INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild,TVat,Vat2,TVat2,Vat3,TVat3)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?)";
 
             string newTen = "";
             if (!string.IsNullOrEmpty(item.nmten))
@@ -1174,6 +1250,9 @@ namespace SaovietTax
             }
 
             string vat = "0";
+            string vat2 = "0";
+            string vat3 = "0";
+            double tvat = 0, tvat2 = 0, tvat3 = 0;
             double TienTrcthue = 0;
             double TienThue = 0;
             if (item.tgtcthue.HasValue)
@@ -1196,7 +1275,21 @@ namespace SaovietTax
             //TienThue = item.tgtthue != null ? double.Parse(item.tgtthue.ToString()) : 0;
             if (item.thttltsuat.Count() > 0)
             {
-                vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+                if (item.thttltsuat.Count >= 1)
+                {
+                    vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
+                    tvat = item.thttltsuat[0].tthue.Value;
+                }
+                if (item.thttltsuat.Count >= 2)
+                {
+                    vat2 = item.thttltsuat[1].tsuat.ToString().Replace("%", "");
+                    tvat2 = item.thttltsuat[1].tthue.Value;
+                }
+                if (item.thttltsuat.Count >= 3)
+                {
+                    vat3 = item.thttltsuat[2].tsuat.ToString().Replace("%", "");
+                    tvat3 = item.thttltsuat[2].tthue.Value;
+                }
             }
             else
             {
@@ -1241,7 +1334,12 @@ namespace SaovietTax
                 new OleDbParameter("?", TienThue),
                 new OleDbParameter("?", type),
                 new OleDbParameter("?", invoceType),
-               new OleDbParameter("?", "1")
+                new OleDbParameter("?", "1"),
+                new OleDbParameter("?", tvat),
+                new OleDbParameter("?", vat2),
+                new OleDbParameter("?", tvat2),
+                new OleDbParameter("?", vat3),
+                new OleDbParameter("?", tvat3),
             };
 
             try
@@ -1258,6 +1356,11 @@ namespace SaovietTax
         int stt = 1;
         private List<QLHD> lstDauvao = new List<QLHD>();
         private List<QLHD> lstDaura = new List<QLHD>();
+
+        private void UpdateDataexcel()
+        {
+           
+        }
         private void frmTaiCoQuanThue_Load(object sender, EventArgs e)
         {
             if (frmMain.type == 1)
@@ -1276,7 +1379,7 @@ namespace SaovietTax
             query = "SELECT * FROM tbimport"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             existingTbImport = ExecuteQuery(query);
             //Danh sách chứng từ
-            query = "SELECT * FROM ChungTu"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
+            query = "SELECT * FROM HoaDon"; // Giả sử bạn muốn lấy tất cả dữ liệu từ bảng KhachHang
             existingTbChungtu= ExecuteQuery(query);
             // XulyFileExcel();
 
@@ -1406,8 +1509,10 @@ namespace SaovietTax
                         ExecuteQueryResult(query, parametersss);
                         if(frmMain.type==1)
                         {
-                            Xulydauvao1(cookie.Value, 6);
+                            Xulydauvao1(cookie.Value, 6); 
                             Xulydauvao1(cookie.Value, 8);
+                            //Cap nhatdata excel
+                            UpdateDataexcel();
                             Xulydauvaomaytinhtien(cookie.Value, 10);
                         }
                         if (frmMain.type == 2)
