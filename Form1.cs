@@ -863,6 +863,11 @@ namespace SaovietTax
                         // Nếu không tồn tại, thêm cột tkoco
                         AddColumn(connection, "tbimport", "Vat2", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
                     }
+                    if (!ColumnExists(connection, "tbDinhdanhNganhang", "TK2"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbDinhdanhNganhang", "TK2", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbDinhdanhNganhang", "SoHieu"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -8588,7 +8593,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             headerRowNumber += 1;
                     }
 
-                    else if (getdata.Contains("Description") || getdata.Contains("Transactions") || Kiemtratren(getdata, "Nội dung giao dịch") || getdata.Contains("Nội dung") || getdata.Contains("Ghi chú") || getdata.Contains("Remark"))
+                    else if (getdata.Contains("Description") || getdata.Contains("Transactions") || Kiemtratren(getdata, "Nội dung giao dịch") || getdata.Contains("Nội dung") || getdata.Contains("Ghi chú") || getdata.Contains("Remark") || getdata.Contains("Diễn giải"))
                     {
                         indexDiengiai = cell.Address.ColumnNumber;
                     }
@@ -8770,8 +8775,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 //Kiểm tra có chứa mặc định không
                                 if (RemoveVietnameseDiacritics(nganhang.Diengiai).Contains(getNoidung))
                                 {
-                                    if(string.IsNullOrEmpty(dtRow["SoHieu"].ToString()))
-                                    tkDoiung = dtRow["TK"].ToString();
+                                  if(string.IsNullOrEmpty(dtRow["SoHieu"].ToString()))
+                                    {
+                                        if (tkno!=0)
+                                            tkDoiung = dtRow["TK"].ToString();
+                                        else
+                                            tkDoiung = dtRow["TK2"].ToString();
+                                    }
                                     else
                                         tkDoiung = dtRow["TK"].ToString()+"|"+ dtRow["SoHieu"].ToString();
                                 }
@@ -9195,34 +9205,39 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                       DateTime.TryParse(row.Field<string>("NgayGD"), out DateTime ngayGD) &&
                       ngayGD.Date == item.NgayGD.Date))
                     {
-                        //Nếu bỏ check thì cập nhật bỏ check
-                        var query = @"update tbNganhang set  ";
-                        var parameters = new OleDbParameter[]
-                           {
-            new OleDbParameter("?", item.Maso), 
-                           };
-                        try
-                        {
-                           // int rowsAffected = ExecuteQueryResult(query, parameters);
-                        }
-                        catch(Exception ex)
-                        {
+                        XtraMessageBox.Show("Trùng");
+            //            //Nếu bỏ check thì cập nhật bỏ check
+            //            var query = @"update tbNganhang set  ";
+            //            var parameters = new OleDbParameter[]
+            //               {
+            //new OleDbParameter("?", item.Maso), 
+            //               };
+            //            try
+            //            {
+            //               // int rowsAffected = ExecuteQueryResult(query, parameters);
+            //            }
+            //            catch(Exception ex)
+            //            {
 
-                        }
+            //            }
                     }
                     else
                     {
                         if (item.TKNo.Contains("131") || item.TKNo.Contains("341"))
                         {
                             if (!item.TKNo.Contains('|'))
+                            {
                                 XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
-                            return;
+                                return;
+                            }
                         }
                         if (item.TKCo.Contains("131") || item.TKCo.Contains("341"))
                         {
                             if (!item.TKCo.Contains('|'))
+                            {
                                 XtraMessageBox.Show("Vui lòng chọn khách hàng", "Thông báo", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
-                            return;
+                                return;
+                            }
                         }
 
                         var query = @"INSERT INTO tbNganhang (SHDon, NgayGD, DienGiai, TongTien,TongTien2, TKNo,TKCo,Status,Checked) VALUES (?, ?, ?, ?, ?,?,?,?,?)";

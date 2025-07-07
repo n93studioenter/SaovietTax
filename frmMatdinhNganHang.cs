@@ -37,12 +37,13 @@ namespace SaovietTax
         }
         private void btnLuudinhdanh_Click(object sender, EventArgs e)
         {
-            var query = @"INSERT INTO tbDinhdanhNganhang (Noidung,TK,SoHieu) VALUES (?, ?,?)";
+            var query = @"INSERT INTO tbDinhdanhNganhang (Noidung,TK,SoHieu,TK2) VALUES (?, ?,?,?)";
             var parameters = new OleDbParameter[]
             {
             new OleDbParameter("?", txtDiengiai.Text), 
             new OleDbParameter("?", textEdit1.Text),
-             new OleDbParameter("?", txtMaKH.Text)
+            new OleDbParameter("?", txtMaKH.Text),
+            new OleDbParameter("?", textEdit2.Text),
             };
             int rowsAffected = ExecuteQueryResult(query, parameters);
             LoadData();

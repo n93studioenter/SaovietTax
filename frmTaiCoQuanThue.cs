@@ -922,7 +922,7 @@ namespace SaovietTax
         }
         public void InsertTbImport(Data item,int invoceType)
         {
-            if(item.shdon== 10692)
+            if(item.shdon== 276111)
             {
                 int ass = 10;
             }
@@ -1090,6 +1090,8 @@ namespace SaovietTax
                 {
                     vat = item.thttltsuat[0].tsuat.ToString().Replace("%", "");
                     tvat = item.thttltsuat[0].tthue;
+                    if (vat == "KCT")
+                        vat = "0";
                 }
                 if (item.thttltsuat.Count >= 2)
                 {
@@ -1169,6 +1171,10 @@ namespace SaovietTax
             {
                 return;
             }
+            if (existingTbChungtu.AsEnumerable().Any(row => row.Field<string>("SoHD").ToString() == item.shdon.ToString() && row.Field<string>("KyHieu").ToString() == item.khhdon && row.Field<DateTime>("NgayPH").Month == DateTime.Parse(item.ntao).Month))
+            {
+                return;
+            }
             int type = frmMain.type;
             string query = @"
             INSERT INTO tbImport (SHDon, KHHDon, NLap, Ten, Noidung,TKNo,TKCo, TkThue, Mst, Status, Ngaytao, TongTien, Vat, SohieuTP,TPhi,TgTCThue,TgTThue,Type,InvoiceType,IsHaschild,TVat,Vat2,TVat2,Vat3,TVat3)
@@ -1231,8 +1237,9 @@ namespace SaovietTax
 
             string tgtkcthue = "";
             string dateTimeString = item.ntao;
+            DateTime utcDateTime = DateTime.Parse(dateTimeString, null, System.Globalization.DateTimeStyles.RoundtripKind);
             DateTime dateTime = DateTime.Parse(dateTimeString);
-            string formattedDate = dateTime.ToShortDateString();
+            string formattedDate = utcDateTime.ToShortDateString();
             string getMST = "";
             if (item.nmmst != null)
             {
