@@ -316,17 +316,84 @@ namespace SaovietTax
                 }
             }
         }
-        private async Task Xulyexel(string token,Data item)
+        private async Task Xulyexel(string token,Data item,int type)
         {
             string formattedDate1 = frmMain.dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
             string formattedDate2 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
-            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=05/06/2025T00:00:00;tdlap=le=04/07/2025T23:59:59;ttxly==6%20%20%20%20&type=purchase
+            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=01/04/2025T00:00:00;tdlap=le=30/04/2025T23:59:59;ttxly==5%20%20%20%20&type=purchase
+
             string url = "";
-            url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge="+ formattedDate1+";tdlap=le=" + formattedDate2 + ";ttxly==6%20%20%20%20&type=purchase";
-            string filename = item.shdon + "_" + item.khhdon + ".xlsx";
-            string path = frmMain.savedPath + @"\" + "HDVao" + @"\" + item.ntao.Month + @"\" + filename;
+            if (type == 1)
+                url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==5%20%20%20%20&type=purchase";
+            if (type == 2)
+                url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==6%20%20%20%20&type=purchase";
+            if (type == 3)
+                url = @"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/export-excel-sold?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2 + ";ttxly==8%20%20%20%20&type=purchase";
+            string filename = "";
+            if(type==1)
+                filename= "HDDienTuDaCapMa.xlsx";
+            if(type == 2)
+                filename = "HDDienTuKhongMa.xlsx";
+            if (type == 3)
+                filename = "HDDienTuMayTinhTien.xlsx";
+            string path = frmMain.savedPath + @"\" + "HDVao" + @"\" + frmMain.dtFrom.Month + @"\" + filename;
             //Xóa tat ca file excel truc khi tải
-            string directoryPath = Path.Combine(frmMain.savedPath, "HDVao", item.ntao.Month.ToString());
+            string directoryPath = Path.Combine(frmMain.savedPath, "HDVao", frmMain.dtFrom.Month.ToString());
+            string deletpath = Path.Combine(directoryPath, filename);
+            // Xóa tất cả các tệp Excel trong thư mục
+            if (Directory.Exists(directoryPath))
+            {
+                var excelFiles = Directory.GetFiles(directoryPath, "*.xlsx");
+                foreach (var file in excelFiles)
+                {
+                    File.Delete(file);
+                }
+            }
+
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream")); // Định dạng nhị phân 
+                try
+                {
+                    Thread.Sleep(300); // Đợi một chút trước khi gửi yêu cầu    
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode(); // Ném ngoại lệ nếu không thành công
+                    var fileBytes = await response.Content.ReadAsByteArrayAsync();
+
+                    // Lưu file ZIP
+                    File.WriteAllBytes(path, fileBytes); // Sử dụng WriteAllBytes
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Đã xảy ra lỗi: {ex.Message}");
+                }
+            }
+        }
+        private async Task Xulyexel2(string token, InvoiceRa2List item, int type)
+        {
+            string formattedDate1 = frmMain.dtFrom.ToString("dd/MM/yyyyTHH:mm:ss");
+            string formattedDate2 = frmMain.dtTo.ToString("dd/MM/yyyyTHH:mm:ss");
+            //https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=01/06/2025T00:00:00;tdlap=le=30/06/2025T23:59:59
+
+
+            string url = "";
+            if (type == 1)
+                url = @"https://hoadondientu.gdt.gov.vn:30000/query/invoices/export-excel?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2;
+            if (type == 2)
+                url = @"https://hoadondientu.gdt.gov.vn:30000/sco-query/invoices/export-excel?sort=tdlap:desc,khmshdon:asc,shdon:desc&search=tdlap=ge=" + formattedDate1 + ";tdlap=le=" + formattedDate2;
+          
+            string filename = "";
+            if (type == 1)
+                filename = "Hoadondientu.xlsx";
+            if (type == 2)
+                filename = "HDDienTuMayTinhTien.xlsx";
+            if (type == 3)
+                filename = "HDDienTuMayTinhTien.xlsx";
+            string path = frmMain.savedPath + @"\" + "HDRa" + @"\" + frmMain.dtFrom.Month + @"\" + filename;
+            //Xóa tat ca file excel truc khi tải
+            string directoryPath = Path.Combine(frmMain.savedPath, "HDRa", frmMain.dtFrom.Month.ToString());
             string deletpath = Path.Combine(directoryPath, filename);
             // Xóa tất cả các tệp Excel trong thư mục
             if (Directory.Exists(directoryPath))
@@ -783,27 +850,48 @@ namespace SaovietTax
 
             return -1;
         }
-        bool xlExcel = false;
+        bool xlExcel2 = false;
+        bool xlExcel1 = false;
+        bool xlExcel3 = false;
         public  void XulyDataXML(RootObject rootObject,string tokken,int invoceType)
         {
             foreach(var item in rootObject.datas)
             {
                 InsertTbImport(item, invoceType);
-                if (xlExcel == false)
+                if (xlExcel1 == false)
                 {
-                    xlExcel = true;
-                    Xulyexel(tokken, item);
+                    xlExcel1 = true;
+                    Xulyexel(tokken, item,1);
                 }
-              
+                if (xlExcel2 == false)
+                {
+                    xlExcel2 = true;
+                    Xulyexel(tokken, item,2);
+                }
+                if (xlExcel3 == false)
+                {
+                    xlExcel3 = true;
+                    Xulyexel(tokken, item, 3);
+                }
                 // GetdetailXML(item.nbmst, item.khhdon, item.shdon.ToString(),tokken);
             }
         }
+        bool xrlExcel1 = false; bool xrlExcel2 = false;
         public void XulyRa2ML(InvoiceRa2 rootObject, string tokken,int invoceType)
         {
             foreach (var item in rootObject.datas)
             {
                 InsertTbImport2(item,tokken, invoceType);
-               
+                if (xlExcel1 == false)
+                {
+                    xlExcel1 = true;
+                    Xulyexel2(tokken, item, 1);
+                }
+                if (xlExcel2 == false)
+                {
+                    xlExcel2 = true;
+                    Xulyexel2(tokken, item, 2);
+                }
             }
         }
        
@@ -1057,8 +1145,9 @@ namespace SaovietTax
                 }
             }
             string dateTimeString = nl.ToString();
+            DateTime utcDateTime = DateTime.Parse(dateTimeString, null, System.Globalization.DateTimeStyles.RoundtripKind);
             DateTime dateTime = DateTime.Parse(dateTimeString);
-            string formattedDate = dateTime.ToShortDateString();
+            string formattedDate = utcDateTime.ToShortDateString();
 
             string vat = "0";
             string vat2 = "0";  

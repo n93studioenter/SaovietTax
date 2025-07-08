@@ -237,7 +237,25 @@ namespace SaovietTax
                 ReadExcelFile(excelFile); // Gọi phương thức đọc tệp Excel
             }
         }
+        private void Xulyexcel2()
+        {
+            string directoryPath = Path.Combine(savedPath, "HDRa", dtTungay.DateTime.Month.ToString());
 
+            // Kiểm tra xem thư mục có tồn tại không
+            if (!Directory.Exists(directoryPath))
+            {
+                Console.WriteLine("Thư mục không tồn tại.");
+                return;
+            }
+
+            var excelFiles = Directory.EnumerateFiles(directoryPath, "*.xlsx", SearchOption.AllDirectories).ToList();
+
+            foreach (var excelFile in excelFiles)
+            {
+                Console.WriteLine($"Đang xử lý tệp: {excelFile}");
+                ReadExcelFile(excelFile); // Gọi phương thức đọc tệp Excel
+            }
+        }
         private void ReadExcelFile(string filePath)
         {
             using (var workbook = new XLWorkbook(filePath))
@@ -264,7 +282,7 @@ namespace SaovietTax
         }
         private void LoadDataGridview(int type)
         {
-            Xulyexcel();
+           
             string mstcty = "";
             string query = "SELECT * FROM tbRegister";
             var kq2 = ExecuteQuery(query, null);
@@ -1434,6 +1452,8 @@ namespace SaovietTax
         }
         private async void frmMain_Load(object sender, EventArgs e)
         {
+            string testkt = "CONG TY TNHH CO KHI DUY LINH-GD 079332-2025-01-21T12:08:51-970415-/CTR/CTY CK DUY LINH TT TIEN DV KHAI BAO THUE THEO HOA DON SO 184/MAC/EAA4BC0000004C12";
+            var checks = Helpers.GetName(testkt);
             //string a = "Cán dao màu";
             //string b = "Cán dao màu tím";
             //var result = Math.Round(FindSimilar(a, b));
@@ -3595,12 +3615,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 //LoadXmlFilesOptimized(savedPath, 1);
                 // LoadExcel(savedPath, 1);
                 //ImportHD(people, "HDVao");
+                Xulyexcel();
                 LoadDataGridview(1);
             }
             if (chkDaura.Checked)
             {
                 // LoadXmlFilesOptimized(savedPath, 2);
                 // ImportHD(people2, "HDRa");
+                Xulyexcel2();
                 LoadDataGridview(2);
 
             }
@@ -8631,6 +8653,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
  new OleDbParameter("?",null)
                    };
                 var dtnganhang = ExecuteQuery(queryCheckVatTu, parameterss);
+               
                 for (int rowIndex = headerRowNumber + 1; rowIndex <= worksheet.LastCellUsed().Address.RowNumber; rowIndex++)
                 {
                     if (rowIndex == 58)
@@ -8638,6 +8661,28 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         int da = 10;
                     }
                     var row = worksheet.Row(rowIndex);
+                    bool isMerged = false;
+
+                    int hasRowMerge = 0;
+                    int hasCellMerge = 0;
+                    foreach (var mergedRange in worksheet.MergedRanges)
+                    {
+                        // Kiểm tra từng ô trong hàng
+                        foreach (var cell in row.CellsUsed())
+                        {
+                            if (mergedRange.Contains(cell.Address.ToString()))
+                            {
+                                isMerged = true;
+                                Console.WriteLine($"Ô gộp tại hàng {rowIndex}, ô {cell.Address.ColumnNumber}. Nội dung: {cell.GetString()}");
+                                hasRowMerge = rowIndex;
+                                hasCellMerge = cell.Address.ColumnNumber;
+                                break;
+                            }
+                        }
+
+                        if (isMerged) break; // Thoát nếu tìm thấy ô gộp
+                    }
+                 
 
                     // --- Xác thực cơ bản để bỏ qua các hàng trống hoặc không phải dữ liệu ---
                     // Kiểm tra xem ô STT hoặc ô Ngày GD có dữ liệu không.
@@ -8679,7 +8724,21 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             }
                         }
                         else
-                            nganhang.Maso = row.Cell(indexMaGD).GetString().Trim();
+                        {
+                            if (hasCellMerge != 0 && (hasRowMerge > (headerRowNumber + 2)))
+                            {
+                                if (indexMaGD > hasCellMerge)
+                                {
+                                    nganhang.Maso = row.Cell(indexMaGD+1).GetString().Trim();
+                                }
+                                else
+                                {
+                                    nganhang.Maso = row.Cell(indexMaGD).GetString().Trim();
+                                }
+                            }
+                            else
+                                nganhang.Maso = row.Cell(indexMaGD).GetString().Trim();
+                        }
                         if (nganhang.Maso == "TT25142V0Y9X")
                         {
                             int a = 10;
@@ -8691,8 +8750,17 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         //if (filteredRows == true)
                         //    continue;
                         // Diễn giải
-                        nganhang.Diengiai = row.Cell(indexDiengiai).GetString().Trim();
-                        DateTime? parsedNgayGD = DateHelper.ParseAndCorrectDate(ngayGDCellContent);
+
+                        //Trường  hợp cột bị mergre
+                        if (hasCellMerge != 0 && indexDiengiai > hasCellMerge && (hasRowMerge>(headerRowNumber+2)))
+                        {
+                            nganhang.Diengiai = row.Cell(indexDiengiai+1).GetString().Trim();
+                        }
+                        else
+                        {
+                            nganhang.Diengiai = row.Cell(indexDiengiai).GetString().Trim();
+                        }
+                            DateTime? parsedNgayGD = DateHelper.ParseAndCorrectDate(ngayGDCellContent);
                         if (parsedNgayGD.HasValue)
                         {
                             nganhang.NgayGD = parsedNgayGD.Value;
@@ -8726,13 +8794,43 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                             double.TryParse(row.Cell(indexTKNo - 1).GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out tkno);
                         }
                         else
+                          
                         {
-                            string cellValue = row.Cell(indexTKCo).GetString();
+                            string cellValue = "";
+                            if (hasCellMerge != 0 && (hasRowMerge > (headerRowNumber + 2)))
+                            {
+                                // Nếu cột bị gộp, lấy giá trị từ ô bên phải
+                                if(indexTKCo > hasCellMerge)
+                                    cellValue = row.Cell(indexTKCo + 1).GetString();
+                                else
+                                {
+                                    cellValue = row.Cell(indexTKCo).GetString();
+                                }
+                            }
+                            else
+                                cellValue = row.Cell(indexTKCo).GetString();
+
+
+
                             if (!cellValue.Contains(","))
                                 cellValue = cellValue.Replace(".", "");
                             // Sử dụng InvariantCulture để đảm bảo việc phân tích số nhất quán, loại bỏ dấu phẩy/chấm
                             double.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tkco);
-                            string cellValue2 = row.Cell(indexTKNo).GetString();
+                            string cellValue2 = "";
+
+                            if (hasCellMerge != 0 && (hasRowMerge > (headerRowNumber + 2)))
+                            {
+                                if (indexTKNo > hasCellMerge)
+                                    cellValue2 = row.Cell(indexTKNo + 1).GetString();
+                                else
+                                {
+                                    cellValue2 = row.Cell(indexTKNo).GetString();
+                                }
+                            }
+                            else
+                            {
+                                cellValue2 = row.Cell(indexTKNo).GetString();
+                            }
                             if (!cellValue2.Contains(","))
                                 cellValue2 = cellValue2.Replace(".", "");
 
@@ -8754,8 +8852,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         else
                         {
                             //Lọc ko có
-                           
-
+                            
                             var filteredRows = dtnganhang.AsEnumerable().Where(rows => rows["DienGiai"].ToString() == nganhang.Diengiai).FirstOrDefault();
                             if (filteredRows==null)
                                 continue; // Bỏ qua nếu đã xử lý
@@ -9204,22 +9301,26 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                       row.Field<string>("NgayGD") != null &&
                       DateTime.TryParse(row.Field<string>("NgayGD"), out DateTime ngayGD) &&
                       ngayGD.Date == item.NgayGD.Date))
-                    {
-                        XtraMessageBox.Show("Trùng");
-            //            //Nếu bỏ check thì cập nhật bỏ check
-            //            var query = @"update tbNganhang set  ";
-            //            var parameters = new OleDbParameter[]
-            //               {
-            //new OleDbParameter("?", item.Maso), 
-            //               };
-            //            try
-            //            {
-            //               // int rowsAffected = ExecuteQueryResult(query, parameters);
-            //            }
-            //            catch(Exception ex)
-            //            {
+                    { 
+                        //Nếu bỏ check thì cập nhật bỏ check
+                        var query = @"update tbNganhang set  TKNo=?, TKCo=?,Checked=?,DienGiai=? where SHDon=? and NgayGD=?";
+                        var parameters = new OleDbParameter[]
+                           {
+                               new OleDbParameter("?", item.TKNo),
+                               new OleDbParameter("?", item.TKCo),
+                               new OleDbParameter("?", item.Checked?"1":"0"),
+                               new OleDbParameter("?", Helpers.ConvertUnicodeToVni(item.Diengiai)),
+                               new OleDbParameter("?", item.Maso),
+                               new OleDbParameter("?", item.NgayGD),
+                           };
+                        try
+                        {
+                            int rowsAffected = ExecuteQueryResult(query, parameters);
+                        }
+                        catch (Exception ex)
+                        {
 
-            //            }
+                        }
                     }
                     else
                     {
@@ -9365,10 +9466,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 string maso = gridView.GetRowCellValue(currentRowHandle, "Maso").ToString();
                 string tkco = gridView.GetRowCellValue(currentRowHandle, "TKCo").ToString();
                 string tkno = gridView.GetRowCellValue(currentRowHandle, "TKNo").ToString();
-                int stt = int.Parse(gridView.GetRowCellValue(currentRowHandle, "Stt").ToString());
+                if (tkco.Contains("112"))
+                {
+                    tkno = currentvalue;
+                }
+                else
+                {
+                    tkco = currentvalue;
+                }
+                    int stt = int.Parse(gridView.GetRowCellValue(currentRowHandle, "Stt").ToString());
                 if (cellValue != null)
                 {
-                    if (cellValue.ToString().Contains("341") || cellValue.ToString().Contains("131") || cellValue.ToString().Contains("331"))
+                    if (currentvalue.ToString().Contains("341") || currentvalue.ToString().Contains("131") || currentvalue.ToString().Contains("331"))
                     {
                         frmKhachhang frmKhachhang = new frmKhachhang();
                         frmKhachhang.Mode = 2;
@@ -9443,12 +9552,15 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
             }
         }
-
+        string currentvalue = "";
         private void gridView5_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
+           
+
             gridControl3.ToolTipController = toolTipController1;
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
+            currentvalue = newValue.ToString();
             if (newValue.ToString().Length < 2)
             {
                 toolTipController.HideHint();
@@ -9559,6 +9671,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             gridControl3.DataSource = lstNganhan;
 
+        }
+
+        private void gridView5_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar.ToString() == Keys.Enter)
+            {
+                int a = 100;
+            }
         }
 
         //private void btnScanCmera_Click(object sender, EventArgs e)

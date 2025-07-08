@@ -712,7 +712,7 @@
             this.gridControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.gridControl2.MainView = this.gridView3;
             this.gridControl2.Name = "gridControl2";
-            this.gridControl2.Size = new System.Drawing.Size(1667, 226);
+            this.gridControl2.Size = new System.Drawing.Size(1661, 209);
             this.gridControl2.TabIndex = 1;
             this.gridControl2.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView3,
@@ -1163,7 +1163,7 @@
             this.xtraTabPage4.Controls.Add(this.lblSofiles2);
             this.xtraTabPage4.Controls.Add(this.gridControl2);
             this.xtraTabPage4.Name = "xtraTabPage4";
-            this.xtraTabPage4.Size = new System.Drawing.Size(1667, 226);
+            this.xtraTabPage4.Size = new System.Drawing.Size(1661, 209);
             this.xtraTabPage4.Text = "HĐ Đầu ra";
             // 
             // label2
@@ -1194,7 +1194,7 @@
             this.xtraTabPage2.Controls.Add(this.btnChontknganhang);
             this.xtraTabPage2.Controls.Add(this.gridControl3);
             this.xtraTabPage2.Name = "xtraTabPage2";
-            this.xtraTabPage2.Size = new System.Drawing.Size(1667, 226);
+            this.xtraTabPage2.Size = new System.Drawing.Size(1661, 209);
             this.xtraTabPage2.Text = "Ngân hàng";
             // 
             // lblTKNganhang
@@ -1254,6 +1254,7 @@
             this.gridView5.OptionsView.ShowGroupPanel = false;
             this.gridView5.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView5_CellValueChanging);
             this.gridView5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView5_KeyDown);
+            this.gridView5.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gridView5_KeyPress);
             this.gridView5.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView5_MouseDown);
             // 
             // colStt

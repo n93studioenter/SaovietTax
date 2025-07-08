@@ -64,8 +64,6 @@
             // 
             this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelControl1.Controls.Add(this.labelControl3);
-            this.panelControl1.Controls.Add(this.textEdit2);
             this.panelControl1.Controls.Add(this.labelControl2);
             this.panelControl1.Controls.Add(this.txtMaKH);
             this.panelControl1.Controls.Add(this.labelControl1);
@@ -75,31 +73,33 @@
             this.panelControl1.Controls.Add(this.btnLuudinhdanh);
             this.panelControl1.Location = new System.Drawing.Point(12, 12);
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1039, 110);
+            this.panelControl1.Size = new System.Drawing.Size(795, 110);
             this.panelControl1.TabIndex = 22;
             // 
             // labelControl3
             // 
             this.labelControl3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl3.Location = new System.Drawing.Point(617, 59);
+            this.labelControl3.Location = new System.Drawing.Point(30, 580);
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(91, 19);
             this.labelControl3.TabIndex = 28;
             this.labelControl3.Text = "Tài khoản có";
+            this.labelControl3.Visible = false;
             // 
             // textEdit2
             // 
-            this.textEdit2.Location = new System.Drawing.Point(735, 56);
+            this.textEdit2.Location = new System.Drawing.Point(458, 577);
             this.textEdit2.Name = "textEdit2";
             this.textEdit2.Size = new System.Drawing.Size(156, 27);
             this.textEdit2.TabIndex = 27;
+            this.textEdit2.Visible = false;
             // 
             // labelControl2
             // 
             this.labelControl2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl2.Location = new System.Drawing.Point(17, 59);
+            this.labelControl2.Location = new System.Drawing.Point(301, 66);
             this.labelControl2.Name = "labelControl2";
             this.labelControl2.Size = new System.Drawing.Size(106, 19);
             this.labelControl2.TabIndex = 26;
@@ -107,9 +107,9 @@
             // 
             // txtMaKH
             // 
-            this.txtMaKH.Location = new System.Drawing.Point(129, 56);
+            this.txtMaKH.Location = new System.Drawing.Point(413, 63);
             this.txtMaKH.Name = "txtMaKH";
-            this.txtMaKH.Size = new System.Drawing.Size(473, 27);
+            this.txtMaKH.Size = new System.Drawing.Size(211, 27);
             this.txtMaKH.TabIndex = 25;
             this.txtMaKH.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtMaKH_KeyUp);
             // 
@@ -117,15 +117,15 @@
             // 
             this.labelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelControl1.Location = new System.Drawing.Point(617, 15);
+            this.labelControl1.Location = new System.Drawing.Point(18, 66);
             this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(93, 19);
+            this.labelControl1.Size = new System.Drawing.Size(70, 19);
             this.labelControl1.TabIndex = 24;
-            this.labelControl1.Text = "Tài khoản nợ";
+            this.labelControl1.Text = "Tài khoản";
             // 
             // textEdit1
             // 
-            this.textEdit1.Location = new System.Drawing.Point(735, 12);
+            this.textEdit1.Location = new System.Drawing.Point(129, 63);
             this.textEdit1.Name = "textEdit1";
             this.textEdit1.Size = new System.Drawing.Size(156, 27);
             this.textEdit1.TabIndex = 23;
@@ -146,13 +146,13 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDiengiai.Location = new System.Drawing.Point(129, 12);
             this.txtDiengiai.Name = "txtDiengiai";
-            this.txtDiengiai.Size = new System.Drawing.Size(473, 27);
+            this.txtDiengiai.Size = new System.Drawing.Size(495, 27);
             this.txtDiengiai.TabIndex = 13;
             // 
             // btnLuudinhdanh
             // 
             this.btnLuudinhdanh.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnLuudinhdanh.ImageOptions.Image")));
-            this.btnLuudinhdanh.Location = new System.Drawing.Point(915, 15);
+            this.btnLuudinhdanh.Location = new System.Drawing.Point(647, 15);
             this.btnLuudinhdanh.Name = "btnLuudinhdanh";
             this.btnLuudinhdanh.Size = new System.Drawing.Size(119, 34);
             this.btnLuudinhdanh.TabIndex = 20;
@@ -168,7 +168,7 @@
             this.gcDinhdanh.Location = new System.Drawing.Point(12, 161);
             this.gcDinhdanh.MainView = this.gridView2;
             this.gcDinhdanh.Name = "gcDinhdanh";
-            this.gcDinhdanh.Size = new System.Drawing.Size(1039, 466);
+            this.gcDinhdanh.Size = new System.Drawing.Size(795, 466);
             this.gcDinhdanh.TabIndex = 23;
             this.gcDinhdanh.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView2});
@@ -207,7 +207,7 @@
             this.colNoidung.Name = "colNoidung";
             this.colNoidung.Visible = true;
             this.colNoidung.VisibleIndex = 0;
-            this.colNoidung.Width = 203;
+            this.colNoidung.Width = 154;
             // 
             // gridColumn2
             // 
@@ -217,7 +217,7 @@
             this.gridColumn2.Name = "gridColumn2";
             this.gridColumn2.Visible = true;
             this.gridColumn2.VisibleIndex = 1;
-            this.gridColumn2.Width = 301;
+            this.gridColumn2.Width = 228;
             // 
             // gridColumn3
             // 
@@ -227,7 +227,7 @@
             this.gridColumn3.Name = "gridColumn3";
             this.gridColumn3.Visible = true;
             this.gridColumn3.VisibleIndex = 2;
-            this.gridColumn3.Width = 239;
+            this.gridColumn3.Width = 181;
             // 
             // colSoHieu
             // 
@@ -237,7 +237,7 @@
             this.colSoHieu.Name = "colSoHieu";
             this.colSoHieu.Visible = true;
             this.colSoHieu.VisibleIndex = 3;
-            this.colSoHieu.Width = 222;
+            this.colSoHieu.Width = 143;
             // 
             // gridColumn1
             // 
@@ -248,14 +248,16 @@
             this.gridColumn1.OptionsColumn.AllowEdit = false;
             this.gridColumn1.Visible = true;
             this.gridColumn1.VisibleIndex = 4;
-            this.gridColumn1.Width = 51;
+            this.gridColumn1.Width = 66;
             // 
             // frmMatdinhNganHang
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1063, 639);
+            this.ClientSize = new System.Drawing.Size(819, 639);
+            this.Controls.Add(this.labelControl3);
             this.Controls.Add(this.gcDinhdanh);
+            this.Controls.Add(this.textEdit2);
             this.Controls.Add(this.panelControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.IconOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("frmMatdinhNganHang.IconOptions.LargeImage")));
@@ -274,6 +276,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.matdinhnganhangBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

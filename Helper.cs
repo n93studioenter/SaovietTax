@@ -15,7 +15,30 @@ namespace SaovietTax
 {
     public static class Helpers
     {
-       
+
+        public static string GetName(string input)
+        {
+            // Biểu thức chính quy để tìm tên công ty
+            string companyPattern = @"(?:CÔNG TY TNHH|CT TNHH|CT)\s+([A-Z\s]+)";
+            Match companyMatch = Regex.Match(input, companyPattern, RegexOptions.IgnoreCase);
+
+            if (companyMatch.Success)
+            {
+                // Trả về tên công ty sau từ khóa
+                return "Tên công ty: " + companyMatch.Groups[1].Value.Trim();
+            }
+
+            // Biểu thức chính quy để tìm tên người
+            string personPattern = @"([A-Z]+\s+[A-Z]+\s+[A-Z]+)";
+            Match personMatch = Regex.Match(input, personPattern);
+
+            if (personMatch.Success)
+            {
+                return "Tên người: " + personMatch.Value.Trim();
+            }
+
+            return "Không tìm thấy tên.";
+        }
         public static string RemoveVietnameseDiacritics(string str)
         {
             if(str == null)
