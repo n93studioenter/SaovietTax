@@ -209,7 +209,18 @@ namespace SaovietTax
         public frmMain()
         {
             InitializeComponent();
-
+            suggestionControl = new SuggestionControl();
+            suggestionControl1 = new SuggestionControl();
+            suggestionControl3 = new SuggestionControl();
+            suggestionControl.ItemSelected += SuggestionControl_ItemSelected;
+            suggestionControl1.ItemSelected += SuggestionControl_ItemSelected;
+            suggestionControl3.ItemSelected += SuggestionControl_ItemSelected;
+            gridView3.GridControl.Controls.Add(suggestionControl);
+            gridView1.GridControl.Controls.Add(suggestionControl1);
+            gridView5.GridControl.Controls.Add(suggestionControl3);
+            suggestionControl.Hide(); // Ẩn nó ban đầu
+            suggestionControl1.Hide(); // Ẩn nó ban đầu
+            suggestionControl3.Hide(); // Ẩn nó ban đầu
         }
 
         private List<People> GetListFileImport()
@@ -396,6 +407,11 @@ namespace SaovietTax
                             foreach (DataRow itemDetail in kq2.Rows)
                             {
                                 FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString(), CultureInfo.InvariantCulture), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                //Nếu là chiết khấu thì cho ve tk 711
+                                if(string.IsNullOrEmpty(fileImportDetail.DVT) && fileImportDetail.Ten.ToLower().Contains("chiết khấu"))
+                                {
+                                    fileImportDetail.TKNo = "711";
+                                }
                                 fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString());
                                 fileImport.fileImportDetails.Add(fileImportDetail);
                             }
@@ -416,6 +432,7 @@ namespace SaovietTax
                             foreach (DataRow itemDetail in kq3.Rows)
                             {
                                 FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                              
                                 fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString());
                                 fileImport.fileImportDetails.Add(fileImportDetail);
                             }
@@ -856,6 +873,11 @@ namespace SaovietTax
                 }
                 else
                 {
+                    if (!ColumnExists(connection, "tbNganhang", "MaKH"))
+                    {
+                        // Nếu không tồn tại, thêm cột tkoco
+                        AddColumn(connection, "tbNganhang", "MaKH", "TEXT"); // Bạn có thể thay đổi kiểu dữ liệu nếu cần 
+                    }
                     if (!ColumnExists(connection, "tbimport", "TVat3"))
                     {
                         // Nếu không tồn tại, thêm cột tkoco
@@ -3475,8 +3497,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 fileImport.Noidung = it.Ten;
                             }
                             //
-                            // Chèn chi tiết hóa đơn
-                            query = @"
+                            // Chèn ch
+                            // i tiết hóa đơn
+                            string tkno = "";
+                            if (string.IsNullOrEmpty(it.Dvtinh) && it.Ten.ToLower().Contains("chiết khấu"))
+                            {
+                                tkno = "711";
+                            }
+                            else
+                            {
+                                tkno = kq2.Rows[0]["TKNo"].ToString();  
+                            }
+                                query = @"
                     INSERT INTO tbimportdetail (ParentId, SoHieu, SoLuong, DonGia, DVT, Ten, MaCT, TKNo, TKCo, TTien)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -3489,7 +3521,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         new OleDbParameter("?", Helpers.ConvertUnicodeToVni(it.Dvtinh)),
                         new OleDbParameter("?", it.Ten!=null?Helpers.ConvertUnicodeToVni(it.Ten):""),
                         new OleDbParameter("?", ""),
-                        new OleDbParameter("?", kq2.Rows[0]["TKNo"]),
+                        new OleDbParameter("?", tkno),
                         new OleDbParameter("?", kq2.Rows[0]["TKCo"]),
                         new OleDbParameter("?", it.Thtien!=null?it.Thtien:0),
                             };
@@ -4665,7 +4697,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             catch (Exception ex)
             {
-               // XtraMessageBox.Show(ex.Message + path, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+              //  XtraMessageBox.Show(ex.Message + path, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -8203,18 +8235,24 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         {
 
         }
-
+        public class HeThongTK
+        {
+            public int MaSo { get; set; }
+            public string SoHieu { get; set; }
+            public string Ten { get; set; }
+        }
+       
         private void gridView3_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             gridControl1.ToolTipController = toolTipController1;
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
-            if (newValue.ToString().Length < 4)
-            {
-                toolTipController.HideHint();
-                return;
-            }
-            if (view.FocusedColumn.FieldName == "TKCo") // Thay đổi tên cột theo nhu cầu
+            //if (newValue.ToString().Length < 4)
+            //{
+            //    toolTipController.HideHint();
+            //    return;
+            //}
+            if (view.FocusedColumn.FieldName == "TKCos") // Thay đổi tên cột theo nhu cầu
             {
                 // Hiển thị tooltip
                 string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
@@ -8247,19 +8285,77 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 }
 
             }
+            if (view.FocusedColumn.FieldName == "TKCo" || view.FocusedColumn.FieldName =="TKNo") // Thay đổi tên cột theo nhu cầu
+            {
+
+
+                string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"));
+
+                List<HeThongTK> lstHethongtk = new List<HeThongTK>();
+                foreach (DataRow dt in resultkm.Rows)
+                {
+                    HeThongTK HeThongTK = new HeThongTK();
+                    HeThongTK.MaSo = int.Parse(dt["MaSo"].ToString());
+                    HeThongTK.SoHieu = dt["SoHieu"].ToString();
+                    HeThongTK.Ten = dt["Ten"].ToString();
+                    lstHethongtk.Add(HeThongTK);
+                }
+                suggestionControl.UpdateSuggestions(lstHethongtk.ToList());
+
+
+                // Đặt vị trí cho UserControl 
+                // Lấy thông tin về GridView
+                var gridViewInfo = gridView3.GetViewInfo() as GridViewInfo;
+                GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, gridView3.FocusedColumn);
+
+                if (cellInfo != null)
+                {
+                    // Lấy vị trí của cell
+                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
+                    System.Drawing.Point screenPoint = gridView3.GridControl.PointToScreen(cellRect.Location);
+
+                    // Đặt vị trí cho UserControl ngay dưới cell
+                    suggestionControl.Location = new System.Drawing.Point(screenPoint.X-50, screenPoint.Y-300 ); // Thêm khoảng cách 5 pixels
+
+                    // Hiển thị UserControl
+                    suggestionControl.Show();
+
+                }
+            }
         }
+        private void CloseSuggestionControl()
+        {
+            if (suggestionControl != null)
+            {
+                suggestionControl.Hide(); // Ẩn UserControl
+            }
+        }
+        private void SuggestionControl_ItemSelected(object sender, string selectedItem)
+        {
+            if (xtraTabControl2.SelectedTabPageIndex==0)
+                gridView1.SetFocusedValue(selectedItem);
+            if (xtraTabControl2.SelectedTabPageIndex == 1)
+                gridView3.SetFocusedValue(selectedItem);
+            if (xtraTabControl2.SelectedTabPageIndex == 2)
+                gridView5.SetFocusedValue(selectedItem);
+            CloseSuggestionControl();
+        }
+        private SuggestionControl suggestionControl;
+        private SuggestionControl suggestionControl1;
+        private SuggestionControl suggestionControl3;
 
         private void gridView1_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             gridControl1.ToolTipController = toolTipController1;
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
-            if (newValue.ToString().Length < 3)
-            {
-                toolTipController.HideHint();
-                return;
-            }
-            if (view.FocusedColumn.FieldName == "TKNo") // Thay đổi tên cột theo nhu cầu
+            //if (newValue.ToString().Length < 3)
+            //{
+            //    toolTipController.HideHint();
+            //    return;
+            //}
+            if (view.FocusedColumn.FieldName == "TKNos") // Thay đổi tên cột theo nhu cầu
             {
                 // Hiển thị tooltip
                 string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
@@ -8291,6 +8387,45 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     toolTipController.ShowHint(tooltipText, screenPoint);
                 }
 
+            }
+
+            if (view.FocusedColumn.FieldName == "TKCo" || view.FocusedColumn.FieldName == "TKNo") // Thay đổi tên cột theo nhu cầu
+            {
+
+
+                string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"));
+
+                List<HeThongTK> lstHethongtk = new List<HeThongTK>();
+                foreach (DataRow dt in resultkm.Rows)
+                {
+                    HeThongTK HeThongTK = new HeThongTK();
+                    HeThongTK.MaSo = int.Parse(dt["MaSo"].ToString());
+                    HeThongTK.SoHieu = dt["SoHieu"].ToString();
+                    HeThongTK.Ten = dt["Ten"].ToString();
+                    lstHethongtk.Add(HeThongTK);
+                }
+                suggestionControl1.UpdateSuggestions(lstHethongtk.ToList());
+
+
+                // Đặt vị trí cho UserControl 
+                // Lấy thông tin về GridView
+                var gridViewInfo = gridView1.GetViewInfo() as GridViewInfo;
+                GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, gridView1.FocusedColumn);
+
+                if (cellInfo != null)
+                {
+                    // Lấy vị trí của cell
+                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
+                    System.Drawing.Point screenPoint = gridView1.GridControl.PointToScreen(cellRect.Location);
+
+                    // Đặt vị trí cho UserControl ngay dưới cell
+                    suggestionControl1.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 300); // Thêm khoảng cách 5 pixels
+
+                    // Hiển thị UserControl
+                    suggestionControl1.Show();
+
+                }
             }
         }
 
@@ -8475,6 +8610,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             public double ThanhTien2 { get; set; }
             public string TKNo { get; set; }
             public string TKCo { get; set; }
+            public string MaKH { get; set; }
             public bool Checked { get; set; }
         }
         private List<Nganhang> lstNganhan = new List<Nganhang>();
@@ -9380,6 +9516,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void simpleButton3_Click(object sender, EventArgs e)
         {
+            progressPanel1.Visible = true;
+            Application.DoEvents();
             frmTaiCoQuanThue frmTaiCoQuanThue = new frmTaiCoQuanThue();
             username = txtuser.Text;
             pasword = txtpass.Text;
@@ -9388,6 +9526,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             dtTo = dtDenngay.DateTime;
             frmTaiCoQuanThue.frmMain = this;
             frmTaiCoQuanThue.Show();
+            progressPanel1.Visible = false;
         }
 
         private void btnLichsuimport_Click(object sender, EventArgs e)
@@ -9561,43 +9700,81 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
             currentvalue = newValue.ToString();
-            if (newValue.ToString().Length < 2)
-            {
-                toolTipController.HideHint();
-                return;
-            }
+           
             if (view.FocusedColumn.FieldName == "TKCo" || view.FocusedColumn.FieldName == "TKNo") // Thay đổi tên cột theo nhu cầu
             {
-                // Hiển thị tooltip
+
+
                 string querydinhdanh = @"SELECT * FROM HeThongTK WHERE SoHieu LIKE ?";
                 var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"));
-                var str = "";
-                var strBuilder = new System.Text.StringBuilder();
 
-                if (resultkm.Rows.Count > 0)
+                List<HeThongTK> lstHethongtk = new List<HeThongTK>();
+                foreach (DataRow dt in resultkm.Rows)
                 {
-                    for (int i = 0; i < resultkm.Rows.Count; i++)
-                    {
-                        strBuilder.AppendLine(resultkm.Rows[i]["SoHieu"].ToString() + "-" + Helpers.ConvertVniToUnicode(resultkm.Rows[i]["Ten"].ToString())); // Thêm xuống dòng
-                    }
+                    HeThongTK HeThongTK = new HeThongTK();
+                    HeThongTK.MaSo = int.Parse(dt["MaSo"].ToString());
+                    HeThongTK.SoHieu = dt["SoHieu"].ToString();
+                    HeThongTK.Ten = dt["Ten"].ToString();
+                    lstHethongtk.Add(HeThongTK);
                 }
-                if (resultkm.Rows.Count > 1)
+                suggestionControl.UpdateSuggestions(lstHethongtk.ToList());
+
+
+                // Đặt vị trí cho UserControl 
+                // Lấy thông tin về GridView
+                var gridViewInfo = gridView5.GetViewInfo() as GridViewInfo;
+                GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, gridView5.FocusedColumn);
+
+                if (cellInfo != null)
                 {
-                    string tooltipText = strBuilder.ToString().Trim(); // Loại bỏ dòng trống cuối cùng (nếu có)
-
-                    var gridViewInfo = view.GetViewInfo() as GridViewInfo;
-
-                    GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, view.FocusedColumn);
-
-                    int rowHandle = view.FocusedRowHandle;
+                    // Lấy vị trí của cell
                     System.Drawing.Rectangle cellRect = cellInfo.Bounds;
-                    System.Drawing.Point screenPoint = view.GridControl.PointToScreen(
-                        new System.Drawing.Point(cellRect.X, cellRect.Bottom + 2)
-                    );
+                    System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
 
-                    toolTipController.ShowHint(tooltipText, screenPoint);
+                    // Đặt vị trí cho UserControl ngay dưới cell
+                    suggestionControl.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 350); // Thêm khoảng cách 5 pixels
+
+                    // Hiển thị UserControl
+                    suggestionControl.Show();
+
                 }
+            }
 
+            if (view.FocusedColumn.FieldName == "MaKH" )  
+            {
+                string querydinhdanh = @"SELECT * FROM KhachHang WHERE SoHieu LIKE ? or LCase(Ten) like ?";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"), new OleDbParameter("?", "%"+ Helpers.ConvertUnicodeToVni(newValue.ToString().ToLower()) + "%"));
+
+                List<HeThongTK> lstHethongtk = new List<HeThongTK>();
+                foreach (DataRow dt in resultkm.Rows)
+                {
+                    HeThongTK HeThongTK = new HeThongTK();
+                    HeThongTK.MaSo = int.Parse(dt["MaSo"].ToString());
+                    HeThongTK.SoHieu = dt["SoHieu"].ToString();
+                    HeThongTK.Ten = dt["Ten"].ToString();
+                    lstHethongtk.Add(HeThongTK);
+                }
+                suggestionControl.UpdateSuggestions(lstHethongtk.ToList());
+
+
+                // Đặt vị trí cho UserControl 
+                // Lấy thông tin về GridView
+                var gridViewInfo = gridView5.GetViewInfo() as GridViewInfo;
+                GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, gridView5.FocusedColumn);
+
+                if (cellInfo != null)
+                {
+                    // Lấy vị trí của cell
+                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
+                    System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
+
+                    // Đặt vị trí cho UserControl ngay dưới cell
+                    suggestionControl.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 350); // Thêm khoảng cách 5 pixels
+
+                    // Hiển thị UserControl
+                    suggestionControl.Show();
+
+                }
             }
         }
 
@@ -9628,6 +9805,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private int typeNganhang=0;
         private void btnLocdulieuNganhang_Click(object sender, EventArgs e)
         {
+            xtraTabControl2.SelectedTabPageIndex = 2;
             //typeNganhang = 2;
             //progressPanel1.Visible = true;
             //Application.DoEvents();
@@ -9661,11 +9839,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 stt += 1;
                 nganhang.NgayGD = DateTime.Parse(item["NgayGD"].ToString());
                 nganhang.Maso = item["SHDon"].ToString();
-                nganhang.Diengiai = item["DienGiai"].ToString();
+                nganhang.Diengiai = Helpers.ConvertVniToUnicode(item["DienGiai"].ToString());
                 nganhang.ThanhTien = item["TongTien"].ToString()!="0"?double.Parse(item["TongTien"].ToString()):0;
                 nganhang.ThanhTien2 = item["TongTien2"].ToString() != "0" ? double.Parse(item["TongTien2"].ToString()) : 0;
                 nganhang.TKNo = item["TKNo"].ToString();
                 nganhang.TKCo = item["TKCo"].ToString();
+                nganhang.MaKH= item["MaKH"].ToString();
                 nganhang.Checked = true;
                 lstNganhan.Add(nganhang);
             }
@@ -9678,6 +9857,41 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             if (e.KeyChar.ToString() == Keys.Enter)
             {
                 int a = 100;
+            }
+        }
+
+        private void gridView5_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            int rowHandle = e.RowHandle;
+            string SHDon = gridView5.GetRowCellValue(rowHandle, "Maso").ToString();
+            string TKNo = gridView5.GetRowCellValue(rowHandle, "TKNo").ToString();
+            string TKCo = gridView5.GetRowCellValue(rowHandle, "TKCo").ToString();
+            string Diengiai = gridView5.GetRowCellValue(rowHandle, "Diengiai").ToString();
+            string NgayGD = gridView5.GetRowCellValue(rowHandle, "NgayGD").ToString();
+            string MaKH= gridView5.GetRowCellValue(rowHandle, "MaKH").ToString();
+            string query = @"UPDATE tbNganhang 
+                 SET DienGiai = ?, TKNo = ?, TKCo = ? ,MaKH =?
+                 WHERE SHDon = ? AND NgayGD = ?";
+
+            var parameters = new OleDbParameter[]
+            {
+                new OleDbParameter("DienGiai", Helpers.ConvertUnicodeToVni(Diengiai)),
+                new OleDbParameter("TKNo", TKNo),
+                new OleDbParameter("TKCo", TKCo),
+                new OleDbParameter("MaKH", MaKH),
+                new OleDbParameter("SHDon", SHDon),
+                new OleDbParameter("NgayGD", DateTime.Parse(NgayGD)) // Chuyển đổi Ngày thành DateTime nếu cần
+             };
+
+            // Gọi hàm thực thi câu lệnh SQL
+            int rowsAffected = ExecuteQueryResult(query, parameters);
+
+            // Kiểm tra số hàng bị ảnh hưởng
+            if (rowsAffected > 0)
+            {
+            }
+            else
+            {
             }
         }
 

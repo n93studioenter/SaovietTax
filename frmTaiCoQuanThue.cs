@@ -1591,7 +1591,7 @@ namespace SaovietTax
                         { 
                             new OleDbParameter("?", cookie.Value),
                         };
-
+                        int a = ExecuteQueryResult(query, parametersss);
                         frmMain.tokken = cookie.Value;
                        
                         try
@@ -1601,8 +1601,7 @@ namespace SaovietTax
                         catch(Exception ex)
                         {
                            
-                        }
-                        ExecuteQueryResult(query, parametersss);
+                        } 
                         if(frmMain.type==1)
                         {
                             Xulydauvao1(cookie.Value, 6); 

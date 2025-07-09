@@ -125,6 +125,7 @@
             this.gridColumn11 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKCo1 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colMaKH = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colCheck = new DevExpress.XtraGrid.Columns.GridColumn();
             this.lblDpPath = new DevExpress.XtraEditors.LabelControl();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
@@ -1248,10 +1249,12 @@
             this.gridColumn11,
             this.colTKNo1,
             this.colTKCo1,
+            this.colMaKH,
             this.colCheck});
             this.gridView5.GridControl = this.gridControl3;
             this.gridView5.Name = "gridView5";
             this.gridView5.OptionsView.ShowGroupPanel = false;
+            this.gridView5.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView5_CellValueChanged);
             this.gridView5.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView5_CellValueChanging);
             this.gridView5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView5_KeyDown);
             this.gridView5.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gridView5_KeyPress);
@@ -1264,7 +1267,7 @@
             this.colStt.Name = "colStt";
             this.colStt.Visible = true;
             this.colStt.VisibleIndex = 0;
-            this.colStt.Width = 63;
+            this.colStt.Width = 55;
             // 
             // colNgayGD
             // 
@@ -1274,7 +1277,7 @@
             this.colNgayGD.Name = "colNgayGD";
             this.colNgayGD.Visible = true;
             this.colNgayGD.VisibleIndex = 1;
-            this.colNgayGD.Width = 125;
+            this.colNgayGD.Width = 109;
             // 
             // colMaso
             // 
@@ -1284,7 +1287,7 @@
             this.colMaso.Name = "colMaso";
             this.colMaso.Visible = true;
             this.colMaso.VisibleIndex = 2;
-            this.colMaso.Width = 131;
+            this.colMaso.Width = 115;
             // 
             // colDiengiai
             // 
@@ -1294,7 +1297,7 @@
             this.colDiengiai.Name = "colDiengiai";
             this.colDiengiai.Visible = true;
             this.colDiengiai.VisibleIndex = 3;
-            this.colDiengiai.Width = 551;
+            this.colDiengiai.Width = 511;
             // 
             // colThanhTien1
             // 
@@ -1306,7 +1309,7 @@
             this.colThanhTien1.Name = "colThanhTien1";
             this.colThanhTien1.Visible = true;
             this.colThanhTien1.VisibleIndex = 4;
-            this.colThanhTien1.Width = 211;
+            this.colThanhTien1.Width = 133;
             // 
             // gridColumn11
             // 
@@ -1318,7 +1321,7 @@
             this.gridColumn11.Name = "gridColumn11";
             this.gridColumn11.Visible = true;
             this.gridColumn11.VisibleIndex = 5;
-            this.gridColumn11.Width = 102;
+            this.gridColumn11.Width = 139;
             // 
             // colTKNo1
             // 
@@ -1332,7 +1335,7 @@
             this.colTKNo1.Name = "colTKNo1";
             this.colTKNo1.Visible = true;
             this.colTKNo1.VisibleIndex = 6;
-            this.colTKNo1.Width = 211;
+            this.colTKNo1.Width = 118;
             // 
             // colTKCo1
             // 
@@ -1346,7 +1349,17 @@
             this.colTKCo1.Name = "colTKCo1";
             this.colTKCo1.Visible = true;
             this.colTKCo1.VisibleIndex = 7;
-            this.colTKCo1.Width = 230;
+            this.colTKCo1.Width = 107;
+            // 
+            // colMaKH
+            // 
+            this.colMaKH.Caption = "Mã khách hàng";
+            this.colMaKH.FieldName = "MaKH";
+            this.colMaKH.MinWidth = 30;
+            this.colMaKH.Name = "colMaKH";
+            this.colMaKH.Visible = true;
+            this.colMaKH.VisibleIndex = 8;
+            this.colMaKH.Width = 233;
             // 
             // colCheck
             // 
@@ -1355,8 +1368,8 @@
             this.colCheck.MinWidth = 30;
             this.colCheck.Name = "colCheck";
             this.colCheck.Visible = true;
-            this.colCheck.VisibleIndex = 8;
-            this.colCheck.Width = 112;
+            this.colCheck.VisibleIndex = 9;
+            this.colCheck.Width = 104;
             // 
             // lblDpPath
             // 
@@ -1838,5 +1851,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn col2Vat;
         private DevExpress.XtraGrid.Columns.GridColumn col2Vat2;
         private DevExpress.XtraGrid.Columns.GridColumn colVat3;
+        private DevExpress.XtraGrid.Columns.GridColumn colMaKH;
     }
 }

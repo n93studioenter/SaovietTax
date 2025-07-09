@@ -538,3 +538,5 @@ C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.CoreCompil
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.csproj.Up2Date
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.exe
 C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.pdb
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.PopupTaikhoan.resources
+C:\TCP\Saoviet\DAP3\SaovietTax\SaovietTax\obj\Debug\SaovietTax.SuggestionControl.resources

@@ -271,8 +271,20 @@
       <DependentUpon>frmWebbrowser.cs</DependentUpon>
     </Compile>
     <Compile Include="Helper.cs" />
+    <Compile Include="PopupTaikhoan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopupTaikhoan.Designer.cs">
+      <DependentUpon>PopupTaikhoan.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SuggestionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SuggestionControl.Designer.cs">
+      <DependentUpon>SuggestionControl.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -309,6 +321,9 @@
     <EmbeddedResource Include="frmWebbrowser.resx">
       <DependentUpon>frmWebbrowser.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="PopupTaikhoan.resx">
+      <DependentUpon>PopupTaikhoan.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -319,6 +334,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SuggestionControl.resx">
+      <DependentUpon>SuggestionControl.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="App.config" />
     <None Include="NGÂN HÀNG BIVD.pdf" />
     <None Include="packages.config" />
