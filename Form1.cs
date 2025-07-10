@@ -126,7 +126,7 @@ namespace SaovietTax
             public double TTien { get; set; }
             public double TgTThue { get; set; }
 
-            public FileImportDetail(string ten, int parentId, string soHieu, double soluong, double dongia, string dVT, string maCT, string tkNo, string tkCo, double ttien)
+            public FileImportDetail(int id,string ten, int parentId, string soHieu, double soluong, double dongia, string dVT, string maCT, string tkNo, string tkCo, double ttien)
             {
                 Ten = ten;
                 ParentId = parentId;
@@ -138,6 +138,7 @@ namespace SaovietTax
                 TKNo = tkNo;
                 TKCo = tkCo;
                 TTien = ttien;
+                ID = id;
             }
         }
         public class FileImport
@@ -209,18 +210,28 @@ namespace SaovietTax
         public frmMain()
         {
             InitializeComponent();
+            this.KeyPreview = true; // Đặt KeyPreview thành true
+
             suggestionControl = new SuggestionControl();
             suggestionControl1 = new SuggestionControl();
             suggestionControl3 = new SuggestionControl();
+            suggestionControlhh = new HanghoaControl();
+            suggestionControlhh2 = new HanghoaControl();
             suggestionControl.ItemSelected += SuggestionControl_ItemSelected;
             suggestionControl1.ItemSelected += SuggestionControl_ItemSelected;
             suggestionControl3.ItemSelected += SuggestionControl_ItemSelected;
+            suggestionControlhh.ItemSelected += HanghoaControl_ItemSelected;
+            suggestionControlhh2.ItemSelected += HanghoaControl_ItemSelected;
             gridView3.GridControl.Controls.Add(suggestionControl);
             gridView1.GridControl.Controls.Add(suggestionControl1);
             gridView5.GridControl.Controls.Add(suggestionControl3);
+            gridView2.GridControl.Controls.Add(suggestionControlhh);
+            gridView4.GridControl.Controls.Add(suggestionControlhh2);
             suggestionControl.Hide(); // Ẩn nó ban đầu
             suggestionControl1.Hide(); // Ẩn nó ban đầu
             suggestionControl3.Hide(); // Ẩn nó ban đầu
+            suggestionControlhh.Hide(); // Ẩn nó ban đầu
+            suggestionControlhh2.Hide(); // Ẩn nó ban đầu
         }
 
         private List<People> GetListFileImport()
@@ -370,11 +381,11 @@ namespace SaovietTax
                             string mst = item["Mst"].ToString();
                             double tongTien = double.Parse(item["TongTien"].ToString());
                             int vat = int.Parse(item["Vat"].ToString());
-                            int vat2 = int.Parse(item["Vat2"].ToString());
-                            double Tvat = double.Parse(item["TVat"].ToString());
-                            double Tvat2 = double.Parse(item["TVat2"].ToString());
-                            int vat3 = int.Parse(item["Vat3"].ToString());
-                            double Tvat3 = double.Parse(item["TVat3"].ToString());
+                            int vat2 =!string.IsNullOrEmpty(item["Vat2"].ToString())? int.Parse(item["Vat2"].ToString()):0;
+                            double Tvat = !string.IsNullOrEmpty(item["TVat"].ToString()) ? double.Parse(item["TVat"].ToString()) : 0;
+                            double Tvat2 =!string.IsNullOrEmpty(item["TVat2"].ToString())? double.Parse(item["TVat2"].ToString()):0 ;
+                            int vat3 = !string.IsNullOrEmpty(item["Vat3"].ToString()) ? int.Parse(item["Vat3"].ToString()) : 0;
+                            double Tvat3 = !string.IsNullOrEmpty(item["TVat3"].ToString())? double.Parse(item["TVat3"].ToString()):0;
                             string soHieuTP = item["SohieuTP"].ToString();
                             bool hasChild = true; // Giá trị mặc định
                             double tpHi = double.Parse(item["TPHi"].ToString());
@@ -406,7 +417,7 @@ namespace SaovietTax
                         {
                             foreach (DataRow itemDetail in kq2.Rows)
                             {
-                                FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString(), CultureInfo.InvariantCulture), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                FileImportDetail fileImportDetail = new FileImportDetail(int.Parse(itemDetail["ID"].ToString()),Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString(), CultureInfo.InvariantCulture), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
                                 //Nếu là chiết khấu thì cho ve tk 711
                                 if(string.IsNullOrEmpty(fileImportDetail.DVT) && fileImportDetail.Ten.ToLower().Contains("chiết khấu"))
                                 {
@@ -431,7 +442,7 @@ namespace SaovietTax
                             var kq3 = ExecuteQuery(queryCheckVatTu, parame);
                             foreach (DataRow itemDetail in kq3.Rows)
                             {
-                                FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                FileImportDetail fileImportDetail = new FileImportDetail(int.Parse(itemDetail["ID"].ToString()),Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
                               
                                 fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString());
                                 fileImport.fileImportDetails.Add(fileImportDetail);
@@ -525,11 +536,11 @@ namespace SaovietTax
                             string mst = item["Mst"].ToString();
                             double tongTien = double.Parse(item["TongTien"].ToString());
                             int vat = int.Parse(item["Vat"].ToString());
-                            int vat2 = int.Parse(item["Vat2"].ToString());
-                            double Tvat = double.Parse(item["TVat"].ToString());
-                            double Tvat2 = double.Parse(item["TVat2"].ToString());
-                            int vat3 = int.Parse(item["Vat3"].ToString());
-                            double Tvat3 = double.Parse(item["TVat3"].ToString());
+                            int vat2 = !string.IsNullOrEmpty(item["Vat2"].ToString()) ? int.Parse(item["Vat2"].ToString()) : 0;
+                            double Tvat = !string.IsNullOrEmpty(item["TVat"].ToString()) ? double.Parse(item["TVat"].ToString()) : 0;
+                            double Tvat2 = !string.IsNullOrEmpty(item["TVat2"].ToString()) ? double.Parse(item["TVat2"].ToString()) : 0;
+                            int vat3 = !string.IsNullOrEmpty(item["Vat3"].ToString()) ? int.Parse(item["Vat3"].ToString()) : 0;
+                            double Tvat3 = !string.IsNullOrEmpty(item["TVat3"].ToString()) ? double.Parse(item["TVat3"].ToString()) : 0;
                             string soHieuTP = item["SohieuTP"].ToString();
                             bool hasChild = true; // Giá trị mặc định
                             double tpHi = double.Parse(item["TPHi"].ToString());
@@ -561,7 +572,7 @@ namespace SaovietTax
                         {
                             foreach (DataRow itemDetail in kq2.Rows)
                             {
-                                FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                FileImportDetail fileImportDetail = new FileImportDetail(int.Parse(itemDetail["ID"].ToString()),Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
                                 fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString());
                                 fileImport.fileImportDetails.Add(fileImportDetail);
                             }
@@ -580,7 +591,7 @@ namespace SaovietTax
                             var kq3 = ExecuteQuery(queryCheckVatTu, parame);
                             foreach (DataRow itemDetail in kq3.Rows)
                             {
-                                FileImportDetail fileImportDetail = new FileImportDetail(Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
+                                FileImportDetail fileImportDetail = new FileImportDetail(int.Parse(itemDetail["ID"].ToString()),Helpers.ConvertVniToUnicode(itemDetail["Ten"].ToString()), int.Parse(itemDetail["ParentId"].ToString()), itemDetail["SoHieu"].ToString(), double.Parse(itemDetail["SoLuong"].ToString()), double.Parse(itemDetail["DonGia"].ToString()), Helpers.ConvertVniToUnicode(itemDetail["DVT"].ToString()), itemDetail["MaCT"].ToString(), itemDetail["TKNo"].ToString(), itemDetail["TKCo"].ToString(), double.Parse(itemDetail["TTien"].ToString()));
                                 fileImportDetail.ID = int.Parse(itemDetail["ID"].ToString());
                                 fileImport.fileImportDetails.Add(fileImportDetail);
                             }
@@ -1982,7 +1993,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 DGia = !string.IsNullOrEmpty(DGia) ? DGia : "0";
                                 SLuong = !string.IsNullOrEmpty(SLuong) ? SLuong : "0";
                                 //Thiết lập MÃ ctrinh2 và tkno cho detail 
-                                FileImportDetail fileImportDetail = new FileImportDetail(newName, peopleTemp.LastOrDefault().ID, sohieu.ToUpper(), double.Parse(SLuong), double.Parse(DGia), DVTinh, mct, tkno, tkco, 0);
+                                FileImportDetail fileImportDetail = new FileImportDetail(0,newName, peopleTemp.LastOrDefault().ID, sohieu.ToUpper(), double.Parse(SLuong), double.Parse(DGia), DVTinh, mct, tkno, tkco, 0);
                                 peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                             }
 
@@ -1997,7 +2008,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     ThTien = hhdVuList[i].SelectSingleNode("THTien")?.InnerText;
                                 if (hhdVuList.Count == 1)
                                 {
-                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception", "", "", "", 0);
+                                    FileImportDetail fileImportDetail = new FileImportDetail(0,THHDVu, peopleTemp.LastOrDefault().ID, "711", 1, double.Parse(ThTien), "Exception", "", "", "", 0);
                                     peopleTemp.LastOrDefault().TKNo = "331";
                                     peopleTemp.LastOrDefault().TKCo = "711";
                                     peopleTemp.LastOrDefault().TkThue = 1331;
@@ -2006,7 +2017,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 }
                                 else
                                 {
-                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "711", 0, double.Parse(ThTien), "Exception", "", "", "", 0);
+                                    FileImportDetail fileImportDetail = new FileImportDetail(0,THHDVu, peopleTemp.LastOrDefault().ID, "711", 0, double.Parse(ThTien), "Exception", "", "", "", 0);
                                     peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                                 }
 
@@ -2018,7 +2029,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     ThTien = hhdVuList[i].SelectSingleNode("THTien")?.InnerText;
                                 if (ThTien != null && double.Parse(ThTien) > 0)
                                 {
-                                    FileImportDetail fileImportDetail = new FileImportDetail(THHDVu, peopleTemp.LastOrDefault().ID, "6422", 0, double.Parse(ThTien), "Exception", "", "", "", 0);
+                                    FileImportDetail fileImportDetail = new FileImportDetail(0,THHDVu, peopleTemp.LastOrDefault().ID, "6422", 0, double.Parse(ThTien), "Exception", "", "", "", 0);
                                     peopleTemp.LastOrDefault().fileImportDetails.Add(fileImportDetail);
                                 }
 
@@ -2627,7 +2638,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         var getcurrent = getparent.fileImportDetails.Where(m => m.ID == getID).FirstOrDefault();
                         if (getcurrent != null)
                         {
-                            getparent.fileImportDetails.Add(new FileImportDetail(getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
+                            getparent.fileImportDetails.Add(new FileImportDetail(0,getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
                             gridControl1.DataSource = lstImportVao;
                         }
 
@@ -2655,7 +2666,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                         var getcurrent = getparent.fileImportDetails.Where(m => m.ID == getID).FirstOrDefault();
                         if (getcurrent != null)
                         {
-                            getparent.fileImportDetails.Add(new FileImportDetail(getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
+                            getparent.fileImportDetails.Add(new FileImportDetail(0,getcurrent.Ten, getcurrent.ParentId, getcurrent.SoHieu, getcurrent.Soluong, getcurrent.Dongia, getcurrent.DVT, getcurrent.MaCT, getcurrent.TKNo, getcurrent.TKCo, getcurrent.TTien));
                             gridControl2.DataSource = lstImportRa;
                         }
 
@@ -3088,7 +3099,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                 //soHieuVattu = existingVatTu[$"{tenVattuVni}-{dvTinhVni}"]["SoHieu"]?.ToString();
                             }
 
-                            FileImportDetail fileImportDetail = new FileImportDetail(NormalizeVietnameseString(thhdVu), newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString(), dttien);
+                            FileImportDetail fileImportDetail = new FileImportDetail(0,NormalizeVietnameseString(thhdVu), newFileImport.ID, soHieuVattu?.ToUpper(), sLuong, dGia, dvTinh, "", tkNo.ToString(), tkCo.ToString(), dttien);
                             newFileImport.fileImportDetails.Add(fileImportDetail);
                         }
                         else if (thhdVu?.ToLower().Contains("chiết khấu") == true)
@@ -3104,12 +3115,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     newFileImport.TkThue = 1331;
                                     newFileImport.Noidung = "Chiết khấu thương mại";
                                 }
-                                newFileImport.fileImportDetails.Add(new FileImportDetail(thhdVu, newFileImport.ID, soHieuCK, 0, thTien, "Exception", "", "", "", 0));
+                                newFileImport.fileImportDetails.Add(new FileImportDetail(0,thhdVu, newFileImport.ID, soHieuCK, 0, thTien, "Exception", "", "", "", 0));
                             }
                         }
                         else if (double.TryParse(hhdVu.SelectSingleNode("ThTien")?.InnerText ?? hhdVu.SelectSingleNode("THTien")?.InnerText, out var thTienNN) && thTienNN > 0)
                         {
-                            newFileImport.fileImportDetails.Add(new FileImportDetail(thhdVu, newFileImport.ID, "6422", 0, thTienNN, "Exception", "", "", "", 0));
+                            newFileImport.fileImportDetails.Add(new FileImportDetail(0,thhdVu, newFileImport.ID, "6422", 0, thTienNN, "Exception", "", "", "", 0));
                         }
                     }
                     catch (Exception ex)
@@ -6997,6 +7008,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 var fileImportDetails = dt.fileImportDetails;
                 // fileImportDetails.ForEach(m => m.Ten = Helpers.ConvertVniToUnicode(m.Ten));
                 e.ChildList = fileImportDetails; // Gán danh sách đã sửa đổi
+
             }
         }
 
@@ -7513,14 +7525,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             progressPanel1.Visible = false;
         }
 
+        private void Hidecontrols()
+        {
+            suggestionControl.Hide();
+            suggestionControl1.Hide();
+            suggestionControl3.Hide();
+            suggestionControlhh.Hide();
+        }
         private void gridView1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == System.Windows.Forms.Keys.Escape)
             {
-                frmTaikhoan frmTaikhoan = new frmTaikhoan();
-                frmTaikhoan.frmMain = this;
-                frmTaikhoan.ShowDialog();
-
+                Hidecontrols();
             }
             if (e.KeyCode == System.Windows.Forms.Keys.Enter)
             {
@@ -8123,7 +8139,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 if (!string.IsNullOrEmpty(ten))
                 {
                     ten = Helpers.ConvertUnicodeToVni(ten);
-                    kh = tbKhachhang.AsEnumerable().Where(row => Helpers.RemoveVietnameseDiacritics(row.Field<string>("Ten").ToLower()) == Helpers.RemoveVietnameseDiacritics(ten.ToLower())).FirstOrDefault();
+                    kh = tbKhachhang.AsEnumerable().Where(row => Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(row.Field<string>("Ten").ToLower())) == Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(ten.ToLower()))).FirstOrDefault();
                 }
             }
             vatTu.MaSo = int.Parse(kh["MaSo"].ToString());
@@ -8241,7 +8257,12 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             public string SoHieu { get; set; }
             public string Ten { get; set; }
         }
-       
+        public class HangHoaTK
+        {
+            public int MaSo { get; set; }
+            public string SoHieu { get; set; }
+            public string TenVattu { get; set; }
+        }
         private void gridView3_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             gridControl1.ToolTipController = toolTipController1;
@@ -8331,10 +8352,37 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 suggestionControl.Hide(); // Ẩn UserControl
             }
         }
+
+        private void HanghoaControl_ItemSelected(object sender, string selectedItem)
+        {
+            int currentRowHandle = gridView.FocusedRowHandle;
+            VatTu vattu = lstvt.ToList().Where(m => m.SoHieu == selectedItem).FirstOrDefault();
+            if (vattu != null)
+            {
+                string tenvt = vattu.TenVattu;
+                gridView.SetRowCellValue(currentRowHandle, "SoHieu", selectedItem);
+                gridView.SetRowCellValue(currentRowHandle, "Ten", tenvt);
+            }
+            
+        }
         private void SuggestionControl_ItemSelected(object sender, string selectedItem)
         {
             if (xtraTabControl2.SelectedTabPageIndex==0)
+            {
+                int rowHandle = 1; // Thay đổi chỉ số hàng theo nhu cầu
+
+                // Kiểm tra xem hàng có đang mở rộng hay không
+                bool isExpanded = gridView1.GetRowExpanded(rowHandle);
+                if (isExpanded)
+                {
+                    Console.WriteLine("Hàng đang mở rộng.");
+                }
+                else
+                {
+                    Console.WriteLine("Hàng không đang mở rộng.");
+                }
                 gridView1.SetFocusedValue(selectedItem);
+            }
             if (xtraTabControl2.SelectedTabPageIndex == 1)
                 gridView3.SetFocusedValue(selectedItem);
             if (xtraTabControl2.SelectedTabPageIndex == 2)
@@ -8344,12 +8392,14 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
         private SuggestionControl suggestionControl;
         private SuggestionControl suggestionControl1;
         private SuggestionControl suggestionControl3;
-
+        private HanghoaControl suggestionControlhh;
+        private HanghoaControl suggestionControlhh2;
         private void gridView1_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             gridControl1.ToolTipController = toolTipController1;
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
+            int rowindex = view.FocusedRowHandle;
             //if (newValue.ToString().Length < 3)
             //{
             //    toolTipController.HideHint();
@@ -8420,7 +8470,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     System.Drawing.Point screenPoint = gridView1.GridControl.PointToScreen(cellRect.Location);
 
                     // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl1.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 300); // Thêm khoảng cách 5 pixels
+                    suggestionControl1.Location = new System.Drawing.Point(screenPoint.X - 20, cellRect.Height+(cellRect.Height* rowindex)+90); // Thêm khoảng cách 5 pixels
 
                     // Hiển thị UserControl
                     suggestionControl1.Show();
@@ -9717,7 +9767,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     HeThongTK.Ten = dt["Ten"].ToString();
                     lstHethongtk.Add(HeThongTK);
                 }
-                suggestionControl.UpdateSuggestions(lstHethongtk.ToList());
+                suggestionControl3.UpdateSuggestions(lstHethongtk.ToList());
 
 
                 // Đặt vị trí cho UserControl 
@@ -9732,10 +9782,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
 
                     // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 350); // Thêm khoảng cách 5 pixels
+                    suggestionControl3.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 350); // Thêm khoảng cách 5 pixels
 
                     // Hiển thị UserControl
-                    suggestionControl.Show();
+                    suggestionControl3.Show();
 
                 }
             }
@@ -9892,6 +9942,125 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
             else
             {
+            }
+        }
+        int idchititet = 0;
+        DevExpress.XtraGrid.Views.Grid.GridView gridView;
+
+        private void gridView2_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+
+            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            var newValue = e.Value; 
+            if (view.FocusedColumn.FieldName == "SoHieu") 
+            {
+                gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+                int parentrowIndex=gridView1.FocusedRowHandle;
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                idchititet = (int)gridView.GetRowCellValue(currentRowHandle,"ID"); 
+                string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu LIKE ? or LCase(TenVattu) like ? ";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"), new OleDbParameter("?", "%"+ Helpers.ConvertUnicodeToVni(newValue.ToString().ToLower()) + "%"));
+
+                List<HangHoaTK> lstHethongtk = new List<HangHoaTK>();
+                foreach (DataRow dt in resultkm.Rows)
+                {
+                    HangHoaTK HeThongTK = new HangHoaTK();
+                    HeThongTK.MaSo = int.Parse(dt["MaSo"].ToString());
+                    HeThongTK.SoHieu = dt["SoHieu"].ToString();
+                    HeThongTK.TenVattu  = dt["TenVattu"].ToString();
+                    lstHethongtk.Add(HeThongTK);
+                }
+                suggestionControlhh.UpdateSuggestions(lstHethongtk.ToList());
+
+
+                // Đặt vị trí cho UserControl 
+                // Lấy thông tin về GridView
+                var gridViewInfo = gridView.GetViewInfo() as GridViewInfo;
+                GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, gridView.FocusedColumn);
+
+                if (cellInfo != null)
+                {
+                    // Lấy vị trí của cell
+                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
+
+                    // Chuyển đổi vị trí của cell thành tọa độ màn hình
+                    System.Drawing.Point screenPoint = gridView.GridControl.PointToScreen(cellRect.Location);
+
+                    // Đặt vị trí cho UserControl ngay dưới cell
+                    suggestionControlhh.Location = new System.Drawing.Point(screenPoint.X-20, 0 + cellRect.Height+ (cellRect.Height * parentrowIndex) + (cellRect.Height* currentRowHandle) + 150); // Thêm khoảng cách 5 pixels
+
+                    // Hiển thị UserControl
+                    suggestionControlhh.Show(); 
+
+                }
+            }
+        }
+
+        private void frmMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode.ToString() =="Escape")
+            {
+                Hidecontrols();
+            }
+        }
+
+        private void frmMain_KeyPress(object sender, KeyPressEventArgs e)
+        {
+          
+
+        }
+
+        private void gridView4_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            var newValue = e.Value;
+            if (view.FocusedColumn.FieldName == "SoHieu")
+            {
+                gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+
+                int currentRowHandle = gridView.FocusedRowHandle;
+                int parentrowIndex = gridView3.FocusedRowHandle;
+                // Lấy tên của cột hiện tại
+                string currentColumnName = gridView.FocusedColumn.FieldName;
+                idchititet = (int)gridView.GetRowCellValue(currentRowHandle, "ID");
+                string querydinhdanh = @"SELECT * FROM Vattu WHERE SoHieu LIKE ? or LCase(TenVattu) like ? ";
+                var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"), new OleDbParameter("?", "%" + Helpers.ConvertUnicodeToVni(newValue.ToString().ToLower()) + "%"));
+
+                List<HangHoaTK> lstHethongtk = new List<HangHoaTK>();
+                foreach (DataRow dt in resultkm.Rows)
+                {
+                    HangHoaTK HeThongTK = new HangHoaTK();
+                    HeThongTK.MaSo = int.Parse(dt["MaSo"].ToString());
+                    HeThongTK.SoHieu = dt["SoHieu"].ToString();
+                    HeThongTK.TenVattu = dt["TenVattu"].ToString();
+                    lstHethongtk.Add(HeThongTK);
+                }
+                suggestionControlhh2.UpdateSuggestions(lstHethongtk.ToList());
+
+
+                // Đặt vị trí cho UserControl 
+                // Lấy thông tin về GridView
+                var gridViewInfo = gridView.GetViewInfo() as GridViewInfo;
+                GridCellInfo cellInfo = gridViewInfo.GetGridCellInfo(e.RowHandle, gridView.FocusedColumn);
+
+                if (cellInfo != null)
+                {
+                    // Lấy vị trí của cell
+                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
+
+                    // Chuyển đổi vị trí của cell thành tọa độ màn hình
+                    System.Drawing.Point screenPoint = gridView.GridControl.PointToScreen(cellRect.Location);
+
+                    // Đặt vị trí cho UserControl ngay dưới cell
+                    suggestionControlhh2.Location = new System.Drawing.Point(screenPoint.X - 20, 0 + cellRect.Height + (cellRect.Height * parentrowIndex) + (cellRect.Height * currentRowHandle) + 180); // Thêm khoảng cách 5 pixels
+
+                    // Hiển thị UserControl
+                    suggestionControlhh2.Show();
+
+                }
             }
         }
 

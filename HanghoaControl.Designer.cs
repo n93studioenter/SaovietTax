@@ -1,6 +1,6 @@
 ﻿namespace SaovietTax
 {
-    partial class SuggestionControl
+    partial class HanghoaControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -38,16 +38,17 @@
             this.listBox1.ItemHeight = 20;
             this.listBox1.Location = new System.Drawing.Point(0, 0);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(650, 412);
+            this.listBox1.Size = new System.Drawing.Size(488, 439);
             this.listBox1.TabIndex = 0;
+            this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox1_DrawItem);
             // 
-            // SuggestionControl
+            // HanghoaControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.listBox1);
-            this.Name = "SuggestionControl";
-            this.Size = new System.Drawing.Size(650, 412);
+            this.Name = "HanghoaControl";
+            this.Size = new System.Drawing.Size(488, 439);
             this.ResumeLayout(false);
 
         }

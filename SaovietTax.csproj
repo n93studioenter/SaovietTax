@@ -270,6 +270,12 @@
     <Compile Include="frmWebbrowser.Designer.cs">
       <DependentUpon>frmWebbrowser.cs</DependentUpon>
     </Compile>
+    <Compile Include="HanghoaControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HanghoaControl.Designer.cs">
+      <DependentUpon>HanghoaControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helper.cs" />
     <Compile Include="PopupTaikhoan.cs">
       <SubType>Form</SubType>
@@ -320,6 +326,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmWebbrowser.resx">
       <DependentUpon>frmWebbrowser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanghoaControl.resx">
+      <DependentUpon>HanghoaControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PopupTaikhoan.resx">
       <DependentUpon>PopupTaikhoan.cs</DependentUpon>

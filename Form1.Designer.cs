@@ -42,6 +42,7 @@
             this.colMaCT2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colTKNo2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.coltkco2 = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.gridColumn12 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.fileImportBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -209,7 +210,8 @@
             this.colDVT,
             this.colMaCT2,
             this.colTKNo2,
-            this.coltkco2});
+            this.coltkco2,
+            this.gridColumn12});
             this.gridView2.GridControl = this.gridControl1;
             this.gridView2.Name = "gridView2";
             this.gridView2.OptionsView.ShowGroupPanel = false;
@@ -219,6 +221,7 @@
             this.gridView2.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView2_RowCellStyle);
             this.gridView2.RowStyle += new DevExpress.XtraGrid.Views.Grid.RowStyleEventHandler(this.gridView2_RowStyle);
             this.gridView2.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView2_CellValueChanged);
+            this.gridView2.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView2_CellValueChanging);
             this.gridView2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyDown);
             this.gridView2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.gridView2_KeyUp);
             this.gridView2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView2_MouseDown);
@@ -317,6 +320,16 @@
             this.coltkco2.Visible = true;
             this.coltkco2.VisibleIndex = 7;
             this.coltkco2.Width = 226;
+            // 
+            // gridColumn12
+            // 
+            this.gridColumn12.Caption = "ID";
+            this.gridColumn12.FieldName = "ID";
+            this.gridColumn12.MinWidth = 30;
+            this.gridColumn12.Name = "gridColumn12";
+            this.gridColumn12.Visible = true;
+            this.gridColumn12.VisibleIndex = 8;
+            this.gridColumn12.Width = 112;
             // 
             // gridControl1
             // 
@@ -611,6 +624,7 @@
             this.gridView4.CustomDrawCell += new DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventHandler(this.gridView4_CustomDrawCell);
             this.gridView4.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView4_RowCellStyle);
             this.gridView4.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView4_CellValueChanged);
+            this.gridView4.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView4_CellValueChanging);
             this.gridView4.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView4_KeyDown);
             this.gridView4.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gridView4_KeyPress);
             this.gridView4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridView4_MouseDown);
@@ -1676,6 +1690,8 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.frmMain_KeyPress);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.frmMain_MouseDoubleClick);
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
@@ -1852,5 +1868,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn col2Vat2;
         private DevExpress.XtraGrid.Columns.GridColumn colVat3;
         private DevExpress.XtraGrid.Columns.GridColumn colMaKH;
+        private DevExpress.XtraGrid.Columns.GridColumn gridColumn12;
     }
 }

@@ -914,7 +914,7 @@ namespace SaovietTax
             }
             else
             {
-                if (existingKhachHang.AsEnumerable().Any(row => Helpers.RemoveVietnameseDiacritics(row.Field<string>("Ten")).ToLower() == Helpers.RemoveVietnameseDiacritics(ten).ToLower()))
+                if (existingKhachHang.AsEnumerable().Any(row => Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(row.Field<string>("Ten"))).ToLower() == Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(ten)).ToLower()))
                 {
                     return true;
                 }
@@ -1206,6 +1206,9 @@ namespace SaovietTax
             {
                 vat = "0";
             }
+            //Nếu tiền thuế =0 thì lấy tiền thuế gốc
+            if (tvat == 0)
+                tvat = TienThue;
             OleDbParameter[] parameters = new OleDbParameter[]
                     {
                 new OleDbParameter("?", item.shdon),
@@ -1408,7 +1411,8 @@ namespace SaovietTax
                 vat = "0";
             }
             int vats = 0;
-             
+             if(tvat==0)
+                tvat = TienThue;
             OleDbParameter[] parameters = new OleDbParameter[]
             {
                 new OleDbParameter("?", item.shdon),
