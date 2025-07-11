@@ -85,6 +85,7 @@ using XmlNode = System.Xml.XmlNode;
 using Color = System.Drawing.Color;
 using DevExpress.Xpo.Helpers;
 using Windows.Media.Protection.PlayReady;
+using DevExpress.XtraRichEdit.Model;
 
 namespace SaovietTax
 {
@@ -8153,13 +8154,13 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             frmKhachhang.ShowDialog();
             if (!string.IsNullOrEmpty(hiddenValue) && frmKhachhang.isChange)
             {
-                gridView.SetRowCellValue(currentRowHandle, "Mst", hiddenValue2);
+                gridView.SetRowCellValue(currentRowHandle, "Mst", hiddenValue3);
                 gridView.SetRowCellValue(currentRowHandle, "Ten", hiddenValue);
                 //cập nhật cho tbimport
                 var getfip = lstImportRa.Where(m => m.ID == int.Parse(gridView.GetRowCellValue(currentRowHandle, "ID").ToString())).FirstOrDefault();
                 if (getfip != null)
                 {
-                    getfip.Mst = hiddenValue2;
+                    getfip.Mst = hiddenValue3;
                     getfip.Ten = hiddenValue;
                     //Update vào database
                     string query = @"UPDATE tbimport SET Mst=?,Ten=? where ID=? ";
@@ -9686,8 +9687,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     var getsplit = tkco.Split('|');
                                     tkco = getsplit[0];
                                 }
-                                getnh.TKCo = tkco + "|" + getSohieu;
-                                gridView.SetRowCellValue(currentRowHandle, currentColumnName, getnh.TKCo);
+                                getnh.MaKH = getSohieu;
+                                gridView.SetRowCellValue(currentRowHandle, "MaKH", getSohieu);
                             }
                             else if (currentColumnName == "TKNo")
                             {
@@ -9696,8 +9697,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                                     var getsplit = tkno.Split('|');
                                     tkno = getsplit[0];
                                 }
-                                getnh.TKNo = tkno + "|" + getSohieu;
-                                gridView.SetRowCellValue(currentRowHandle, currentColumnName, getnh.TKNo);
+                                getnh.MaKH = getSohieu;
+                                gridView.SetRowCellValue(currentRowHandle,"MaKH", getSohieu);
                             }
                         } 
                     }
@@ -9750,7 +9751,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
             currentvalue = newValue.ToString();
-           
+            int rowindexs = view.FocusedRowHandle;
             if (view.FocusedColumn.FieldName == "TKCo" || view.FocusedColumn.FieldName == "TKNo") // Thay đổi tên cột theo nhu cầu
             {
 
@@ -9782,11 +9783,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
 
                     // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl3.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 350); // Thêm khoảng cách 5 pixels
+                    suggestionControl3.Location = new System.Drawing.Point(screenPoint.X, screenPoint.Y + cellRect.Height + 5); // Thêm khoảng cách 5 pixels
 
                     // Hiển thị UserControl
                     suggestionControl3.Show();
-
                 }
             }
 
@@ -9794,7 +9794,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             {
                 string querydinhdanh = @"SELECT * FROM KhachHang WHERE SoHieu LIKE ? or LCase(Ten) like ?";
                 var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"), new OleDbParameter("?", "%"+ Helpers.ConvertUnicodeToVni(newValue.ToString().ToLower()) + "%"));
-
+                int rowindex = gridView5.FocusedRowHandle;
                 List<HeThongTK> lstHethongtk = new List<HeThongTK>();
                 foreach (DataRow dt in resultkm.Rows)
                 {
@@ -9804,7 +9804,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     HeThongTK.Ten = dt["Ten"].ToString();
                     lstHethongtk.Add(HeThongTK);
                 }
-                suggestionControl.UpdateSuggestions(lstHethongtk.ToList());
+                suggestionControl3.UpdateSuggestions(lstHethongtk.ToList());
 
 
                 // Đặt vị trí cho UserControl 
@@ -9819,11 +9819,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
 
                     // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl.Location = new System.Drawing.Point(screenPoint.X - 50, screenPoint.Y - 350); // Thêm khoảng cách 5 pixels
+                    suggestionControl3.Location = new System.Drawing.Point(screenPoint.X, screenPoint.Y + cellRect.Height + 5); // Thêm khoảng cách 5 pixels
 
                     // Hiển thị UserControl
-                    suggestionControl.Show();
-
+                    suggestionControl3.Show();
                 }
             }
         }

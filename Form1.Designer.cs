@@ -1268,6 +1268,8 @@
             this.gridView5.GridControl = this.gridControl3;
             this.gridView5.Name = "gridView5";
             this.gridView5.OptionsView.ShowGroupPanel = false;
+            this.gridView5.SortInfo.AddRange(new DevExpress.XtraGrid.Columns.GridColumnSortInfo[] {
+            new DevExpress.XtraGrid.Columns.GridColumnSortInfo(this.colTKNo1, DevExpress.Data.ColumnSortOrder.Ascending)});
             this.gridView5.CellValueChanged += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView5_CellValueChanged);
             this.gridView5.CellValueChanging += new DevExpress.XtraGrid.Views.Base.CellValueChangedEventHandler(this.gridView5_CellValueChanging);
             this.gridView5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridView5_KeyDown);
@@ -1362,8 +1364,8 @@
             this.colTKCo1.MinWidth = 30;
             this.colTKCo1.Name = "colTKCo1";
             this.colTKCo1.Visible = true;
-            this.colTKCo1.VisibleIndex = 7;
-            this.colTKCo1.Width = 107;
+            this.colTKCo1.VisibleIndex = 8;
+            this.colTKCo1.Width = 143;
             // 
             // colMaKH
             // 
@@ -1371,9 +1373,10 @@
             this.colMaKH.FieldName = "MaKH";
             this.colMaKH.MinWidth = 30;
             this.colMaKH.Name = "colMaKH";
+            this.colMaKH.OptionsColumn.ShowInExpressionEditor = false;
             this.colMaKH.Visible = true;
-            this.colMaKH.VisibleIndex = 8;
-            this.colMaKH.Width = 233;
+            this.colMaKH.VisibleIndex = 7;
+            this.colMaKH.Width = 162;
             // 
             // colCheck
             // 
@@ -1383,7 +1386,7 @@
             this.colCheck.Name = "colCheck";
             this.colCheck.Visible = true;
             this.colCheck.VisibleIndex = 9;
-            this.colCheck.Width = 104;
+            this.colCheck.Width = 139;
             // 
             // lblDpPath
             // 

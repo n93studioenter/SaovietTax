@@ -169,7 +169,7 @@ namespace SaovietTax
                 // Thêm Bearer token vào Header
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokken);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+                client.Timeout = TimeSpan.FromSeconds(15); // Thêm timeout để tránh treo ứng dụng
                 try
                 {
                     // Gửi yêu cầu GET
@@ -685,8 +685,8 @@ namespace SaovietTax
                     string responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     var rootObject = JsonConvert.DeserializeObject<Invoice>(responseBody);
 
-                    // Tìm ID Cha mới nhất
                     string query = "SELECT * FROM tbimport WHERE SHDon=? AND KHHDon=? AND Mst=?";
+                    // Tìm ID Cha mới nhất
                     var parameterss = new OleDbParameter[]
                     {
                 new OleDbParameter("?", shdon),
@@ -895,29 +895,37 @@ namespace SaovietTax
             }
         }
        
-        private bool CheckExistKH(string mst, string ten)
+        private bool CheckExistKH(string mst, string ten,string cccd)
         {
-            if(string.IsNullOrEmpty(mst) && string.IsNullOrEmpty(ten))
+            //Trường hợp ko có mst , tên và cccd
+            if(string.IsNullOrEmpty(mst) && string.IsNullOrEmpty(ten) && string.IsNullOrEmpty(cccd))
             {
-                return true;
+                return false;
             }
-            if (mst == "0100109106")
-            {
-                int a = 10;
-            }
+            //Nếu có Mã s61 thuế
             if (!string.IsNullOrEmpty(mst))
             {
                 if (existingKhachHang.AsEnumerable().Any(row => row.Field<string>("MST") == mst))
                 {
                     return true;
-                }
+                } 
             }
             else
             {
+
+                if (!string.IsNullOrEmpty(cccd))
+                {
+                    if (existingKhachHang.AsEnumerable().Any(row => row.Field<string>("MST") == cccd))
+                    {
+                        return true;
+                    }
+                }
+                //Trường hợp tìm teo tên
                 if (existingKhachHang.AsEnumerable().Any(row => Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(row.Field<string>("Ten"))).ToLower() == Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(ten)).ToLower()))
                 {
                     return true;
                 }
+
             }
 
             return false;
@@ -950,19 +958,31 @@ namespace SaovietTax
 
             return uniqueAbbreviation;
         }
-        public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst)
+        public void InitCustomer(int Maphanloai, string Sohieu, string Ten, string Diachi, string Mst,string cccd,string sdt)
         {
+            if (string.IsNullOrEmpty(sdt))
+                sdt = "xxx";
             int randNumber = 0;
             Random random = new Random();
 
             //Xử lý địa chỉ
             string diachiKHVni = !string.IsNullOrEmpty(Diachi) ? Helpers.ConvertUnicodeToVni(Diachi) : Helpers.ConvertUnicodeToVni("Bổ sung địa chỉ");
-
+             
             if (string.IsNullOrEmpty(Mst))
             {
-                Sohieu = GenerateAbbreviation(Helpers.ConvertVniToUnicode(Ten), existingKhachHang.AsEnumerable().Select(row => row.Field<string>("SoHieu")).ToList()).ToUpper();
-                csohieu = Sohieu;
-                Mst = "00"; 
+                //Truong hợp ko có mst và cccd
+                if (string.IsNullOrEmpty(cccd))
+                {
+                    Sohieu = GenerateAbbreviation(Helpers.ConvertVniToUnicode(Ten), existingKhachHang.AsEnumerable().Select(row => row.Field<string>("SoHieu")).ToList()).ToUpper();
+                    csohieu = Sohieu;
+                    Mst = "00";
+                }
+                //Không có mst nhưng có cccd
+                else
+                {
+                    Sohieu= cccd.Substring(cccd.Length - 6);
+                    Mst = cccd;
+                }
             }
             else
             {
@@ -982,18 +1002,19 @@ namespace SaovietTax
             }
              
             string query = @"
-        INSERT INTO KhachHang (MaPhanLoai,SoHieu,Ten,DiaChi,MST)
-        VALUES (?,?,?,?,?)";
+        INSERT INTO KhachHang (MaPhanLoai,SoHieu,Ten,DiaChi,MST,Tel)
+        VALUES (?,?,?,?,?,?)";
 
 
             // Khai báo mảng tham số với đủ 10 tham số
             OleDbParameter[] parameters = new OleDbParameter[]
             {
-        new OleDbParameter("?", Maphanloai),
-          new OleDbParameter("?", Sohieu),
-        new OleDbParameter("?", Ten),
-        new OleDbParameter("?", diachiKHVni),
-        new OleDbParameter("?", Mst)
+               new OleDbParameter("?", Maphanloai),
+               new OleDbParameter("?", Sohieu),
+               new OleDbParameter("?", Ten),
+               new OleDbParameter("?", diachiKHVni),
+               new OleDbParameter("?", Mst),
+               new OleDbParameter("?", sdt),
             };
 
             // Thực thi truy vấn và lấy kết quả
@@ -1034,13 +1055,18 @@ namespace SaovietTax
             string tkco = "";
             string tkthue = "";
             string querykh = @" SELECT *  FROM tbDinhdanhtaikhoan"; // Sử dụng ? thay cho @mst trong OleDb
-            if (CheckExistKH(item.nbmst, newTen) == false)
+            if (CheckExistKH(item.nbmst, newTen,"") == false)
             {
                 int maphanloai = 0;
                 maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
-                InitCustomer(maphanloai, item.khhdon, newTen, item.nbdchi, item.nbmst);
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nbdchi, item.nbmst,"","");
             }
-            var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
+            //Cập nhật thông tin
+            else
+            {
+
+            }
+                var result = ExecuteQuery(querykh, new OleDbParameter("?", ""));
 
 
 
@@ -1254,7 +1280,7 @@ namespace SaovietTax
         }
         public void InsertTbImport2(InvoiceRa2List item, string tokken, int invoceType)
         {
-            if(item.shdon== 1181)
+            if(item.shdon== 343)
             {
                 int asa = 10;
             }
@@ -1283,15 +1309,56 @@ namespace SaovietTax
                 {
                     newTen = Helpers.ConvertUnicodeToVni(item.nmtnmua);
                 }
+                else
+                {
+                    if (!string.IsNullOrEmpty(item.nmhvtnmhang))
+                    {
+                        newTen = Helpers.ConvertUnicodeToVni(item.nmhvtnmhang);
+                    }
+                }
             }
             //Insert khach hàng
-            if (CheckExistKH(item.nmmst, newTen) == false)
+            if (CheckExistKH(item.nmmst, newTen,item.nmcccd) == false)
             {
                 int maphanloai = 0;
                 maphanloai = type == 1 ? 2 : 3; //1 là mua, 2 là bán 
-                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst);
-            } 
-            string newNoidung = Helpers.ConvertUnicodeToVni("");
+                InitCustomer(maphanloai, item.khhdon, newTen, item.nmdchi, item.nmmst,item.nmcccd, item.nmsdthoai);
+            }
+            //Cập nhật lại CCCD
+            else
+            {
+                if (!string.IsNullOrEmpty(item.nmcccd))
+                {
+                    var getKH = existingKhachHang.AsEnumerable().Where(row => Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(row.Field<string>("Ten"))).ToLower() == Helpers.RemoveVietnameseDiacritics(Helpers.ConvertVniToUnicode(newTen)).ToLower()).FirstOrDefault();
+                    string mst = getKH["MST"].ToString();
+                    string tel = item.nmsdthoai!=null? item.nmsdthoai:"...";
+                    string Maso = getKH["MaSo"].ToString();
+                    if (mst == "00" || mst == "...")
+                    {
+
+                        string Sohieu = item.nmcccd.Substring(item.nmcccd.Length - 6);
+                        string  querykhmst = "UPDATE KhachHang SET MST=?,SoHieu=?,Tel=?,MaPhanLoai=? where MaSo=? ";
+                        var parametersss = new OleDbParameter[]
+                        {
+                            new OleDbParameter("?", item.nmcccd),
+                            new OleDbParameter("?", Sohieu),
+                            new OleDbParameter("?", tel),
+                               new OleDbParameter("?","3"),
+                            new OleDbParameter("?", Maso),
+                        };
+                        try
+                        {
+                            int a = ExecuteQueryResult(querykhmst, parametersss);
+                        }
+                        catch(Exception ex)
+                        {
+                            XtraMessageBox.Show(ex.Message + "    " + item.shdon);
+                        }
+                    }
+                }
+                
+            }
+                string newNoidung = Helpers.ConvertUnicodeToVni("");
             //Lấy tài khoản từ mất định
             string tkno = "";
             string tkco = "";
@@ -1339,13 +1406,21 @@ namespace SaovietTax
             }
             else
             {
-                //Lấy ma số thuế từ số hiệu khách hàng
-                querykh = @" SELECT *  FROM KhachHang where Ten=?"; // Sử dụng ? thay cho @mst trong OleDb
-                result = ExecuteQuery(querykh, new OleDbParameter("?", newTen));
-                if (result.Rows.Count > 0)
+                if (!string.IsNullOrEmpty(item.nmcccd))
                 {
-                    getMST = result.Rows[0]["SoHieu"].ToString();
+                    getMST = item.nmcccd;
                 }
+                else
+                {
+                    querykh = @" SELECT *  FROM KhachHang where Ten=?"; // Sử dụng ? thay cho @mst trong OleDb
+                    result = ExecuteQuery(querykh, new OleDbParameter("?", newTen));
+                    if (result.Rows.Count > 0)
+                    {
+                        getMST = result.Rows[0]["SoHieu"].ToString();
+                    }
+                }
+                    //Lấy ma số thuế từ số hiệu khách hàng
+                  
             }
 
             string vat = "0";

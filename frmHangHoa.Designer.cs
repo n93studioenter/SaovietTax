@@ -81,7 +81,7 @@
             this.gridControl1.Location = new System.Drawing.Point(12, 86);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1119, 485);
+            this.gridControl1.Size = new System.Drawing.Size(806, 485);
             this.gridControl1.TabIndex = 2;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -111,7 +111,7 @@
             this.colTenVattu.OptionsColumn.AllowEdit = false;
             this.colTenVattu.Visible = true;
             this.colTenVattu.VisibleIndex = 1;
-            this.colTenVattu.Width = 412;
+            this.colTenVattu.Width = 322;
             // 
             // colSoHieu
             // 
@@ -122,7 +122,7 @@
             this.colSoHieu.OptionsColumn.AllowEdit = false;
             this.colSoHieu.Visible = true;
             this.colSoHieu.VisibleIndex = 0;
-            this.colSoHieu.Width = 90;
+            this.colSoHieu.Width = 86;
             // 
             // colDonvitinh
             // 
@@ -132,7 +132,7 @@
             this.colDonvitinh.Name = "colDonvitinh";
             this.colDonvitinh.Visible = true;
             this.colDonvitinh.VisibleIndex = 2;
-            this.colDonvitinh.Width = 112;
+            this.colDonvitinh.Width = 125;
             // 
             // gridColumn2
             // 
@@ -144,7 +144,7 @@
             this.gridColumn2.Name = "gridColumn2";
             this.gridColumn2.Visible = true;
             this.gridColumn2.VisibleIndex = 3;
-            this.gridColumn2.Width = 112;
+            this.gridColumn2.Width = 125;
             // 
             // gridColumn1
             // 
@@ -156,7 +156,7 @@
             this.gridColumn1.Name = "gridColumn1";
             this.gridColumn1.Visible = true;
             this.gridColumn1.VisibleIndex = 4;
-            this.gridColumn1.Width = 112;
+            this.gridColumn1.Width = 125;
             // 
             // gridColumn3
             // 
@@ -168,10 +168,11 @@
             this.gridColumn3.Name = "gridColumn3";
             this.gridColumn3.Visible = true;
             this.gridColumn3.VisibleIndex = 5;
-            this.gridColumn3.Width = 112;
+            this.gridColumn3.Width = 133;
             // 
             // btnGhi
             // 
+            this.btnGhi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGhi.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnGhi.ImageOptions.Image")));
             this.btnGhi.Location = new System.Drawing.Point(171, 215);
             this.btnGhi.Name = "btnGhi";
@@ -182,6 +183,7 @@
             // 
             // btnThem
             // 
+            this.btnThem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnThem.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnThem.ImageOptions.Image")));
             this.btnThem.Location = new System.Drawing.Point(29, 215);
             this.btnThem.Name = "btnThem";
@@ -192,6 +194,8 @@
             // 
             // txtGhichu
             // 
+            this.txtGhichu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtGhichu.Location = new System.Drawing.Point(113, 182);
             this.txtGhichu.Name = "txtGhichu";
             this.txtGhichu.Size = new System.Drawing.Size(465, 27);
@@ -208,6 +212,8 @@
             // 
             // txtDonvi
             // 
+            this.txtDonvi.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDonvi.Location = new System.Drawing.Point(113, 126);
             this.txtDonvi.Name = "txtDonvi";
             this.txtDonvi.Size = new System.Drawing.Size(465, 27);
@@ -224,6 +230,8 @@
             // 
             // txtTenvattu
             // 
+            this.txtTenvattu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtTenvattu.Location = new System.Drawing.Point(113, 71);
             this.txtTenvattu.Name = "txtTenvattu";
             this.txtTenvattu.Size = new System.Drawing.Size(465, 27);
@@ -240,6 +248,8 @@
             // 
             // txtSohieu
             // 
+            this.txtSohieu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSohieu.Location = new System.Drawing.Point(113, 18);
             this.txtSohieu.Name = "txtSohieu";
             this.txtSohieu.Size = new System.Drawing.Size(465, 27);
@@ -256,7 +266,8 @@
             // 
             // panelControl1
             // 
-            this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelControl1.Controls.Add(this.gridControl2);
             this.panelControl1.Controls.Add(this.txtMaSo);
@@ -272,13 +283,16 @@
             this.panelControl1.Controls.Add(this.label2);
             this.panelControl1.Controls.Add(this.txtSohieu);
             this.panelControl1.Controls.Add(this.label1);
-            this.panelControl1.Location = new System.Drawing.Point(1131, 12);
+            this.panelControl1.Location = new System.Drawing.Point(824, 15);
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(597, 559);
             this.panelControl1.TabIndex = 3;
             // 
             // gridControl2
             // 
+            this.gridControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gridControl2.Location = new System.Drawing.Point(29, 267);
             this.gridControl2.MainView = this.gridView2;
             this.gridControl2.Name = "gridControl2";
@@ -339,7 +353,7 @@
             // 
             // txtMaSo
             // 
-            this.txtMaSo.Location = new System.Drawing.Point(29, 540);
+            this.txtMaSo.Location = new System.Drawing.Point(29, 505);
             this.txtMaSo.Name = "txtMaSo";
             this.txtMaSo.Size = new System.Drawing.Size(549, 27);
             this.txtMaSo.TabIndex = 15;
@@ -347,6 +361,7 @@
             // 
             // btnThoat
             // 
+            this.btnThoat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnThoat.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnThoat.ImageOptions.Image")));
             this.btnThoat.Location = new System.Drawing.Point(447, 215);
             this.btnThoat.Name = "btnThoat";
@@ -357,6 +372,7 @@
             // 
             // btnXoa
             // 
+            this.btnXoa.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnXoa.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnXoa.ImageOptions.Image")));
             this.btnXoa.Location = new System.Drawing.Point(305, 215);
             this.btnXoa.Name = "btnXoa";
@@ -371,14 +387,14 @@
             this.comboBoxEdit1.Name = "comboBoxEdit1";
             this.comboBoxEdit1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.comboBoxEdit1.Size = new System.Drawing.Size(1119, 27);
+            this.comboBoxEdit1.Size = new System.Drawing.Size(806, 27);
             this.comboBoxEdit1.TabIndex = 4;
             this.comboBoxEdit1.SelectedIndexChanged += new System.EventHandler(this.comboBoxEdit1_SelectedIndexChanged);
             // 
             // btnSearch
             // 
             this.btnSearch.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnSearch.ImageOptions.Image")));
-            this.btnSearch.Location = new System.Drawing.Point(1079, 45);
+            this.btnSearch.Location = new System.Drawing.Point(772, 46);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(46, 34);
             this.btnSearch.TabIndex = 12;
@@ -388,14 +404,14 @@
             // 
             this.txtSearch.Location = new System.Drawing.Point(12, 48);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(1060, 27);
+            this.txtSearch.Size = new System.Drawing.Size(754, 27);
             this.txtSearch.TabIndex = 11;
             // 
             // frmHangHoa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1740, 582);
+            this.ClientSize = new System.Drawing.Size(1416, 582);
             this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.comboBoxEdit1);

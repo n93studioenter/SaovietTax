@@ -46,7 +46,7 @@ namespace SaovietTax.DTO
         public object nky { get; set; }
         public string nmmst { get; set; }
         public string nmten { get; set; }
-        public string nmtnmua { get; set; }
+        public string nmtnmua { get; set; } 
         public string ntao { get; set; }
         public string ntnhan { get; set; }
         public string pban { get; set; }
@@ -71,7 +71,7 @@ namespace SaovietTax.DTO
         public int? ladhddt { get; set; }
         public string nbsdthoai { get; set; }
         public object nbcks { get; set; }
-        public object nmsdthoai { get; set; }
+        public string nmsdthoai { get; set; }
         public string nmcccd { get; set; }
         public int? bhphap { get; set; }
         public object gchdgoc { get; set; }
@@ -96,7 +96,7 @@ namespace SaovietTax.DTO
         public object nmshchieu { get; set; }
         public string nbstkhoan { get; set; }
         public string nbtnhang { get; set; }
-        public object nmhvtnmhang { get; set; }
+        public string nmhvtnmhang { get; set; }
         public string thtttoan { get; set; }
         public object nmmdvqhnsach { get; set; }
         public object hdhhdvu { get; set; }
