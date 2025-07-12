@@ -86,6 +86,7 @@ using Color = System.Drawing.Color;
 using DevExpress.Xpo.Helpers;
 using Windows.Media.Protection.PlayReady;
 using DevExpress.XtraRichEdit.Model;
+using DevExpress.XtraTreeList.ViewInfo;
 
 namespace SaovietTax
 {
@@ -8245,7 +8246,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
         private void gridView3_ShownEditor(object sender, EventArgs e)
         {
-
+           
         }
 
         private void gridView3_KeyUp(object sender, KeyEventArgs e)
@@ -8333,14 +8334,18 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 if (cellInfo != null)
                 {
-                    // Lấy vị trí của cell
-                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
-                    System.Drawing.Point screenPoint = gridView3.GridControl.PointToScreen(cellRect.Location);
+                    
+                    Rectangle cellBounds = cellInfo.Bounds;
+                    System.Drawing.Point screenPos = gridView3.GridControl.PointToScreen(cellBounds.Location);
 
-                    // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl.Location = new System.Drawing.Point(screenPoint.X-50, screenPoint.Y-300 ); // Thêm khoảng cách 5 pixels
+                    GridHitInfo hitInfo = view.CalcHitInfo(view.GridControl.PointToClient(System.Windows.Forms.Control.MousePosition));
+                    int bonusheigh = cellBounds.Height;
+                    int rowHeight = gridView3.RowHeight; // Lấy chiều cao mặc định của tất cả các dòng
 
-                    // Hiển thị UserControl
+                    int cellHeight = cellInfo.Bounds.Height;
+                    var sreeny = screenPos.Y;
+                    int heightOrigin = 80;
+                    suggestionControl.Location = new System.Drawing.Point(screenPos.X+70, heightOrigin); 
                     suggestionControl.Show();
 
                 }
@@ -8387,7 +8392,10 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             if (xtraTabControl2.SelectedTabPageIndex == 1)
                 gridView3.SetFocusedValue(selectedItem);
             if (xtraTabControl2.SelectedTabPageIndex == 2)
-                gridView5.SetFocusedValue(selectedItem);
+            {
+                int focusrowhandle = gv5.FocusedRowHandle;
+                gv5.SetFocusedValue(selectedItem);
+            }
             CloseSuggestionControl();
         }
         private SuggestionControl suggestionControl;
@@ -8466,15 +8474,19 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 if (cellInfo != null)
                 {
-                    // Lấy vị trí của cell
-                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
-                    System.Drawing.Point screenPoint = gridView1.GridControl.PointToScreen(cellRect.Location);
 
-                    // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl1.Location = new System.Drawing.Point(screenPoint.X - 20, cellRect.Height+(cellRect.Height* rowindex)+90); // Thêm khoảng cách 5 pixels
+                    Rectangle cellBounds = cellInfo.Bounds;
+                    System.Drawing.Point screenPos = gridView1.GridControl.PointToScreen(cellBounds.Location);
 
-                    // Hiển thị UserControl
-                    suggestionControl1.Show();
+                    GridHitInfo hitInfo = view.CalcHitInfo(view.GridControl.PointToClient(System.Windows.Forms.Control.MousePosition));
+                    int bonusheigh = cellBounds.Height;
+                    int rowHeight = gridView3.RowHeight; // Lấy chiều cao mặc định của tất cả các dòng
+
+                    int cellHeight = cellInfo.Bounds.Height;
+                    var sreeny = screenPos.Y;
+                    int heightOrigin = 80;
+                    suggestionControl.Location = new System.Drawing.Point(screenPos.X + 70, heightOrigin);
+                    suggestionControl.Show();
 
                 }
             }
@@ -9743,16 +9755,17 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             }
         }
         string currentvalue = "";
+        DevExpress.XtraGrid.Views.Grid.GridView gv5;
         private void gridView5_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
            
 
             gridControl3.ToolTipController = toolTipController1;
-            DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
+            gv5 = sender as DevExpress.XtraGrid.Views.Grid.GridView;
             var newValue = e.Value;
             currentvalue = newValue.ToString();
-            int rowindexs = view.FocusedRowHandle;
-            if (view.FocusedColumn.FieldName == "TKCo" || view.FocusedColumn.FieldName == "TKNo") // Thay đổi tên cột theo nhu cầu
+            int rowindexs = gv5.FocusedRowHandle;
+            if (gv5.FocusedColumn.FieldName == "TKCo" || gv5.FocusedColumn.FieldName == "TKNo") // Thay đổi tên cột theo nhu cầu
             {
 
 
@@ -9778,19 +9791,24 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 if (cellInfo != null)
                 {
-                    // Lấy vị trí của cell
-                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
-                    System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
 
-                    // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl3.Location = new System.Drawing.Point(screenPoint.X, screenPoint.Y + cellRect.Height + 5); // Thêm khoảng cách 5 pixels
+                    Rectangle cellBounds = cellInfo.Bounds;
+                    System.Drawing.Point screenPos = gridView5.GridControl.PointToScreen(cellBounds.Location);
 
-                    // Hiển thị UserControl
+                    GridHitInfo hitInfo = gv5.CalcHitInfo(gv5.GridControl.PointToClient(System.Windows.Forms.Control.MousePosition));
+                    int bonusheigh = cellBounds.Height;
+                    int rowHeight = gridView5.RowHeight; // Lấy chiều cao mặc định của tất cả các dòng
+
+                    int cellHeight = cellInfo.Bounds.Height;
+                    var sreeny = screenPos.Y;
+                    int heightOrigin = 80;
+                    suggestionControl3.Location = new System.Drawing.Point(screenPos.X + 70, heightOrigin);
                     suggestionControl3.Show();
+
                 }
             }
 
-            if (view.FocusedColumn.FieldName == "MaKH" )  
+            if (gv5.FocusedColumn.FieldName == "MaKH" )  
             {
                 string querydinhdanh = @"SELECT * FROM KhachHang WHERE SoHieu LIKE ? or LCase(Ten) like ?";
                 var resultkm = ExecuteQuery(querydinhdanh, new OleDbParameter("?", newValue + "%"), new OleDbParameter("?", "%"+ Helpers.ConvertUnicodeToVni(newValue.ToString().ToLower()) + "%"));
@@ -9814,15 +9832,20 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
 
                 if (cellInfo != null)
                 {
-                    // Lấy vị trí của cell
-                    System.Drawing.Rectangle cellRect = cellInfo.Bounds;
-                    System.Drawing.Point screenPoint = gridView5.GridControl.PointToScreen(cellRect.Location);
 
-                    // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControl3.Location = new System.Drawing.Point(screenPoint.X, screenPoint.Y + cellRect.Height + 5); // Thêm khoảng cách 5 pixels
+                    Rectangle cellBounds = cellInfo.Bounds;
+                    System.Drawing.Point screenPos = gridView5.GridControl.PointToScreen(cellBounds.Location);
 
-                    // Hiển thị UserControl
+                    GridHitInfo hitInfo = gv5.CalcHitInfo(gv5.GridControl.PointToClient(System.Windows.Forms.Control.MousePosition));
+                    int bonusheigh = cellBounds.Height;
+                    int rowHeight = gridView5.RowHeight; // Lấy chiều cao mặc định của tất cả các dòng
+
+                    int cellHeight = cellInfo.Bounds.Height;
+                    var sreeny = screenPos.Y;
+                    int heightOrigin = 80;
+                    suggestionControl3.Location = new System.Drawing.Point(screenPos.X + 70, heightOrigin);
                     suggestionControl3.Show();
+
                 }
             }
         }
@@ -9917,7 +9940,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
             string TKCo = gridView5.GetRowCellValue(rowHandle, "TKCo").ToString();
             string Diengiai = gridView5.GetRowCellValue(rowHandle, "Diengiai").ToString();
             string NgayGD = gridView5.GetRowCellValue(rowHandle, "NgayGD").ToString();
-            string MaKH= gridView5.GetRowCellValue(rowHandle, "MaKH").ToString();
+            string MaKH = gridView5.GetRowCellValue(rowHandle, "MaKH")?.ToString() ?? string.Empty;
+
             string query = @"UPDATE tbNganhang 
                  SET DienGiai = ?, TKNo = ?, TKCo = ? ,MaKH =?
                  WHERE SHDon = ? AND NgayGD = ?";
@@ -10011,7 +10035,16 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
           
 
         }
+        private int GetVisibleRowIndex(int rowIndex)
+        {
+            int visibleRowCount = 20; // Số hàng hiển thị tối đa
 
+            // Lấy chỉ số hàng hiện tại trong phạm vi 0-19
+            int visibleIndex = (rowIndex % visibleRowCount);
+
+            // Nếu chỉ số là 0, có nghĩa là nó là hàng thứ 20 (hiển thị là 20)
+            return visibleIndex == 0 ? visibleRowCount : visibleIndex;
+        }
         private void gridView4_CellValueChanging(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
         {
             DevExpress.XtraGrid.Views.Grid.GridView view = sender as DevExpress.XtraGrid.Views.Grid.GridView;
@@ -10021,7 +10054,8 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                 gridView = sender as DevExpress.XtraGrid.Views.Grid.GridView;
 
                 int currentRowHandle = gridView.FocusedRowHandle;
-                int parentrowIndex = gridView3.FocusedRowHandle;
+                int parentrowIndex = GetVisibleRowIndex(gridView3.FocusedRowHandle);
+                
                 // Lấy tên của cột hiện tại
                 string currentColumnName = gridView.FocusedColumn.FieldName;
                 idchititet = (int)gridView.GetRowCellValue(currentRowHandle, "ID");
@@ -10054,7 +10088,7 @@ WHERE LCase(TenVattu) = LCase(?) AND LCase(DonVi) = LCase(?)";
                     System.Drawing.Point screenPoint = gridView.GridControl.PointToScreen(cellRect.Location);
 
                     // Đặt vị trí cho UserControl ngay dưới cell
-                    suggestionControlhh2.Location = new System.Drawing.Point(screenPoint.X - 20, 0 + cellRect.Height + (cellRect.Height * parentrowIndex) + (cellRect.Height * currentRowHandle) + 180); // Thêm khoảng cách 5 pixels
+                    suggestionControlhh2.Location = new System.Drawing.Point(screenPoint.X*12/10, 0 + cellRect.Height+ 70); // Thêm khoảng cách 5 pixels
 
                     // Hiển thị UserControl
                     suggestionControlhh2.Show();

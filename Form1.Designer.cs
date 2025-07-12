@@ -1364,8 +1364,8 @@
             this.colTKCo1.MinWidth = 30;
             this.colTKCo1.Name = "colTKCo1";
             this.colTKCo1.Visible = true;
-            this.colTKCo1.VisibleIndex = 8;
-            this.colTKCo1.Width = 143;
+            this.colTKCo1.VisibleIndex = 7;
+            this.colTKCo1.Width = 115;
             // 
             // colMaKH
             // 
@@ -1375,8 +1375,8 @@
             this.colMaKH.Name = "colMaKH";
             this.colMaKH.OptionsColumn.ShowInExpressionEditor = false;
             this.colMaKH.Visible = true;
-            this.colMaKH.VisibleIndex = 7;
-            this.colMaKH.Width = 162;
+            this.colMaKH.VisibleIndex = 8;
+            this.colMaKH.Width = 143;
             // 
             // colCheck
             // 
@@ -1386,7 +1386,7 @@
             this.colCheck.Name = "colCheck";
             this.colCheck.Visible = true;
             this.colCheck.VisibleIndex = 9;
-            this.colCheck.Width = 139;
+            this.colCheck.Width = 186;
             // 
             // lblDpPath
             // 
